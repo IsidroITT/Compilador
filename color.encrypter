@@ -3,7 +3,7 @@ tempo = 97;
 timbre = [E7.n, G2.b, F1.r];
 // Notas
 	\inicio
-	    Clave(G^2) {
+	    clave(G^2) {
             [F.n, A.b, C.n],
             [B.r]
         },

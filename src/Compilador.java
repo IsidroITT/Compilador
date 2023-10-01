@@ -402,7 +402,7 @@ public class Compilador extends javax.swing.JFrame {
         }
     }
 
-    private void analisisSintactico() {
+    private void analisisSintactico2() {
         Grammar gramatica = new Grammar(tokens, errors);
         /*ERRORES*/
         gramatica.delete(new String[]{"ERROR","ERROR_RESERVADA"}, 1);
@@ -568,6 +568,57 @@ public class Compilador extends javax.swing.JFrame {
         /* Mostrar gramáticas */
         gramatica.show();
     }
+    
+    private void analisisSintactico() {
+    Grammar gramatica = new Grammar(tokens, errors);
+    /* ERRORES */
+    gramatica.delete(new String[]{"ERROR", "ERROR_RESERVADA"}, 1);
+
+    /* GRUPOS metalica*/
+    gramatica.group("FIGURA", "(TOKEN_REDONDA|TOKEN_BLANCA|TOKEN_NEGRA|TOKEN_CORCHEA|TOKEN_SEMICORCHEA|TOKEN_FUSA|TOKEN_SEMIFUSA|"
+            + "TOKEN_SILENCIO_REDONDA|TOKEN_SILENCIO_BLANCA|TOKEN_SILENCIO_NEGRA|TOKEN_SILENCIO_CORCHEA|TOKEN_SILENCIO_SEMICORCHEA|TOKEN_SILENCIO_FUSA|TOKEN_SILENCIO_SEMIFUSA|"
+            + "TOKEN_REDONDA_PIANO|TOKEN_BLANCA_PIANO|TOKEN_NEGRA_PIANO|TOKEN_CORCHEA_PIANO|TOKEN_SEMICORCHEA_PIANO|TOKEN_FUSA_PIANO|TOKEN_SEMIFUSA_PIANO|"
+            + "TOKEN_REDONDA_LED|TOKEN_BLANCA_LED|TOKEN_NEGRA_LED|TOKEN_CORCHEA_LED|TOKEN_SEMICORCHEA_LED|TOKEN_FUSA_LED|TOKEN_SEMIFUSA_LED)", true);
+
+    //gramatica.group("FIGURA_NOTA", "TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGUTA TOKEN_SEPARACION_COMPAS", true);
+    gramatica.group("CLAVE_IF_EXPRESION","TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE TOKEN_DIGITO",true);
+    /*DECLARACION FIGURA CON NOTA-----------------------------------------*/
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+            gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* | TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA");
+        });
+    gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA)+ TOKEN_CIERRE_COMPAS", true);
+    gramatica.group("COMPAS", "TOKEN_DIGITO TOKEN_DIVISOR_TEMPO TOKEN_DIGITO");
+    gramatica.group("COMPAS_ERROR", "TOKEN_DIGITO TOKEN_DIGITO | TOKEN_DIGITO");
+    
+    
+    /* DECLARACIÓN COMPAS */
+    gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true);
+    // ERRORES DECLARACIÓN COMPAS
+
+    /* DECLARACIÓN TEMPO */
+    gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true);
+    // ERRORES DECLARACIÓN TEMPO
+
+    /* DECLARACIÓN IDENTIFICADOR*/
+    gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS TOKEN_FIN_SENTENCIA",true);
+    
+    /* DECLARACIÓN FIGURA CON NOTA */
+    gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+        gramatica.group("DECLARACION_FIGURANOTA", "((FIGURA|FIGURA TOKEN_PUNTILLO) TOKEN_APERTURA (TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL)) (TOKEN_CIERRE | TOKEN_CIERRE TOKEN_DIVISOR_COMPAS))+");
+    });
+    /* ERRORES DECLARACIÓN NOTAS */
+    
+    /* DECLARACION CLAVE*/
+    gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE CLAVE_IF_EXPRESION TOKEN_CIERRE_CLAVE");
+
+    /* DECLARACIÓN BLOQUE DE COMPASES */
+    gramatica.group("BLOQUE_COMPASES", "TOKEN_INICIO_PARTITURA DECLARACION_FIGURANOTA TOKEN_FINAL_PARTITURA", true);
+    // ERROR DECLARACIÓN BLOQUE DE COMPASES
+    gramatica.finalLineColumn();
+    /* Mostrar gramáticas */
+    gramatica.show();
+}
+
 
     private void colores() {
         /* Limpiar el arreglo de colores */
@@ -715,6 +766,8 @@ public class Compilador extends javax.swing.JFrame {
             return "54";
         case "TOKEN_REP":
             return "55";
+        case "TOKEN_NOTA_CLAVE":
+            return "56";
         default:
             return "";
     }

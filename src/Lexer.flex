@@ -42,6 +42,7 @@ Identificador = {Letras}({Letras}|{Numeros})*
 
 /*Notas*/
 {Nota} { return token(yytext(), "TOKEN_NOTA", yyline, yycolumn); }
+{Letra} { return token(yytext(), "TOKEN_NOTA_CLAVE", yyline, yycolumn); }
 /*{Clave} { return token(yytext(), "TOKEN_DEFINE_CLAVE", yyline, yycolumn); }*/
 "*"	 { return token(yytext(), "TOKEN_PUNTILLO", yyline, yycolumn); }
 "#"	 { return token(yytext(), "TOKEN_SOSTENIDO", yyline, yycolumn); }
@@ -54,7 +55,6 @@ Identificador = {Letras}({Letras}|{Numeros})*
 "piano"  { return token(yytext(), "TOKEN_PIANO_CONTROL", yyline, yycolumn); }
 "led" { return token(yytext(), "TOKEN_LEDS", yyline, yycolumn); }
 "rep" { return token(yytext(), "TOKEN_REP", yyline, yycolumn); }
-""{Identificador} { return token(yytext(), "TOKEN_IDENTIFICADOR", yyline, yycolumn); }
 
 /*Secciones*/
 \\"inicio" { return token(yytext(), "TOKEN_INICIO_PARTITURA", yyline, yycolumn); }
@@ -96,6 +96,8 @@ Identificador = {Letras}({Letras}|{Numeros})*
 "L-f"	 { return token(yytext(), "TOKEN_FUSA_LED", yyline, yycolumn); }
 "L-sf"	 { return token(yytext(), "TOKEN_SEMIFUSA_LED", yyline, yycolumn); }
 
+/* Identificador  */
+""{Identificador} { return token(yytext(), "TOKEN_IDENTIFICADOR", yyline, yycolumn); }
 
 /*Compases*/
 "/"	 { return token(yytext(), "TOKEN_DIVISOR_TEMPO", yyline, yycolumn); }
