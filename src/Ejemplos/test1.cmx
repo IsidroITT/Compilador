@@ -1,0 +1,19 @@
+compas = 3/4
+tempo = 97
+ timbre = [E7.n, G2.b, F1.r]
+// notas normales
+    \inicio
+        Clave(G^2) {
+            [F.n, A.b, C.n],
+            [B.r]
+        },
+        timbre,
+        [A2.b, B4.b],
+        rep(3) {
+		   [E4.n, E4.n, F4.n, G4.n ], timbre
+		}
+    \fin
+
+// notas piano
+
+// notas led

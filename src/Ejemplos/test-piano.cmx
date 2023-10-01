@@ -1,0 +1,31 @@
+compas = 3/4;
+tempo = 97;
+timbre = [E7.n, G2.b, F1.r];
+// Notas
+	\inicio
+	    Clave(G^2) {
+            [F.n, A.b, C.n],
+            [B.r]
+        },
+        timbre,
+        [A2.b, B4.b],
+        rep(3) {
+		   [E4.n, E4.n, F4.n, G4.n ], timbre
+		}
+	\fin
+	
+// Notas piano
+timbrePiano = [E7.P-n, G2.P-b, F1.P-r];
+piano(){
+	Clave(G^2) {
+        [F.P-n, A.P-b, C.P-n],
+        [B.P-r]
+    },
+    timbrePiano,
+    [A2.P-b, B4.P-b],
+    rep(3) {
+		[E4.P-n, E4.P-n, F4.P-n, G4.P-n ], timbrePiano
+	}
+}
+
+// Notas LED
