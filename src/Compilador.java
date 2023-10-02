@@ -56,8 +56,6 @@ public class Compilador extends javax.swing.JFrame {
         jPanel1.setLayout(new BorderLayout());
         add(jPanel1, BorderLayout.CENTER);
     }
-    
-
 
     private void init() {
         title = "Codex_Music";// Titulo de la ventana
@@ -359,16 +357,17 @@ public class Compilador extends javax.swing.JFrame {
         disminuirFuente();
     }//GEN-LAST:event_jButton1ActionPerformed
     private void aumentarFuente() {
-     Font font = jtpCode.getFont();
-     float size = font.getSize() + 2; // Incremento de tamaño de la fuente
-     jtpCode.setFont(font.deriveFont(size));
+        Font font = jtpCode.getFont();
+        float size = font.getSize() + 2; // Incremento de tamaño de la fuente
+        jtpCode.setFont(font.deriveFont(size));
     }
 
     private void disminuirFuente() {
-     Font font = jtpCode.getFont();
-     float size = font.getSize() - 2; // Decremento de tamaño de la fuente
-     jtpCode.setFont(font.deriveFont(size));
+        Font font = jtpCode.getFont();
+        float size = font.getSize() - 2; // Decremento de tamaño de la fuente
+        jtpCode.setFont(font.deriveFont(size));
     }
+
     private void compilar() {
         limpiarCampos();
         analisisLexico();
@@ -402,223 +401,164 @@ public class Compilador extends javax.swing.JFrame {
         }
     }
 
-    private void analisisSintactico2() {
+    private void analisisSintactico() {
         Grammar gramatica = new Grammar(tokens, errors);
-        /*ERRORES*/
-        gramatica.delete(new String[]{"ERROR","ERROR_RESERVADA"}, 1);
+        /* ERRORES */
+        gramatica.delete(new String[]{"ERROR", "ERROR_RESERVADA"}, 1);
 
-        /*GRUPOS*/
+        /* GRUPOS */
+        gramatica.group("FIGURA", "(TOKEN_REDONDA|TOKEN_BLANCA|TOKEN_NEGRA|TOKEN_CORCHEA|TOKEN_SEMICORCHEA|TOKEN_FUSA|TOKEN_SEMIFUSA|"
+                + "TOKEN_SILENCIO_REDONDA|TOKEN_SILENCIO_BLANCA|TOKEN_SILENCIO_NEGRA|TOKEN_SILENCIO_CORCHEA|TOKEN_SILENCIO_SEMICORCHEA|TOKEN_SILENCIO_FUSA|TOKEN_SILENCIO_SEMIFUSA|"
+                + "TOKEN_REDONDA_PIANO|TOKEN_BLANCA_PIANO|TOKEN_NEGRA_PIANO|TOKEN_CORCHEA_PIANO|TOKEN_SEMICORCHEA_PIANO|TOKEN_FUSA_PIANO|TOKEN_SEMIFUSA_PIANO|"
+                + "TOKEN_REDONDA_LED|TOKEN_BLANCA_LED|TOKEN_NEGRA_LED|TOKEN_CORCHEA_LED|TOKEN_SEMICORCHEA_LED|TOKEN_FUSA_LED|TOKEN_SEMIFUSA_LED)", true);
+
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE TOKEN_DIGITO", true);
+
+        /* DECLARACION FIGURA CON NOTA ----------------------------------------- */
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+            gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA");
+        });
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+            gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA");
+        });
+        gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS", true);
         gramatica.group("COMPAS", "TOKEN_DIGITO TOKEN_DIVISOR_TEMPO TOKEN_DIGITO");
         gramatica.group("COMPAS_ERROR", "TOKEN_DIGITO TOKEN_DIGITO | TOKEN_DIGITO");
-        gramatica.group("FIGURA", "(TOKEN_REDONDA|TOKEN_BLANCA|TOKEN_NEGRA|TOKEN_CORCHEA|TOKEN_SEMICORCHEA|TOKEN_FUSA|TOKEN_SEMIFUSA|"
-                + "TOKEN_SILENCIO_REDONDA|TOKEN_SILENCIO_BLANCA|TOKEN_SILENCIO_NEGRA|TOKEN_SILENCIO_CORCHEA|TOKEN_SILENCIO_SEMICORCHEA|TOKEN_SILENCIO_FUSA|TOKEN_SILENCIO_SEMIFUSA)", true);
-        /* DECLARACIÓN CLAVE--------------------------------------------------*/
-        gramatica.group("DECLARACION_CLAVE", "TOKEN_CLAVE TOKEN_ASIGNACION TOKEN_NOTA", true);
-        // ERRORES DECLARACION CLAVE
-        gramatica.finalLineColumn();
-        gramatica.group("DECLARACION_CLAVE", "TOKEN_CLAVE (TOKEN_ASIGNACION)+ TOKEN_NOTA", true,
-                45, "Error sintáctico {}: Se ha declarado mas de un simbolo de asignacion (=) [#,%]");
-        
+
+        /* DECLARACIÓN COMPAS */
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true);
+
         gramatica.initialLineColumn();
-        gramatica.group("DECLARACION_CLAVE", "TOKEN_CLAVE TOKEN_ASIGNACION", true,
-                2, "Error sintáctico {}: Declarción incompleta, falta especificar la clave (G2 o F{3,4} o C{1,2,3,4}) [#,%]");
-
-        gramatica.group("DECLARACION_CLAVE", "TOKEN_CLAVE TOKEN_NOTA", true,
-                3, "Error sintáctico {}: Declarción incompleta, se espera simbolo de asignación (=) [#,%]");
-
-        gramatica.group("DECLARACION_CLAVE", "TOKEN_ASIGNACION TOKEN_NOTA", true,
-                4, "Error sintáctico {}: Declarción incompleta, se espera la palabra reservada \"\\clave\" antes de \"=\" [#,%]");
-
-        gramatica.group("DECLARACION_CLAVE", "TOKEN_CLAVE", true,
-                5, "Error sintáctico {}: Declaración de clave incompleta [#,%]");
-
-        /* DECLARACIÓN COMPAS-------------------------------------------------*/
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS", true);
-        /*ERRORES DELCARACION COMPAS*/
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIGITO TOKEN_DIVISOR_TEMPO", true,
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true,
                 6, "Error sintáctico {}: Falta declarar unidad de tiempo [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIVISOR_TEMPO TOKEN_DIGITO", true,
-                7, "Error sintáctico {}: Falta declarar unidad de compas [#,%]");
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIVISOR_TEMPO TOKEN_DIGITO TOKEN_FIN_SENTENCIA", true,
+                7, "Error sintáctico {}: Falta declarar unidad de compás [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_DIGITO TOKEN_DIVISOR_TEMPO TOKEN_DIGITO", true,
-                8, "Error sintáctico {}: Falta declarar asignacion (=) [#,%]");
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_DIGITO TOKEN_DIVISOR_TEMPO TOKEN_DIGITO TOKEN_FIN_SENTENCIA", true,
+                8, "Error sintáctico {}: Falta declarar asignación (=) [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS_ERROR", true,
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
                 9, "Error sintáctico {}: Falta divisor (/) [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION", true,
-                10, "Error sintáctico {}: No hay un compas asignado [#,%]");
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
+                10, "Error sintáctico {}: No hay un compás asignado [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_ASIGNACION COMPAS", true,
-                11, "Error sintáctico {}: Declarción incompleta, se espera la palabra reservada \"\\compas\" antes de \"=\" [#,%]");
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIGITO TOKEN_DIVISOR_TEMPO", true,
+                11, "Error sintáctico {}: Se esperaba un fin de sentencia (;) [#,%]");
+
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIVISOR_TEMPO", true,
+                12, "Error sintáctico {}: Se esperaba un número después del divisor (/) [#,%]");
+
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION", true,
+                13, "Error sintáctico {}: Declaración de compás incompleta, falta especificar el compás (ejemplo: 3/4) [#,%]");
+
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_DIGITO", true,
+                14, "Error sintáctico {}: Declaración de compás incompleta, falta especificar el divisor (/) [#,%]");
 
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS", true,
-                12, "Error sintáctico {}: Declaración de compas incompleta [#,%]");
+                15, "Error sintáctico {}: Declaración de compás incompleta, falta asignar un valor (ejemplo: compas = 3/4;) [#,%]");
 
-        /* DECLARACIÓN TEMPO--------------------------------------------------*/
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION COMPAS_ERROR", true);
-        // ERRORES DECLARACION TEMPO
+        /* DECLARACIÓN TEMPO */
+        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true);
+
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION", true,
-                13, "Error sintáctico {}: Declarción incompleta, falta especificar el tempo [#,%]");
+                16, "Error sintáctico {}: Declaración de tempo incompleta, falta especificar el valor del tempo [#,%]");
 
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO COMPAS_ERROR", true,
-                14, "Error sintáctico {}: Declarción incompleta, se espera simbolo de asignación (=) [#,%]");
-
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_ASIGNACION COMPAS_ERROR", true,
-                15, "Error sintáctico {}: Declarción incompleta, se espera la palabra reservada \"\\tempo\" antes de \"=\" [#,%]");
+        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO COMPAS_ERROR TOKEN_FIN_SENTENCIA", true,
+                17, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
 
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO", true,
-                16, "Error sintáctico {}: Declaración de tempo incompleta [#,%]");
+                18, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
 
-        /*DECLARACION FIGURA CON NOTA-----------------------------------------*/
+        /* DECLARACIÓN IDENTIFICADOR */
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true);
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION", true,
+                19, "Error sintáctico {}: Declaración de identificador incompleta, falta especificar las notas [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true,
+                20, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un valor (ejemplo: id = {...};) [#,%]");
+
+//        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR", true,
+//                21, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un valor (ejemplo: id = {...};) [#,%]");
+
+        /* DECLARACIÓN FIGURA CON NOTA */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("DECLARACION_FIGURANOTA", "((FIGURA|FIGURA TOKEN_PUNTILLO) TOKEN_APERTURA (TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL)) (TOKEN_CIERRE | TOKEN_CIERRE TOKEN_DIVISOR_COMPAS))+");
+            gramatica.group("BLOQUE_NOTAS_TOCAR", "(COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS)* COMPAS_NOTAS|TOKEN_IDENTIFICADOR");
         });
-        /*ERRORES DECLARACION NOTAS*/
-        gramatica.group("DECLARACION_FIGURANOTA", "(FIGURA|FIGURA TOKEN_PUNTILLO) TOKEN_APERTURA (TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL))", true,
-                17, "Error sintáctico {}: Se espera una declaracion de cierre \"}\" para la nota [#,%]");
 
-        gramatica.group("DECLARACION_FIGURANOTA", "(FIGURA|FIGURA TOKEN_PUNTILLO) (TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL)) TOKEN_CIERRE", true,
-                18, "Error sintáctico {}: Se espera una declaracion de apertura \"{\" para la nota [#,%]");
-
-        gramatica.group("DECLARACION_FIGURANOTA", "(FIGURA|FIGURA TOKEN_PUNTILLO) TOKEN_APERTURA TOKEN_CIERRE", true,
-                19, "Error sintáctico {}: Se espera una nota (Ej. A4) [#,%]");
-
-        gramatica.group("DECLARACION_FIGURANOTA", "(FIGURA|FIGURA TOKEN_PUNTILLO) (TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL))", true,
-                20, "Error sintáctico {}: Se espera que el valor de nota se encuentre entre llaves (\"{}\") [#,%]");
-
-        gramatica.group("DECLARACION_FIGURANOTA", "TOKEN_APERTURA (TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL)) TOKEN_CIERRE", true,
-                21, "Error sintáctico {}: No se ha especificado un a figura [#,%]");
-
-        gramatica.group("DECLARACION_FIGURANOTA", "(FIGURA|FIGURA TOKEN_PUNTILLO) TOKEN_APERTURA", true,
-                22, "Error sintáctico {}: Declaracion incompleta, hace falta un valor de nota (Ej. A4) y un cierre \"}\" [#,%]");
-
-        gramatica.group("DECLARACION_FIGURANOTA", "TOKEN_APERTURA (TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL))", true,
-                23, "Error sintáctico {}: Se un valor de figura, y un valor de cierre \"}\" [#,%]");
-
-        gramatica.group("DECLARACION_FIGURANOTA", "(TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL)) TOKEN_CIERRE", true,
-                24, "Error sintáctico {}: Se espera un valor de figura, y un valor de apertura \"{\" [#,%]");
-
-        gramatica.group("DECLARACION_FIGURANOTA", "(FIGURA|FIGURA TOKEN_PUNTILLO) TOKEN_CIERRE", true,
-                25, "Error sintáctico {}: Declaracion incompleta, hace falta un valor de apertura \"{\" y una nota (Ej. A4) [#,%]");
-
-        gramatica.group("DECLARACION_FIGURANOTA", "TOKEN_APERTURA TOKEN_CIERRE", true,
-                26, "Error sintáctico {}: Declaracion incompleta, hace falta un valor de figura y una nota (Ej. A4) [#,%]");
-
-        /*DECLARACION BLOQUE DE COMPASES*/
-        gramatica.group("BLOQUE_COMPASES", "TOKEN_INICIO_PARTITURA DECLARACION_FIGURANOTA TOKEN_FINAL_PARTITURA", true);
-        //ERROR DECLARACION BLOQUE DE COMPASES
-        gramatica.finalLineColumn();
-        gramatica.group("BLOQUE_COMPASES", "TOKEN_INICIO_PARTITURA DECLARACION_FIGURANOTA", true,
-                27, "Error sintáctico {}: Declaracion incompleta, final de la partitura no encontrada (\\final))[#,%]");
+        gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS", true);
 
         gramatica.initialLineColumn();
-        gramatica.group("BLOQUE_COMPASES", "DECLARACION_FIGURANOTA TOKEN_FINAL_PARTITURA", true,
-                28, "Error sintáctico {]: Declaracion incompleta, inicio de la partitura no encontrada (\\inicio()[#,%]");
+        gramatica.group("BLOQUE_NOTAS_TOCAR", "COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS", true,
+                22, "Error sintáctico {}: Declaración de notas incompleta, falta especificar las notas o finalizar con un punto y coma (;) [#,%]");
 
-        gramatica.group("BLOQUE_COMPASES", "TOKEN_INICIO_PARTITURA TOKEN_FINAL_PARTITURA", true,
-                29, "Advertencia: No hay notas en el bloque de partitura [#,%]");
+        gramatica.group("BLOQUE_NOTAS_TOCAR", "(COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS)+", true,
+                23, "Error sintáctico {}: Declaración de notas incompleta, falta especificar las notas o finalizar con un punto y coma (;) [#,%]");
 
-        gramatica.group("DECLARACION_FIGURANOTA", "DECLARACION_FIGURANOTA", true,
-                30, "Error sintáctico #: Declaracion incompleta, hace falta una declaracion de inicio y una declaracion de final en antes y despues del bloque de partitura [#,%]");
+        /* DECLARACION CLAVE */
+        gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE CLAVE_IF_EXPRESION TOKEN_CIERRE_CLAVE", true);
 
-        /*TOKENS FUERA DE CONTEXTO*/
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_INICIO_PARTITURA", true,
-                31, "Error sintáctico {}: Se ha encontrado un inicio de partitura que no lleva a ningun lugar [#,%]");
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
+                24, "Error sintáctico {}: Declaración de clave incompleta, falta especificar el valor (ejemplo: G2;) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_FINAL_PARTITURA", true,
-                32, "Error sintáctico {}: Se ha encontrado un cierre de partitura sin un inicio previo [#,%]");
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE", true,
+                25, "Error sintáctico {}: Declaración de clave incompleta, falta asignar un valor (ejemplo: clave = G2;) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "FIGURA", true,
-                33, "Error sintáctico {}: Se ha encontrado una figura sin contexto [#,%]");
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE", true,
+                26, "Error sintáctico {}: Declaración de clave incompleta, falta asignar un valor (ejemplo: clave = G2;) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_PUNTILLO", true,
-                34, "Error sintáctico {}: Se ha encontrado un puntillo sin contexto [#,%]");
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
+                27, "Error sintáctico {}: Declaración de clave incompleta, falta la palabra reservada \"\\clave\" antes de la selección de clave (ejemplo: \\clave G2;) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_APERTURA", true,
-                35, "Error sintáctico {}: Se ha encontrado una apertura de nota sin contexto [#,%]");
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE", true,
+                28, "Error sintáctico {}: Declaración de clave incompleta, falta la palabra reservada \"\\clave\" antes de la selección de clave (ejemplo: \\clave G2;) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_CIERRE", true,
-                36, "Error sintáctico {}: Se ha encontrado un cierre de nota sin contexto [#,%]");
+        /* DECLARACION REP */
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR+ TOKEN_CIERRE_CLAVE", true);
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_DIVISOR_COMPAS", true,
-                37, "Error sintáctico {}: Se ha encontrado un divisor de compas fuera de contexto[#,%]");
+        gramatica.initialLineColumn();
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR* TOKEN_CIERRE_CLAVE", true,
+                29, "Error sintáctico {}: Declaración de repetición incompleta, falta especificar las repeticiones o el contenido (ejemplo: \\rep {...};) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_NOTA", true,
-                38, "Error sintáctico {}: Se ha encontrado un valor de nota sin contexto [#,%]");
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR+ TOKEN_CIERRE_CLAVE", true,
+                30, "Error sintáctico {}: Declaración de repetición incompleta, falta el contenido (ejemplo: \\rep {...};) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_ASIGNACION", true,
-                39, "Error sintáctico {}: Se ha encontrado una asignacion fuera de contexto [#,%]");
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR+ TOKEN_CIERRE_CLAVE", true,
+                31, "Error sintáctico {}: Declaración de repetición incompleta, falta especificar las repeticiones (ejemplo: \\rep 3 {...};) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "COMPAS_ERROR", true,
-                40, "Error sintáctico {}: Se han encontrado valores numericos sin contexto [#,%]");
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR* TOKEN_CIERRE_CLAVE", true,
+                32, "Error sintáctico {}: Declaración de repetición incompleta, falta especificar las repeticiones (ejemplo: \\rep 3 {...};) [#,%]");
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "COMPAS", true,
-                41, "Error sintáctico {}: Se ha encontrado un compas fuera de contexto [#,%]");
+        /* DECLARACION SENTENCIAS */
+        gramatica.initialLineColumn();
+        gramatica.group("SENTENCIAS", "(BLOQUE_NOTAS_TOCAR | TOKEN_SEPARACION_COMPAS | TOKEN_IDENTIFICADOR)+", true);
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_DIVISOR_COMPAS", true,
-                42, "Error sintáctico {}: Se ha encontrado un divisor de compas sin contexto [#,%]");
-        
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_SOSTENIDO", true,
-                43, "Error sintáctico {}: Se ha encontrado un sostenido sin asignacion a ninguna nota [#,%]");
+        gramatica.initialLineColumn();
+        /* ESTRUCTURAS DE CONTROL */
+        gramatica.group("ESTRUCTURAS_CONTROL", "(CLAVE_IF | DECLARACION_REP)", true);
 
-        gramatica.group("TOKENS_FUERA_DE_CONTEXTO", "TOKEN_BEMOL", true,
-                44, "Error sintáctico {}: Se ha encontrado un bemol sin asignacion a ninguna nota [#,%]");
+        /* FUNCIONES SALIDA FISICA */
+        gramatica.group("FUNCIONES", "(TOKEN_PIANO_CONTROL | TOKEN_LEDS)", true);
+
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+            gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_CIERRE_NOTAS", true);
+        });
+
+        /* DECLARACION INICIO-FIN */
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+            gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)+ TOKEN_FINAL_PARTITURA", true);
+        });
+
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
+            gramatica.group("BLOQUE_SALIDA_FISICA", "FUNCIONES TOKEN_APERTURA_NOTAS (ESTRUCTURA_CONTROL_COMPLETA | SENTENCIAS)+ TOKEN_CIERRE_NOTAS", true);
+        });
+
+        gramatica.finalLineColumn();
         /* Mostrar gramáticas */
         gramatica.show();
     }
-    
-    private void analisisSintactico() {
-    Grammar gramatica = new Grammar(tokens, errors);
-    /* ERRORES */
-    gramatica.delete(new String[]{"ERROR", "ERROR_RESERVADA"}, 1);
-
-    /* GRUPOS metalica*/
-    gramatica.group("FIGURA", "(TOKEN_REDONDA|TOKEN_BLANCA|TOKEN_NEGRA|TOKEN_CORCHEA|TOKEN_SEMICORCHEA|TOKEN_FUSA|TOKEN_SEMIFUSA|"
-            + "TOKEN_SILENCIO_REDONDA|TOKEN_SILENCIO_BLANCA|TOKEN_SILENCIO_NEGRA|TOKEN_SILENCIO_CORCHEA|TOKEN_SILENCIO_SEMICORCHEA|TOKEN_SILENCIO_FUSA|TOKEN_SILENCIO_SEMIFUSA|"
-            + "TOKEN_REDONDA_PIANO|TOKEN_BLANCA_PIANO|TOKEN_NEGRA_PIANO|TOKEN_CORCHEA_PIANO|TOKEN_SEMICORCHEA_PIANO|TOKEN_FUSA_PIANO|TOKEN_SEMIFUSA_PIANO|"
-            + "TOKEN_REDONDA_LED|TOKEN_BLANCA_LED|TOKEN_NEGRA_LED|TOKEN_CORCHEA_LED|TOKEN_SEMICORCHEA_LED|TOKEN_FUSA_LED|TOKEN_SEMIFUSA_LED)", true);
-
-    //gramatica.group("FIGURA_NOTA", "TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGUTA TOKEN_SEPARACION_COMPAS", true);
-    gramatica.group("CLAVE_IF_EXPRESION","TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE TOKEN_DIGITO",true);
-    /*DECLARACION FIGURA CON NOTA-----------------------------------------*/
-        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* | TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA");
-        });
-    gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA)+ TOKEN_CIERRE_COMPAS", true);
-    gramatica.group("COMPAS", "TOKEN_DIGITO TOKEN_DIVISOR_TEMPO TOKEN_DIGITO");
-    gramatica.group("COMPAS_ERROR", "TOKEN_DIGITO TOKEN_DIGITO | TOKEN_DIGITO");
-    
-    
-    /* DECLARACIÓN COMPAS */
-    gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true);
-    // ERRORES DECLARACIÓN COMPAS
-
-    /* DECLARACIÓN TEMPO */
-    gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true);
-    // ERRORES DECLARACIÓN TEMPO
-
-    /* DECLARACIÓN IDENTIFICADOR*/
-    gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS TOKEN_FIN_SENTENCIA",true);
-    
-    /* DECLARACIÓN FIGURA CON NOTA */
-    gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-        gramatica.group("DECLARACION_FIGURANOTA", "((FIGURA|FIGURA TOKEN_PUNTILLO) TOKEN_APERTURA (TOKEN_NOTA | TOKEN_NOTA (TOKEN_SOSTENIDO | TOKEN_BEMOL)) (TOKEN_CIERRE | TOKEN_CIERRE TOKEN_DIVISOR_COMPAS))+");
-    });
-    /* ERRORES DECLARACIÓN NOTAS */
-    
-    /* DECLARACION CLAVE*/
-    gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE CLAVE_IF_EXPRESION TOKEN_CIERRE_CLAVE");
-
-    /* DECLARACIÓN BLOQUE DE COMPASES */
-    gramatica.group("BLOQUE_COMPASES", "TOKEN_INICIO_PARTITURA DECLARACION_FIGURANOTA TOKEN_FINAL_PARTITURA", true);
-    // ERROR DECLARACIÓN BLOQUE DE COMPASES
-    gramatica.finalLineColumn();
-    /* Mostrar gramáticas */
-    gramatica.show();
-}
-
 
     private void colores() {
         /* Limpiar el arreglo de colores */
@@ -655,124 +595,123 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     public String id(String n) {
-    switch (n) {
-        case "TOKEN_DIGITO":
-            return "1";
-        case "TOKEN_NOTA":
-            return "2";
-        case "TOKEN_CLAVE":
-            return "3";
-        case "TOKEN_COMPAS":
-            return "4";
-        case "TOKEN_TEMPO":
-            return "5";
-        case "TOKEN_INICIO_PARTITURA":
-            return "6";
-        case "TOKEN_FINAL_PARTITURA":
-            return "7";
-        case "TOKEN_REDONDA":
-            return "8";
-        case "TOKEN_BLANCA":
-            return "9";
-        case "TOKEN_NEGRA":
-            return "10";
-        case "TOKEN_CORCHEA":
-            return "11";
-        case "TOKEN_SEMICORCHEA":
-            return "12";
-        case "TOKEN_FUSA":
-            return "13";
-        case "TOKEN_SEMIFUSA":
-            return "14";
-        case "TOKEN_SILENCIO_REDONDA":
-            return "15";
-        case "TOKEN_SILENCIO_BLANCA":
-            return "16";
-        case "TOKEN_SILENCIO_NEGRA":
-            return "17";
-        case "TOKEN_SILENCIO_CORCHEA":
-            return "18";
-        case "TOKEN_SILENCIO_SEMICORCHEA":
-            return "19";
-        case "TOKEN_SILENCIO_FUSA":
-            return "20";
-        case "TOKEN_SILENCIO_SEMIFUSA":
-            return "21";
-        case "TOKEN_PUNTILLO":
-            return "22";
-        case "TOKEN_SOSTENIDO":
-            return "23";
-        case "TOKEN_BEMOL":
-            return "24";
-        case "TOKEN_DIVISOR_TEMPO":
-            return "25";
-        case "TOKEN_DIVISOR_COMPAS":
-            return "26";
-        case "TOKEN_APERTURA_NOTAS":
-            return "27";
-        case "TOKEN_APERTURA_COMPAS":
-            return "28";
-        case "TOKEN_APERTURA_CLAVE":
-            return "29";
-        case "TOKEN_CIERRE_NOTAS":
-            return "30";
-        case "TOKEN_CIERRE_COMPAS":
-            return "31";
-        case "TOKEN_CIERRE_CLAVE":
-            return "32";
-        case "TOKEN_ASIGNACION":
-            return "33";
-        case "TOKEN_SEPARACION_COMPAS":
-            return "34";
-        case "TOKEN_DEFINE_CLAVE":
-            return "35";
-        case "TOKEN_FIN_SENTENCIA":
-            return "36";
-        case "TOKEN_SEPARACION_NOTA":
-            return "37";
-        case "TOKEN_IDENTIFICADOR":
-            return "38";
-        case "TOKEN_REDONDA_PIANO":
-            return "39";
-        case "TOKEN_BLANCA_PIANO":
-            return "40";
-        case "TOKEN_NEGRA_PIANO":
-            return "41";
-        case "TOKEN_CORCHEA_PIANO":
-            return "42";
-        case "TOKEN_SEMICORCHEA_PIANO":
-            return "43";
-        case "TOKEN_FUSA_PIANO":
-            return "44";
-        case "TOKEN_SEMIFUSA_PIANO":
-            return "45";
-        case "TOKEN_REDONDA_LED":
-            return "46";
-        case "TOKEN_BLANCA_LED":
-            return "47";
-        case "TOKEN_NEGRA_LED":
-            return "48";
-        case "TOKEN_CORCHEA_LED":
-            return "49";
-        case "TOKEN_SEMICORCHEA_LED":
-            return "50";
-        case "TOKEN_FUSA_LED":
-            return "51";
-        case "TOKEN_SEMIFUSA_LED":
-            return "52";
-        case "TOKEN_SELECION_CLAVE":
-            return "53";
-        case "TOKEN_PIANO_CONTROL":
-            return "54";
-        case "TOKEN_REP":
-            return "55";
-        case "TOKEN_NOTA_CLAVE":
-            return "56";
-        default:
-            return "";
+        switch (n) {
+            case "TOKEN_DIGITO":
+                return "1";
+            case "TOKEN_NOTA":
+                return "2";
+            case "TOKEN_CLAVE":
+                return "3";
+            case "TOKEN_COMPAS":
+                return "4";
+            case "TOKEN_TEMPO":
+                return "5";
+            case "TOKEN_INICIO_PARTITURA":
+                return "6";
+            case "TOKEN_FINAL_PARTITURA":
+                return "7";
+            case "TOKEN_REDONDA":
+                return "8";
+            case "TOKEN_BLANCA":
+                return "9";
+            case "TOKEN_NEGRA":
+                return "10";
+            case "TOKEN_CORCHEA":
+                return "11";
+            case "TOKEN_SEMICORCHEA":
+                return "12";
+            case "TOKEN_FUSA":
+                return "13";
+            case "TOKEN_SEMIFUSA":
+                return "14";
+            case "TOKEN_SILENCIO_REDONDA":
+                return "15";
+            case "TOKEN_SILENCIO_BLANCA":
+                return "16";
+            case "TOKEN_SILENCIO_NEGRA":
+                return "17";
+            case "TOKEN_SILENCIO_CORCHEA":
+                return "18";
+            case "TOKEN_SILENCIO_SEMICORCHEA":
+                return "19";
+            case "TOKEN_SILENCIO_FUSA":
+                return "20";
+            case "TOKEN_SILENCIO_SEMIFUSA":
+                return "21";
+            case "TOKEN_PUNTILLO":
+                return "22";
+            case "TOKEN_SOSTENIDO":
+                return "23";
+            case "TOKEN_BEMOL":
+                return "24";
+            case "TOKEN_DIVISOR_TEMPO":
+                return "25";
+            case "TOKEN_DIVISOR_COMPAS":
+                return "26";
+            case "TOKEN_APERTURA_NOTAS":
+                return "27";
+            case "TOKEN_APERTURA_COMPAS":
+                return "28";
+            case "TOKEN_APERTURA_CLAVE":
+                return "29";
+            case "TOKEN_CIERRE_NOTAS":
+                return "30";
+            case "TOKEN_CIERRE_COMPAS":
+                return "31";
+            case "TOKEN_CIERRE_CLAVE":
+                return "32";
+            case "TOKEN_ASIGNACION":
+                return "33";
+            case "TOKEN_SEPARACION_COMPAS":
+                return "34";
+            case "TOKEN_DEFINE_CLAVE":
+                return "35";
+            case "TOKEN_FIN_SENTENCIA":
+                return "36";
+            case "TOKEN_SEPARACION_NOTA":
+                return "37";
+            case "TOKEN_IDENTIFICADOR":
+                return "38";
+            case "TOKEN_REDONDA_PIANO":
+                return "39";
+            case "TOKEN_BLANCA_PIANO":
+                return "40";
+            case "TOKEN_NEGRA_PIANO":
+                return "41";
+            case "TOKEN_CORCHEA_PIANO":
+                return "42";
+            case "TOKEN_SEMICORCHEA_PIANO":
+                return "43";
+            case "TOKEN_FUSA_PIANO":
+                return "44";
+            case "TOKEN_SEMIFUSA_PIANO":
+                return "45";
+            case "TOKEN_REDONDA_LED":
+                return "46";
+            case "TOKEN_BLANCA_LED":
+                return "47";
+            case "TOKEN_NEGRA_LED":
+                return "48";
+            case "TOKEN_CORCHEA_LED":
+                return "49";
+            case "TOKEN_SEMICORCHEA_LED":
+                return "50";
+            case "TOKEN_FUSA_LED":
+                return "51";
+            case "TOKEN_SEMIFUSA_LED":
+                return "52";
+            case "TOKEN_SELECION_CLAVE":
+                return "53";
+            case "TOKEN_PIANO_CONTROL":
+                return "54";
+            case "TOKEN_REP":
+                return "55";
+            case "TOKEN_NOTA_CLAVE":
+                return "56";
+            default:
+                return "";
+        }
     }
-}
-
 
     private void mostrarConsola() {
         int sizeErrors = errors.size();

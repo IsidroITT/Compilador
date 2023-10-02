@@ -3,7 +3,7 @@ tempo = 97;
 timbre = [E7.n, G2.b, F1.r];
 // Notas
 	\inicio
-	    clave(G^2) {
+	   clave(G^2) {
             [F.n, A.b, C.n],
             [B.r]
         },
@@ -16,15 +16,16 @@ timbre = [E7.n, G2.b, F1.r];
 	
 // Notas piano
 timbrePiano = [E7.P-n, G2.P-b, F1.P-r];
-piano(){
-	Clave(G^2) {
+piano{
+	clave(G^2) {
         [F.P-n, A.P-b, C.P-n],
         [B.P-r]
     },
     timbrePiano,
     [A2.P-b, B4.P-b],
     rep(3) {
-		[E4.P-n, E4.P-n, F4.P-n, G4.P-n ], timbrePiano
+		[E4.P-n, E4.P-n, F4.P-n, G4.P-n ],
+		timbrePiano
 	}
 }
 
