@@ -23,13 +23,14 @@ Comentario = {ComentarioTradicional} | {FinDeLineaComentario}
 /* Identificador  */
 Letra = [A|B|C|D|E|F|G]
 Letras = [A-Za-zÑñ]
-Numeros = [0-9]
+Numeros = [0-9]*
 AlfaErrores = [a-zA-Z]
 /*DigitoEscala = [1-8]*/
 Digito = [1-9][1-6]?
 /*Clave = {Letra}{Digito}*/ //G16 es un error sintactico o semantico??
 Nota = {Letra}{Digito}
 Identificador = {Letras}({Letras}|{Numeros})*
+compasNumero = {Numeros}//{Numeros}
 %%
 
 
@@ -39,6 +40,7 @@ Identificador = {Letras}({Letras}|{Numeros})*
 /*Numeros*/
 /*{DigitoEscala}  { return token(yytext(), "TOKEN_DIGITO_ESCALA", yyline, yycolumn); }*/
 {Digito}  { return token(yytext(), "TOKEN_DIGITO", yyline, yycolumn); }
+{}
 
 /*Notas*/
 {Nota} { return token(yytext(), "TOKEN_NOTA", yyline, yycolumn); }

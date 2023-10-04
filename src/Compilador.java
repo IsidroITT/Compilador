@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
@@ -45,6 +47,10 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> identProd;
     private HashMap<String, String> identificadores;
     private boolean codeHasBeenCompiled = false;
+    private float compasEvaluar;
+    private HashMap<String, Integer> dicNotas;
+    private HashMap<String, Integer> dicSilencios;
+    private ExtraerElementosCompas elementosCompas;
 
     /**
      * Creates new form Compilador
@@ -373,6 +379,7 @@ public class Compilador extends javax.swing.JFrame {
         analisisLexico();
         rellenarTablaTokens();
         analisisSintactico();
+        analisisSemantico();
         mostrarConsola();
         codeHasBeenCompiled = true;
     }
@@ -426,7 +433,7 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("COMPAS_ERROR", "TOKEN_DIGITO TOKEN_DIGITO | TOKEN_DIGITO");
 
         /* DECLARACIÓN COMPAS */
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true);
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true, identProd);
 
         gramatica.initialLineColumn();
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true,
@@ -460,7 +467,7 @@ public class Compilador extends javax.swing.JFrame {
                 15, "Error sintáctico {}: Declaración de compás incompleta, falta asignar un valor (ejemplo: compas = 3/4;) [#,%]");
 
         /* DECLARACIÓN TEMPO */
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true);
+        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true, identProd);
 
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION", true,
                 16, "Error sintáctico {}: Declaración de tempo incompleta, falta especificar el valor del tempo [#,%]");
@@ -472,7 +479,7 @@ public class Compilador extends javax.swing.JFrame {
                 18, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
 
         /* DECLARACIÓN IDENTIFICADOR */
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true);
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true, identProd);
 
         gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION", true,
                 19, "Error sintáctico {}: Declaración de identificador incompleta, falta especificar las notas [#,%]");
@@ -485,7 +492,7 @@ public class Compilador extends javax.swing.JFrame {
 
         /* DECLARACIÓN FIGURA CON NOTA */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("BLOQUE_NOTAS_TOCAR", "(COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS)* COMPAS_NOTAS|TOKEN_IDENTIFICADOR");
+            gramatica.group("BLOQUE_NOTAS_TOCAR", "(COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS)* COMPAS_NOTAS|TOKEN_IDENTIFICADOR", identProd);
         });
 
         gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS", true);
@@ -558,6 +565,57 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.finalLineColumn();
         /* Mostrar gramáticas */
         gramatica.show();
+    }
+
+    private void analisisSemantico() {
+        // Obtener las expreseiones a evaluar de identProd
+        String produccionesEvaluar = "";
+        for (Production id : identProd) {
+            produccionesEvaluar += id.lexemeRank(0, -1);
+        }
+        
+        Map<String, Double> valueMapping = elementosCompas.crearDiccionarioFiguraValor();
+        String[] elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
+        //String[] elementsInBrackets = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
+        
+
+        // Extraer los valores a evaluar de las producciones
+        double compasValue = elementosCompas.calculateCompas(produccionesEvaluar);
+        System.out.println("Valor de compas = " + compasValue);
+
+        for (String element : elementosDentroCompas) {
+            double sum = elementosCompas.sumaValoresCompas(element, valueMapping);
+            //System.out.println(element + " = " + sum);
+
+            if (compasValue > sum) {
+                System.out.println("Compas es menor a " + element + " = " + sum);
+            } else if (compasValue < sum) {
+                System.out.println("Compas es mayor a " + element + " = " + sum);
+            } else {
+                System.out.println("Compas es correcto a " + element + " = " + sum);
+            }
+        }
+        for (String e : elementosDentroCompas) {
+            System.out.println(e);
+        }
+
+//        /* VARIABLES DE EVALUACION */
+//        HashMap<String,String> identDataType = new HashMap<>();
+//        float compasEvaluar = 0f;
+//        HashMap<String,Integer> dicNotas= new HashMap<>();
+//        HashMap<String,Integer> dicSilencios = new HashMap<>();
+//        
+//        identDataType.put("compas", "TOKEN_DIVISOR_TEMPO TOKEN_DIGITO TOKEN_FIN_SENTENCIA");
+//        identDataType.put("tempo", "TOKEN_DIGITO+");
+//        for (Production id: identProd){
+//            //if(!identDataType.get(id.lexemeRank(0)).equals(id.lexicalCompRank(-1))){
+//                //errors.add(new ErrorLSSL(1,"Error semantico:"));
+//            
+//            //}
+//            //System.out.println(identDataType);
+//            System.out.println(id.lexemeRank(0,-1));
+//            //System.out.println(id.lexicalCompRank(0,-1));
+//        }
     }
 
     private void colores() {
