@@ -569,35 +569,52 @@ public class Compilador extends javax.swing.JFrame {
 
     private void analisisSemantico() {
         // Obtener las expreseiones a evaluar de identProd
+        double sum = 0;
         String produccionesEvaluar = "";
+        
+        
         for (Production id : identProd) {
             produccionesEvaluar += id.lexemeRank(0, -1);
-        }
-        
-        Map<String, Double> valueMapping = elementosCompas.crearDiccionarioFiguraValor();
-        String[] elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
-        //String[] elementsInBrackets = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
-        
 
-        // Extraer los valores a evaluar de las producciones
-        double compasValue = elementosCompas.calculateCompas(produccionesEvaluar);
+            // Variables de la evaluacion de notas
+            Map<String, Double> valueMapping = elementosCompas.crearDiccionarioFiguraValor();
+            String[] elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
+            double compasValue = elementosCompas.calculateCompas(produccionesEvaluar);
         System.out.println("Valor de compas = " + compasValue);
+            // Extraer los valores a evaluar de las producciones
+            
 
-        for (String element : elementosDentroCompas) {
-            double sum = elementosCompas.sumaValoresCompas(element, valueMapping);
-            //System.out.println(element + " = " + sum);
-
-            if (compasValue > sum) {
-                System.out.println("Compas es menor a " + element + " = " + sum);
-            } else if (compasValue < sum) {
-                System.out.println("Compas es mayor a " + element + " = " + sum);
-            } else {
-                System.out.println("Compas es correcto a " + element + " = " + sum);
+            for (String element : elementosDentroCompas) {
+                sum = elementosCompas.sumaValoresCompas(element, valueMapping);
             }
+            
+            if (compasValue > sum) { // Error: Numero de notas menor al compas
+                    System.out.println("Las notas son menores al compas en la linea: " + id.getLine());
+                } else if (compasValue < sum) { // Error: Numero de notas mayor al compas
+                    System.out.println("Las notas son mayores al compas en la linea: " + id.getLine());
+                }//+ element + " = " + sum
         }
-        for (String e : elementosDentroCompas) {
-            System.out.println(e);
-        }
+
+//        // Variables de la evaluacion de notas
+//        Map<String, Double> valueMapping = elementosCompas.crearDiccionarioFiguraValor();
+//        String[] elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
+//
+//        // Extraer los valores a evaluar de las producciones
+//        double compasValue = elementosCompas.calculateCompas(produccionesEvaluar);
+//        System.out.println("Valor de compas = " + compasValue);
+//
+//        for (String element : elementosDentroCompas) {
+//            double sum = elementosCompas.sumaValoresCompas(element, valueMapping);
+//
+//            if (compasValue > sum) { // Error: Numero de notas menor al compas
+//                System.out.println("Compas es menor a " + element + " = " + sum);
+//            } else if (compasValue < sum) { // Error: Numero de notas mayor al compas
+//                System.out.println("Compas es mayor a " + element + " = " + sum);
+//            }
+//        }
+//        for (String e : elementosDentroCompas) {
+//            System.out.println(e);
+//        }
 
 //        /* VARIABLES DE EVALUACION */
 //        HashMap<String,String> identDataType = new HashMap<>();
