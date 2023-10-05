@@ -26,7 +26,7 @@ Letras = [A-Za-zÑñ]
 Numeros = [0-9]*
 AlfaErrores = [a-zA-Z]
 /*DigitoEscala = [1-8]*/
-Digito = [1-9][1-6]?
+Digito = [0-9]*
 /*Clave = {Letra}{Digito}*/ //G16 es un error sintactico o semantico??
 Nota = {Letra}{Digito}
 Identificador = {Letras}({Letras}|{Numeros})*
@@ -40,7 +40,6 @@ compasNumero = {Numeros}//{Numeros}
 /*Numeros*/
 /*{DigitoEscala}  { return token(yytext(), "TOKEN_DIGITO_ESCALA", yyline, yycolumn); }*/
 {Digito}  { return token(yytext(), "TOKEN_DIGITO", yyline, yycolumn); }
-{}
 
 /*Notas*/
 {Nota} { return token(yytext(), "TOKEN_NOTA", yyline, yycolumn); }
@@ -57,6 +56,7 @@ compasNumero = {Numeros}//{Numeros}
 "piano"  { return token(yytext(), "TOKEN_PIANO_CONTROL", yyline, yycolumn); }
 "led" { return token(yytext(), "TOKEN_LEDS", yyline, yycolumn); }
 "rep" { return token(yytext(), "TOKEN_REP", yyline, yycolumn); }
+"var" { return token(yytext(), "TOKEN_VAR", yyline, yycolumn); }
 
 /*Secciones*/
 \\"inicio" { return token(yytext(), "TOKEN_INICIO_PARTITURA", yyline, yycolumn); }

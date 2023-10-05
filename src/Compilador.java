@@ -50,7 +50,7 @@ public class Compilador extends javax.swing.JFrame {
     private float compasEvaluar;
     private HashMap<String, Integer> dicNotas;
     private HashMap<String, Integer> dicSilencios;
-    private ExtraerElementosCompas elementosCompas;
+    private AnalisisSemantico elementosCompas;
 
     /**
      * Creates new form Compilador
@@ -430,7 +430,7 @@ public class Compilador extends javax.swing.JFrame {
         });
         gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS", true);
         gramatica.group("COMPAS", "TOKEN_DIGITO TOKEN_DIVISOR_TEMPO TOKEN_DIGITO");
-        gramatica.group("COMPAS_ERROR", "TOKEN_DIGITO TOKEN_DIGITO | TOKEN_DIGITO");
+        //gramatica.group("COMPAS_ERROR", "TOKEN_DIGITO TOKEN_DIGITO | TOKEN_DIGITO");
 
         /* DECLARACIÓN COMPAS */
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true, identProd);
@@ -467,28 +467,25 @@ public class Compilador extends javax.swing.JFrame {
                 15, "Error sintáctico {}: Declaración de compás incompleta, falta asignar un valor (ejemplo: compas = 3/4;) [#,%]");
 
         /* DECLARACIÓN TEMPO */
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true, identProd);
+        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION TOKEN_DIGITO+ TOKEN_FIN_SENTENCIA", true, identProd);
 
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION", true,
                 16, "Error sintáctico {}: Declaración de tempo incompleta, falta especificar el valor del tempo [#,%]");
 
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO COMPAS_ERROR TOKEN_FIN_SENTENCIA", true,
+        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_DIGITO+ TOKEN_FIN_SENTENCIA", true,
                 17, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
 
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO", true,
                 18, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
 
         /* DECLARACIÓN IDENTIFICADOR */
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true, identProd);
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true, identProd);
 
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION", true,
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION", true,
                 19, "Error sintáctico {}: Declaración de identificador incompleta, falta especificar las notas [#,%]");
 
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true,
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true,
                 20, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un valor (ejemplo: id = {...};) [#,%]");
-
-//        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR", true,
-//                21, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un valor (ejemplo: id = {...};) [#,%]");
 
         /* DECLARACIÓN FIGURA CON NOTA */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
@@ -505,10 +502,8 @@ public class Compilador extends javax.swing.JFrame {
                 23, "Error sintáctico {}: Declaración de notas incompleta, falta especificar las notas o finalizar con un punto y coma (;) [#,%]");
 
         /* DECLARACION CLAVE */
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA TOKEN_SELECION_CLAVE TOKEN_DIGITO", true);
         gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE CLAVE_IF_EXPRESION TOKEN_CIERRE_CLAVE", true);
-
-        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
-                24, "Error sintáctico {}: Declaración de clave incompleta, falta especificar el valor (ejemplo: G2;) [#,%]");
 
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE", true,
                 25, "Error sintáctico {}: Declaración de clave incompleta, falta asignar un valor (ejemplo: clave = G2;) [#,%]");
@@ -544,7 +539,7 @@ public class Compilador extends javax.swing.JFrame {
 
         gramatica.initialLineColumn();
         /* ESTRUCTURAS DE CONTROL */
-        gramatica.group("ESTRUCTURAS_CONTROL", "(CLAVE_IF | DECLARACION_REP)", true);
+        gramatica.group("ESTRUCTURAS_CONTROL", "(CLAVE_IF | DECLARACION_REP)", true, identProd);
 
         /* FUNCIONES SALIDA FISICA */
         gramatica.group("FUNCIONES", "(TOKEN_PIANO_CONTROL | TOKEN_LEDS)", true);
@@ -568,71 +563,67 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     private void analisisSemantico() {
-        // Obtener las expreseiones a evaluar de identProd
+        // Variables auxiliares
+        int it = 0;
         double sum = 0;
+        double valorCompas;
         String produccionesEvaluar = "";
-        
-        
+        String[] elementosDentroCompas;
+        Map<String, Double> diccionarioFiguraNota = elementosCompas.crearDiccionarioFiguraValor();
+
+        //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Analisis de rango tempo
         for (Production id : identProd) {
+            // Obtener la produccion a evaluar
             produccionesEvaluar += id.lexemeRank(0, -1);
 
-            // Variables de la evaluacion de notas
-            Map<String, Double> valueMapping = elementosCompas.crearDiccionarioFiguraValor();
-            String[] elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
-            double compasValue = elementosCompas.calculateCompas(produccionesEvaluar);
-        System.out.println("Valor de compas = " + compasValue);
-            // Extraer los valores a evaluar de las producciones
-            
-
-            for (String element : elementosDentroCompas) {
-                sum = elementosCompas.sumaValoresCompas(element, valueMapping);
+            if (elementosCompas.validarTempo(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
+            {
+                errors.add(new ErrorLSSL(51, "Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
             }
+            it++;
+
+        }// Analisis de rango tempo
+
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Analisis de valores compas
+        it = 0;
+        for (Production id : identProd) {
+            // Obtener la produccion a evaluar
+            produccionesEvaluar += id.lexemeRank(0, -1);
+
+            if (elementosCompas.validarTamanoCompas(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
+            {
+                errors.add(new ErrorLSSL(50, "Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
+            }
+            it++;
             
-            if (compasValue > sum) { // Error: Numero de notas menor al compas
-                    System.out.println("Las notas son menores al compas en la linea: " + id.getLine());
-                } else if (compasValue < sum) { // Error: Numero de notas mayor al compas
-                    System.out.println("Las notas son mayores al compas en la linea: " + id.getLine());
-                }//+ element + " = " + sum
-        }
+        }// Analisis de valores compas
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-//        // Variables de la evaluacion de notas
-//        Map<String, Double> valueMapping = elementosCompas.crearDiccionarioFiguraValor();
-//        String[] elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
-//
-//        // Extraer los valores a evaluar de las producciones
-//        double compasValue = elementosCompas.calculateCompas(produccionesEvaluar);
-//        System.out.println("Valor de compas = " + compasValue);
-//
-//        for (String element : elementosDentroCompas) {
-//            double sum = elementosCompas.sumaValoresCompas(element, valueMapping);
-//
-//            if (compasValue > sum) { // Error: Numero de notas menor al compas
-//                System.out.println("Compas es menor a " + element + " = " + sum);
-//            } else if (compasValue < sum) { // Error: Numero de notas mayor al compas
-//                System.out.println("Compas es mayor a " + element + " = " + sum);
-//            }
-//        }
-//        for (String e : elementosDentroCompas) {
-//            System.out.println(e);
-//        }
+        //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Analisis de compases
+        for (Production id : identProd) {
+            // Obtener la produccion a evaluar
+            produccionesEvaluar += id.lexemeRank(0, -1);
+            System.out.println(produccionesEvaluar);
+            // Variables de la evaluacion de notas
+            diccionarioFiguraNota = elementosCompas.crearDiccionarioFiguraValor();
+            elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
+            valorCompas = elementosCompas.calculateCompas(produccionesEvaluar);
+            // Extraer los valores a evaluar de las producciones
+            for (String element : elementosDentroCompas) {
+                sum = elementosCompas.sumaValoresCompas(element, diccionarioFiguraNota);
+            }
 
-//        /* VARIABLES DE EVALUACION */
-//        HashMap<String,String> identDataType = new HashMap<>();
-//        float compasEvaluar = 0f;
-//        HashMap<String,Integer> dicNotas= new HashMap<>();
-//        HashMap<String,Integer> dicSilencios = new HashMap<>();
-//        
-//        identDataType.put("compas", "TOKEN_DIVISOR_TEMPO TOKEN_DIGITO TOKEN_FIN_SENTENCIA");
-//        identDataType.put("tempo", "TOKEN_DIGITO+");
-//        for (Production id: identProd){
-//            //if(!identDataType.get(id.lexemeRank(0)).equals(id.lexicalCompRank(-1))){
-//                //errors.add(new ErrorLSSL(1,"Error semantico:"));
-//            
-//            //}
-//            //System.out.println(identDataType);
-//            System.out.println(id.lexemeRank(0,-1));
-//            //System.out.println(id.lexicalCompRank(0,-1));
-//        }
+            if (valorCompas > sum) { // Error: Numero de notas menor al compas
+                errors.add(new ErrorLSSL(52, "Error: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
+            } else if (valorCompas < sum) { // Error: Numero de notas mayor al compas
+                errors.add(new ErrorLSSL(52, "Error: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
+            }
+        }// Analisis de compases
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        
     }
 
     private void colores() {
@@ -783,6 +774,8 @@ public class Compilador extends javax.swing.JFrame {
                 return "55";
             case "TOKEN_NOTA_CLAVE":
                 return "56";
+            case "TOKEN_VAR":
+                return "57";
             default:
                 return "";
         }
@@ -799,7 +792,7 @@ public class Compilador extends javax.swing.JFrame {
             }
             jtaOutputConsole.setText("Compilación terminada...\n" + strErrors + "\nLa compilación terminó con errores...");
         } else {
-            jtaOutputConsole.setText("Compilación terminada...");
+            jtaOutputConsole.setText("Compilación terminada... \n NO hubo errores");
         }
         jtaOutputConsole.setCaretPosition(0);
     }

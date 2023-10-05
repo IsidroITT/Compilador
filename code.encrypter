@@ -1,6 +1,6 @@
-compas = 3/4;
-tempo = 97;
-timbre = [E7.n, G2.b, F1.r];
+compas = 4/4;
+tempo = 208;
+var timbre = [F1.r];
 // Notas
 	\inicio
 	   clave(G^2) {
@@ -15,7 +15,7 @@ timbre = [E7.n, G2.b, F1.r];
 	\fin
 	
 // Notas piano
-timbrePiano = [E7.P-n, G2.P-b, F1.P-r];
+var timbrePiano = [E7.P-n, G2.P-b, F1.P-n];
 piano{
 	clave(G^2) {
         [F.P-n, A.P-b, C.P-n],

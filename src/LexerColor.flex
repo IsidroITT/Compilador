@@ -26,7 +26,7 @@ Letras = [A-Za-zÑñ]
 Numeros = [0-9]
 AlfaErrores = [a-zA-Z]
 /*DigitoEscala = [1-8]*/
-Digito = [1-9][1-6]?
+Digito = [0-9]*
 /*Clave = {Letra}{Digito}*/ //G16 es un error sintáctico o semántico??
 Nota = {Letra}{Digito}
 Identificador = {Letras}({Letras}|{Numeros})*
@@ -55,6 +55,7 @@ Identificador = {Letras}({Letras}|{Numeros})*
 "piano" { return textColor(yychar, yylength(), new Color(255, 255, 0)); }
 "led" { return textColor(yychar, yylength(), new Color(255, 255, 0)); }
 "rep" { return textColor(yychar, yylength(), new Color(255, 255, 0)); }
+"var" { return textColor(yychar, yylength(), new Color(125, 200, 130)); }
 ""{Identificador} { return textColor(yychar, yylength(), new Color(255, 255, 0)); }
 
 /* Secciones */
