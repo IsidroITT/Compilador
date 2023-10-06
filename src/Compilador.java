@@ -68,7 +68,7 @@ public class Compilador extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setTitle(title);
         btnEjecutar.setVisible(false);
-        // algun nombre de extension???
+        // algun nombre de extebtnEjecutarnsion???
         directorio = new Directory(this, jtpCode, title, ".cmx");
 
         //Asegurarse de que al salir podamos guardar los cambios en el archivo
@@ -349,8 +349,9 @@ public class Compilador extends javax.swing.JFrame {
             } else {
                 CodeBlock codeBlock = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";");
                 System.out.println(codeBlock);
-                ArrayList<String> blocksOfCode = codeBlock.getBlocksOfCodeInOrderOfExec();
-                System.out.println(blocksOfCode);
+                ArrayList<String> bloquesCodigo = codeBlock.getBlocksOfCodeInOrderOfExec();
+                System.out.println(bloquesCodigo);
+                codigoEjecutable(bloquesCodigo,1);
             }
         }
     }//GEN-LAST:event_btnEjecutarActionPerformed
@@ -362,6 +363,19 @@ public class Compilador extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         disminuirFuente();
     }//GEN-LAST:event_jButton1ActionPerformed
+    
+    // NO USAR NO FUNCIONA
+    private void codigoEjecutable(ArrayList<String> bloquesCodigo, int repetir){
+        for (int i = 0; i <= repetir; i++) {
+            int repeatCode = -1;
+            for (int j = 0; 1 < repeatCode; i++){
+                String bloqueCodigo = bloquesCodigo.get(j);
+                if (repeatCode != -1){
+                    
+                }
+            }
+        }
+    }
     private void aumentarFuente() {
         Font font = jtpCode.getFont();
         float size = font.getSize() + 2; // Incremento de tamaño de la fuente
