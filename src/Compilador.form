@@ -295,7 +295,7 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="5e" green="49" red="34" type="rgb"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Analizador Sintactico"/>
+                <Property name="text" type="java.lang.String" value="CONSOLA"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">

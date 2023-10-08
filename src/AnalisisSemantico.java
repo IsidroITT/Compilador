@@ -16,13 +16,6 @@ import java.util.regex.Pattern;
 
 public class AnalisisSemantico {
 
-    private static String EntradaCompas;
-
-    // Constructor
-    public AnalisisSemantico(String Entrada) {
-        this.EntradaCompas = Entrada;
-    }
-
     /*
     * Metodo para extraer los elementos del compas para evaluarlos por separado
     * @param Entrada
@@ -89,7 +82,7 @@ public class AnalisisSemantico {
         return sumaCompas;
     }
 
-    public static double calculateCompas(String compasEvaluar) {
+    public static double calcularCompas(String compasEvaluar) {
         Pattern patron = Pattern.compile("compas\\s*=\\s*(\\d+\\s*[/]\\s*\\d+)");
         Matcher comparador = patron.matcher(compasEvaluar);
 
@@ -118,7 +111,7 @@ public class AnalisisSemantico {
                 int numerador = Integer.parseInt(elementosCompas[0].trim());
                 int denominador = Integer.parseInt(elementosCompas[1].trim());
 
-                return numerador >= 10 || denominador >= 10;
+                return numerador > 10 || denominador > 10;
             }
         }
         return false;
@@ -137,6 +130,7 @@ public class AnalisisSemantico {
         return false;
     }
     
+    // AUN NO FUNCIONA, VUELVA CUANDO FUNCIONE
     public static boolean validateClave(String clave) {
         String regex = "[A-Za-z]+(\\^\\d+)";
 

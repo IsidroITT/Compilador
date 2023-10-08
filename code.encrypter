@@ -1,6 +1,6 @@
-compas = 7/8;
-tempo = 97;
-timbre = [G2.b, F4.b];
+compas = 8/8;
+tempo = 357;
+var timbre = [G2.b, F4.b];
 // Notas
 	\inicio
 	    clave(G^2) {
@@ -15,7 +15,7 @@ timbre = [G2.b, F4.b];
 	\fin
 	
 // Notas piano
-timbrePiano = [F1.P-r];
+var timbrePiano = [F1.P-r];
 piano(){
 	Clave(G^2) {
         [F.P-n, A.P-b, C.P-n],
@@ -27,5 +27,3 @@ piano(){
 		[E4.P-n, E4.P-n, F4.P-n, G4.P-n ], timbrePiano
 	}
 }
-
-// Notas LED

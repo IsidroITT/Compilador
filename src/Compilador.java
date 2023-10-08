@@ -234,7 +234,7 @@ public class Compilador extends javax.swing.JFrame {
 
         lblASin.setFont(new java.awt.Font("Open Sans Semibold", 0, 18)); // NOI18N
         lblASin.setForeground(new java.awt.Color(52, 73, 94));
-        lblASin.setText("Analizador Sintactico");
+        lblASin.setText("CONSOLA");
         jPanel1.add(lblASin, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 520, -1, -1));
 
         lblALex.setFont(new java.awt.Font("Open Sans Semibold", 0, 18)); // NOI18N
@@ -596,10 +596,9 @@ public class Compilador extends javax.swing.JFrame {
                 errors.add(new ErrorLSSL(51, "Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
             }
             it++;
-
         }// Analisis de rango tempo
-
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        
         // Analisis de valores compas
         it = 0;
         for (Production id : identProd) {
@@ -620,11 +619,12 @@ public class Compilador extends javax.swing.JFrame {
         for (Production id : identProd) {
             // Obtener la produccion a evaluar
             produccionesEvaluar += id.lexemeRank(0, -1);
-            System.out.println(produccionesEvaluar);
+            
             // Variables de la evaluacion de notas
             diccionarioFiguraNota = elementosCompas.crearDiccionarioFiguraValor();
             elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
-            valorCompas = elementosCompas.calculateCompas(produccionesEvaluar);
+            valorCompas = elementosCompas.calcularCompas(produccionesEvaluar);
+            
             // Extraer los valores a evaluar de las producciones
             for (String element : elementosDentroCompas) {
                 sum = elementosCompas.sumaValoresCompas(element, diccionarioFiguraNota);
