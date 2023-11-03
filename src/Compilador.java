@@ -42,9 +42,6 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Production> identProd;
     private HashMap<String, String> identificadores;
     private boolean codeHasBeenCompiled = false;
-    private float compasEvaluar;
-    private HashMap<String, Integer> dicNotas;
-    private HashMap<String, Integer> dicSilencios;
     private AnalisisSemantico elementosCompas;
     private generadorIntermedio codIntermedio;
     private String codigoIntermedioSinOptimizar;
@@ -59,7 +56,7 @@ public class Compilador extends javax.swing.JFrame {
         //setExtendedState(JFrame.MAXIMIZED_BOTH);
         jPanel1.setLayout(new BorderLayout());
         add(jPanel1, BorderLayout.CENTER);
-        
+
     }
 
     private void init() {
@@ -384,33 +381,16 @@ public class Compilador extends javax.swing.JFrame {
         } else {
             codigoIntermedioSinOptimizar = "";
             compilar();
-            CodeBlock bloqueCodigo = Functions.splitCodeInCodeBlocks(tokens,"{","}",";");
+            CodeBlock bloqueCodigo = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";");
             ArrayList<String> bloquesCodigo = bloqueCodigo.getBlocksOfCodeInOrderOfExec();
-            System.out.println("BLOQUES DE CODIGO: \n"+bloquesCodigo);
-            codigoEjecutable(bloquesCodigo,1);
+            codigoEjecutable(bloquesCodigo, 1);
+            System.out.println("<----------------------------------------------------->\n CODIGO INTERMEDIO GENERADO");
             System.out.println(codigoIntermedioSinOptimizar);
+            System.out.println("<----------------------------------------------------->\n VARIABLES ENCONTRADAS");
+            for (Map.Entry<String, String> entry : identificadores.entrySet()) {
+                System.out.println("Variable: " + entry.getKey() + " = " + entry.getValue());
+            }
         }
-        
-//        if (getTitle().contains("*") || getTitle().equals(title)) {
-//            if (directorio.Save()) {
-//                compilar();
-//            }
-//        } else {
-//            compilar();
-//        }
-//        btnCompilar.doClick();
-//        if (codeHasBeenCompiled) {
-//            if (!errors.isEmpty()) {
-//                JOptionPane.showMessageDialog(null, "No se puede ejecutar el código ya que se encontró uno o más errores",
-//                    "Error en la compilación", JOptionPane.ERROR_MESSAGE);
-//            } else {
-//                CodeBlock codeBlock = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";");
-//                System.out.println(codeBlock);
-//                ArrayList<String> bloquesCodigo = codeBlock.getBlocksOfCodeInOrderOfExec();
-//                System.out.println(bloquesCodigo);
-//                codigoEjecutable(bloquesCodigo,1);
-//            }
-//        }
     }//GEN-LAST:event_btnCompilarActionPerformed
 
     private void btnGuardarCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarCActionPerformed
@@ -436,36 +416,60 @@ public class Compilador extends javax.swing.JFrame {
         directorio.New();
         limpiarCampos();
     }//GEN-LAST:event_btnNuevoActionPerformed
-    
-    // NO USAR NO FUNCIONA
-    private void codigoEjecutable(ArrayList<String> blocksOfCode, int repeats){
+
+    private void codigoEjecutable(ArrayList<String> blocksOfCode, int repeats) {
         for (int i = 1; i <= repeats; i++) {
             int repeatCode = -1;
-            for (int j = 0; j < blocksOfCode.size(); j++){
+            for (int j = 0; j < blocksOfCode.size(); j++) {
                 String blockOfCode = blocksOfCode.get(j);
-                if (repeatCode != -1){
+                if (repeatCode != -1) {
                     int[] posicionMarcador = CodeBlock.getPositionOfBothMarkers(blocksOfCode, blockOfCode);
-                    codigoEjecutable(new ArrayList<>(blocksOfCode.subList(posicionMarcador[0], posicionMarcador[1])),repeatCode);
+                    codigoEjecutable(new ArrayList<>(blocksOfCode.subList(posicionMarcador[0], posicionMarcador[1])), repeatCode);
                     repeatCode = -1;
                     i = posicionMarcador[1];
-                }
-                else{
+                } else {
                     String[] sentences = blockOfCode.split(";");
-                    for (String sentence: sentences){
+                    for (String sentence : sentences) {
+                        // Agregar variables al mapa
+                        if (sentence.startsWith("var")) {
+                            codIntermedio.agregarVariablesAlMapa(sentence, identificadores);
+                        }
+                        
                         // Generar codigo intermedio del tempos
-                        if(sentence.startsWith("tempo")){
+                        if (sentence.startsWith("tempo")) {
                             codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioTempo(sentence) + "\n";
                         }
+                        
+                        // Ciclo de REP
+                        if (sentence.contains("rep")) {
+                            // Encontrar el numero de repeticiones
+                            String parametro = sentence.substring(6, sentence.length() - 2);
+                            // Remover espacios en blanco
+                            if (parametro.contains("")) {
+                                parametro = parametro.replaceAll(" ", "");
+                            }
+                            repeatCode = Integer.parseInt(parametro) - 1;
+                        }
+                        
+                        //Reemplazar variables
+                        if (codIntermedio.cadenaPerteneceAlMapa(sentence, identificadores)) {
+                            sentence = codIntermedio.reemplazarVariables(sentence, identificadores);
+                        }
+                        
                         //Remplazar varibables y generar estructura de variables
-                        if(sentence.contains("[") && sentence.contains("]")){
-                            if(sentence.contains("var")) continue;
+                        if (sentence.contains("[") && sentence.contains("]")) {
+                            if (sentence.contains("var") || sentence.contains("P")) {
+                                continue;
+                            }
                             codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioNotas(sentence) + "\n";
                         }
+                        // Estructura Clave -INFIERNO-
                     }
                 }
             }
         }
     }
+
     private void aumentarFuente() {
         Font font = jtpCode.getFont();
         float size = font.getSize() + 2; // Incremento de tamaño de la fuente
@@ -701,7 +705,7 @@ public class Compilador extends javax.swing.JFrame {
                 errors.add(new ErrorLSSL(50, " × Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
             }
             it++;
-            
+
         }// Analisis de valores compas
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -710,7 +714,6 @@ public class Compilador extends javax.swing.JFrame {
         for (Production id : identProd) {
             // Obtener la produccion a evaluar
             produccionesEvaluar += id.lexemeRank(0, -1);
-            System.out.println(produccionesEvaluar);
             // Variables de la evaluacion de notas
             diccionarioFiguraNota = elementosCompas.crearDiccionarioFiguraValor();
             elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
@@ -759,7 +762,7 @@ public class Compilador extends javax.swing.JFrame {
     private void rellenarTablaTokens() {
         tokens.forEach(token -> {
             Object[] data = new Object[]{id(token.getLexicalComp()), token.getLexicalComp(), token.getLexeme(), "[" + token.getLine() + ", " + token.getColumn() + "]"};
-           // Functions.addRowDataInTable(tblTokens, data);
+            // Functions.addRowDataInTable(tblTokens, data);
         });
     }
 

@@ -2,7 +2,16 @@
 
 // Define los pines para los servos y los LEDs
 Servo servoMoverDerecha;
-Servo servoMoverIzquierda;
+Servo ser
+
+void setup() {
+  servo1.attach(servo1Pin);
+  servo2.attach(servo2Pin);
+
+  pinMode(led1Pin, OUTPUT);
+  pinMode(led2Pin, OUTPUT);
+
+  // Inicializa los LEDs apagadvoMoverIzquierda;
 Servo sTecla1;
 Servo sTecla2;
 Servo sTecla3;
@@ -17,16 +26,7 @@ int led1Pin = 2;
 int led2Pin = 3;
 int led3Pin = 4;
 int led4Pin = 5;
-int led5Pin = 6;
-
-void setup() {
-  servo1.attach(servo1Pin);
-  servo2.attach(servo2Pin);
-
-  pinMode(led1Pin, OUTPUT);
-  pinMode(led2Pin, OUTPUT);
-
-  // Inicializa los LEDs apagados
+int led5Pin = 6;os
   digitalWrite(led1Pin, LOW);
   digitalWrite(led2Pin, LOW);
 }

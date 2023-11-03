@@ -26,64 +26,22 @@ public class generadorIntermedio {
         String entradaNotas = "[ F . n , A . b , C . n ]";
         System.out.println(codigoIntermedioNotas(entradaNotas));
         //----------------------------------------------------------------------
-//        // Divisor y dividendo en la regla de tres
-//        double divisorReglaTres = 225.0;
-//        double dividendoReglaTres = 110.0;
-//        
-//        // Obtener el valor original
-//        int valorOriginal = obtenerValorOriginal(entradaTempo);
-//        
-//        // Aplicar la regla de tres
-//        int valorTransformado = (int)codigoTempoOptimizado(valorOriginal, divisorReglaTres, dividendoReglaTres);
-//        
-//        // Llamar a la función y obtener la cadena de salida
-//        String salidaTempo = aplicarReglaDeTres("tempo", valorOriginal, dividendoReglaTres, divisorReglaTres);
-//
-//        // Imprimir la cadena de salida
-//        System.out.println(salidaTempo);
-        //System.out.println("int tempo = "+valorTransformado+";");
-
-//        System.out.println("float t1 = " + valorOriginal + " * " + divisorReglaTres +";");
-//        System.out.println("float t2 = t1 / "+dividendoReglaTres+";");
-//
-//        // Resultado final
-//        System.out.println("int tempo = round(t2);");
-//        
-//        // Generar la cadena de salida
-//        String salidaTempo = generarCadenaDeSalida("tempo", valorTransformado);
-//        System.out.println("Cadena de salida: " + salidaTempo);
+        
         //----------------------------------------------------------------------
-//        // Definir el texto de entrada
-//        String entrada = "var timbre = [G2.b, F4.b];\n// Notas\n\t\\inicio;\n\t\trep(3) {\n"
-//                + "		   	[E4.n, E4.n, F4.n, G4.n ], timbre;\n"
-//                + "		}";
-//
-//        // Definir un mapa para almacenar las variables
-//        Map<String, String> variables = new HashMap<>();
-//        variables.put("timbre", "[G2.b, F4.b]");
-//
-//        // Realizar el reemplazo de variables
-//        String salida = reemplazarVariables(entrada, variables);
-//
-//        // Imprimir el resultado
-//        System.out.println(salida);
-//
-//        double numeroDecimal = 204.55;
-//        int numeroEntero = (int) Math.round(numeroDecimal);
-//
-//        System.out.println("Número decimal: " + numeroDecimal);
-//        System.out.println("Número entero: " + numeroEntero);
-//        
-//        String entrada2 = "var timbrePiano = [ F1 . P-r ] ";
-//
-//        Map<String, String> variables2 = new HashMap<>();
-//
-//        agregarVariablesAlMapa(entrada2, variables2);
-//
-//        // Imprimir el mapa de variables
-//        for (Map.Entry<String, String> entry : variables.entrySet()) {
-//            System.out.println("Variable: " + entry.getKey() + " = " + entry.getValue());
-//        }
+        // Generar variables
+        String entradaVariables = "var timbrePiano = [ G2 . b , F4 . b ]; var velocidad = [ 120 ];";
+
+        // Crear un mapa para almacenar las variables
+        Map<String, String> variablesMap = new HashMap<>();
+
+        // Llamar a la función para agregar variables al mapa
+        agregarVariablesAlMapa(entradaVariables, variablesMap);
+
+        // Imprimir las variables en el mapa
+        for (Map.Entry<String, String> entry : variablesMap.entrySet()) {
+            System.out.println("Variable: " + entry.getKey() + " = " + entry.getValue());
+        }
+        //----------------------------------------------------------------------
     }
 
     //--------------------------------------------------------------------------
@@ -96,39 +54,26 @@ public class generadorIntermedio {
         // Obtener el valor original
         int valorOriginal = obtenerValorOriginal(entradaTempo);
 
-        // Aplicar la regla de tres
-        int valorTransformado = (int) codigoTempoOptimizado(valorOriginal, divisorReglaTres, dividendoReglaTres);
-
         return aplicarReglaDeTres("tempo", valorOriginal, dividendoReglaTres, divisorReglaTres);
     }
-
+    
     private static int obtenerValorOriginal(String entrada) {
         String[] partes = entrada.split("=");
         String valorStr = partes[1].trim();
         return Integer.parseInt(valorStr);
     }
 
-    private static double codigoTempoOptimizado(int valorOriginal, double divisor, double dividendo) {
-        return (valorOriginal * divisor) / dividendo;
-    }
-
-    private static String generarCadenaDeSalida(String variable, double valorTransformado) {
-        return "int " + variable + " = " + (int) Math.round(valorTransformado) + ";";
-    }
-
     private static String aplicarReglaDeTres(String variable, int valorOriginal, double dividendoReglaTres, double divisorReglaTres) {
-        // Calcular t1
-        double t1 = valorOriginal * divisorReglaTres;
-
-        // Calcular t2
-        double t2 = t1 / dividendoReglaTres;
-
         // Generar la cadena de salida
         String cadenaSalida = "float t1 = " + valorOriginal + " * " + divisorReglaTres + ";\n";
         cadenaSalida += "float t2 = t1 / " + dividendoReglaTres + ";\n";
         cadenaSalida += "int " + variable + " = round(t2);";
 
         return cadenaSalida;
+    }
+    
+    private static double codigoTempoOptimizado(int valorOriginal, double divisor, double dividendo) {
+        return (valorOriginal * divisor) / dividendo;
     }
     //--------------------------------------------------------------------------
 
@@ -182,16 +127,10 @@ public class generadorIntermedio {
 
         return resultado.toString();
     }
-//
-//    public static Map<String, Integer> crearDiccionario() {
-//        
-//
-//        return diccionarioFiguraValor;
-//    }
     //--------------------------------------------------------------------------
 
     //--------------------------------------------------------------------------
-    // Agregar variables al mapa de variables
+    // Metodos de tratamiento de variables
     public static void agregarVariablesAlMapa(String entrada, Map<String, String> variables) {
         // Crear una expresión regular para encontrar las variables
         Pattern pattern = Pattern.compile("var\\s+(\\w+)\\s*=\\s*\\[(.*?)\\]");
@@ -204,8 +143,7 @@ public class generadorIntermedio {
             variables.put(nombreVariable, "[" + valorVariable + "]");
         }
     }
-    //--------------------------------------------------------------------------
-
+    
     public static String reemplazarVariables(String texto, Map<String, String> variables) {
         // Crear una expresión regular para encontrar variables entre llaves {}
         Pattern pattern = Pattern.compile("\\b(\\w+)\\b");
@@ -226,57 +164,11 @@ public class generadorIntermedio {
 
         return resultado.toString();
     }
-
-//    public static String triploTempo(String entrada) {
-//        Map<String, Integer> tablaSimbolos = new HashMap<>();
-//        String[] tokens = entrada.split(" ");
-//
-//        // Evaluamos la cantidad de tokens en el array
-//        if (tokens.length == 3 && tokens[1].equals("=")) {
-//            String variable = tokens[0];
-//            String valorStr = tokens[2];
-//
-//            if (esNumero(valorStr)) {
-//                int valor = Integer.parseInt(valorStr);
-//                tablaSimbolos.put(variable, valor);
-//                String codigoIntermedio = "=, " + variable + " , " + valor;
-//                return "Triplo: " + codigoIntermedio;
-//            } else {
-//                return "Error: El valor no es un número válido.";
-//            }
-//        } else {
-//            return "Error: Formato de entrada incorrecto.";
-//        }
-//    }
-    public static boolean esNumero(String str) {
-        try {
-            Integer.parseInt(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    //--------------------------------------------------------------------------
-    // Codigo de compas
-    public static String generarCodigoIntermedio(String entrada) {
-        String[] tokens = entrada.split("=");
-
-        if (tokens.length == 2) {
-            String variable = tokens[0].trim();
-            String expresion = tokens[1].trim();
-            String tempVariable = "t1"; // Variable temporal
-
-            // Generar el primer triplo
-            String triplo1 = tempVariable + " = " + expresion;
-
-            // Generar el segundo triplo
-            String triplo2 = variable + " = " + tempVariable;
-
-            return triplo1 + "\n" + triplo2;
-        } else {
-            return "Error: Formato de entrada incorrecto.";
-        }
+    
+    public static boolean cadenaPerteneceAlMapa(String cadena, Map<String, String> variables) {
+        if(cadena.contains(" "))
+            cadena = cadena.replaceFirst(" ", "");
+        return variables.containsKey(cadena);
     }
     //--------------------------------------------------------------------------
 }
