@@ -1,29 +1,32 @@
 compas = 8/8;
-tempo = 357;
+tempo = 89;
 var timbre = [G2.b, F4.b];
 // Notas
-	\inicio
-	    clave(G^2) {
-            [F.n, A.b, C.n],
-            [B.r]
-        },
-        timbre,
-        [A2.b, B4.b],
-        rep(3) {
-		   [E4.n, E4.n, F4.n, G4.n ], timbre
-		}
-	\fin
+	\inicio;
+		timbre;
+	    	clave(G^2) {
+            	[F.n, A.b, C.n];
+            	[B.r];
+        	};
+        	timbre;
+        	[A2.b, B4.b];
+        	rep(3) {
+		   	[E4.n, E4.n, F4.n, G4.n ]; 
+			timbre;
+		};
+	\fin;
 	
 // Notas piano
 var timbrePiano = [F1.P-r];
 piano(){
 	Clave(G^2) {
-        [F.P-n, A.P-b, C.P-n],
-        [B.P-r]
-    },
-    timbrePiano,
-    [A2.P-b, B4.P-b],
-    rep(3) {
-		[E4.P-n, E4.P-n, F4.P-n, G4.P-n ], timbrePiano
-	}
+        	[F.P-n, A.P-b, C.P-n];
+      	[B.P-r];
+   	};
+   	timbrePiano;
+    	[A2.P-b, B4.P-b];
+	rep(3) {
+		[E4.P-n, E4.P-n, F4.P-n, G4.P-n ];
+		timbrePiano;
+	};
 }

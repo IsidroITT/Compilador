@@ -1,3 +1,4 @@
+
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import compilerTools.CodeBlock;
 import compilerTools.Directory;
@@ -24,14 +25,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
+//import jflex.performance.Timer;
 
 /**
  *
  * @author codex_404
  */
-public class Compilador extends javax.swing.JFrame {
+public class CompiladorV1 extends javax.swing.JFrame {
 
     private String title;
     private Directory directorio;
@@ -46,27 +51,24 @@ public class Compilador extends javax.swing.JFrame {
     private HashMap<String, Integer> dicNotas;
     private HashMap<String, Integer> dicSilencios;
     private AnalisisSemantico elementosCompas;
-    private generadorIntermedio codIntermedio;
-    private String codigoIntermedioSinOptimizar;
 
     /**
      * Creates new form Compilador
      */
-    public Compilador() {
+    public CompiladorV1() {
         initComponents();
         init();
-        //this.setResizable(false);
+        this.setResizable(false);
         //setExtendedState(JFrame.MAXIMIZED_BOTH);
         jPanel1.setLayout(new BorderLayout());
         add(jPanel1, BorderLayout.CENTER);
-        
     }
 
     private void init() {
         title = "Codex_Music";// Titulo de la ventana
         setLocationRelativeTo(null);
         setTitle(title);
-        //btnEjecutar.setVisible(false);
+        btnEjecutar.setVisible(false);
         // algun nombre de extebtnEjecutarnsion???
         directorio = new Directory(this, jtpCode, title, ".cmx");
 
@@ -111,32 +113,38 @@ public class Compilador extends javax.swing.JFrame {
 
         rootPanel = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
+        btnEjecutar = new javax.swing.JButton();
         btnNuevo = new javax.swing.JButton();
         btnAbrir = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
         btnGuardarC = new javax.swing.JButton();
         btnCompilar = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtpCode = new javax.swing.JTextPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         jtaOutputConsole = new javax.swing.JTextArea();
         lblASin = new javax.swing.JLabel();
+        lblALex = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        btnGuardarC1 = new javax.swing.JButton();
-        btnGuardarC2 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        btnGuardarC3 = new javax.swing.JButton();
-        btnGuardarC4 = new javax.swing.JButton();
-        btnGuardarC5 = new javax.swing.JButton();
-        btnGuardarC6 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblTokens = new javax.swing.JTable();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
 
-        rootPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jPanel1.setBackground(new java.awt.Color(98, 114, 164));
+        jPanel1.setBackground(new java.awt.Color(188, 255, 237));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnEjecutar.setText("Ejecutar");
+        btnEjecutar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEjecutarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnEjecutar, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 520, -1, -1));
 
         btnNuevo.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/newfile_85903 (1).png"))); // NOI18N
@@ -149,7 +157,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnNuevoActionPerformed(evt);
             }
         });
-        jPanel1.add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 0, 230, 80));
+        jPanel1.add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 130, 50));
 
         btnAbrir.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnAbrir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/32527 (1).png"))); // NOI18N
@@ -162,7 +170,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnAbrirActionPerformed(evt);
             }
         });
-        jPanel1.add(btnAbrir, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 0, 210, 80));
+        jPanel1.add(btnAbrir, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 20, 110, 50));
 
         btnGuardar.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/save_icon_125167 (1).png"))); // NOI18N
@@ -175,11 +183,11 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 0, 270, 80));
+        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 20, 120, 50));
 
         btnGuardarC.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/981402 (1).png"))); // NOI18N
-        btnGuardarC.setText("Tabla de simbolos");
+        btnGuardarC.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/32743 (1).png"))); // NOI18N
+        btnGuardarC.setText("Guardar como");
         btnGuardarC.setToolTipText("");
         btnGuardarC.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
         btnGuardarC.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -188,7 +196,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarCActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 480, 210, 80));
+        jPanel1.add(btnGuardarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 20, 170, 50));
 
         btnCompilar.setBackground(new java.awt.Color(204, 255, 204));
         btnCompilar.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
@@ -202,7 +210,11 @@ public class Compilador extends javax.swing.JFrame {
                 btnCompilarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnCompilar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 560, 210, 90));
+        jPanel1.add(btnCompilar, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 530, 130, 50));
+
+        jLabel1.setFont(new java.awt.Font("Open Sans", 2, 36)); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/Codex-Mus c (1).png"))); // NOI18N
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 351, 78));
 
         jtpCode.setBackground(new java.awt.Color(39, 41, 52));
         jtpCode.setFont(new java.awt.Font("JetBrainsMono Nerd Font", 0, 24)); // NOI18N
@@ -211,7 +223,7 @@ public class Compilador extends javax.swing.JFrame {
         jtpCode.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jScrollPane1.setViewportView(jtpCode);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 1020, 480));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 840, 430));
 
         jtaOutputConsole.setEditable(false);
         jtaOutputConsole.setBackground(new java.awt.Color(229, 251, 255));
@@ -219,14 +231,19 @@ public class Compilador extends javax.swing.JFrame {
         jtaOutputConsole.setRows(5);
         jScrollPane2.setViewportView(jtaOutputConsole);
 
-        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 560, 1030, 199));
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 560, 710, 199));
 
         lblASin.setFont(new java.awt.Font("Open Sans Semibold", 0, 18)); // NOI18N
         lblASin.setForeground(new java.awt.Color(52, 73, 94));
-        lblASin.setText("Analizador Sintactico");
+        lblASin.setText("CONSOLA");
         jPanel1.add(lblASin, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 520, -1, -1));
 
-        jButton1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lblALex.setFont(new java.awt.Font("Open Sans Semibold", 0, 18)); // NOI18N
+        lblALex.setForeground(new java.awt.Color(52, 73, 94));
+        lblALex.setText("Analizador Lexico");
+        jPanel1.add(lblALex, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 0, -1, -1));
+
+        jButton1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jButton1.setText("-");
         jButton1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -234,9 +251,9 @@ public class Compilador extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 650, 100, 50));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 530, 40, 20));
 
-        jButton2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButton2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jButton2.setText("+");
         jButton2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -244,186 +261,56 @@ public class Compilador extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 650, 110, 50));
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 530, 40, 20));
 
-        btnGuardarC1.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/32743 (1).png"))); // NOI18N
-        btnGuardarC1.setText("Guardar como");
-        btnGuardarC1.setToolTipText("");
-        btnGuardarC1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC1ActionPerformed(evt);
+        tblTokens.setBackground(new java.awt.Color(229, 251, 255));
+        tblTokens.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        tblTokens.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Componente léxico", "Lexema", "[Línea, Columna]"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
-        jPanel1.add(btnGuardarC1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 0, 210, 80));
+        tblTokens.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tblTokens.getTableHeader().setReorderingAllowed(false);
+        jScrollPane3.setViewportView(tblTokens);
 
-        btnGuardarC2.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/lexico.png"))); // NOI18N
-        btnGuardarC2.setText("Analizador lexico");
-        btnGuardarC2.setToolTipText("");
-        btnGuardarC2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC2ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnGuardarC2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 80, 210, 80));
+        jPanel1.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 30, 500, 550));
 
-        jLabel1.setFont(new java.awt.Font("Open Sans", 2, 36)); // NOI18N
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logo3.png"))); // NOI18N
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 0, 320, 70));
+        jLabel2.setFont(new java.awt.Font("Cantarell", 0, 24)); // NOI18N
+        jLabel2.setText("Espacio para boton de abrir nuevas ventanas de ayuda xdxdxd");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 660, 660, -1));
 
-        btnGuardarC3.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
-        btnGuardarC3.setText("Arbol sintantico");
-        btnGuardarC3.setToolTipText("");
-        btnGuardarC3.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC3ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnGuardarC3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 160, 210, 80));
-
-        btnGuardarC4.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
-        btnGuardarC4.setText("Arbol semantico");
-        btnGuardarC4.setToolTipText("");
-        btnGuardarC4.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC4ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnGuardarC4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 90));
-
-        btnGuardarC5.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/GooglePlus_G_icon-icons.com_49945 (1).png"))); // NOI18N
-        btnGuardarC5.setText("Gramatica");
-        btnGuardarC5.setToolTipText("");
-        btnGuardarC5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC5ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnGuardarC5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 330, 210, 70));
-
-        btnGuardarC6.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/300px-simple_cycle_graphsvg (1).png"))); // NOI18N
-        btnGuardarC6.setText("AFND");
-        btnGuardarC6.setToolTipText("");
-        btnGuardarC6.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC6ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnGuardarC6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 400, 210, 80));
-
-        rootPanel.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(rootPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 1252, javax.swing.GroupLayout.PREFERRED_SIZE)
+        javax.swing.GroupLayout rootPanelLayout = new javax.swing.GroupLayout(rootPanel);
+        rootPanel.setLayout(rootPanelLayout);
+        rootPanelLayout.setHorizontalGroup(
+            rootPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(rootPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        rootPanelLayout.setVerticalGroup(
+            rootPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 765, Short.MAX_VALUE)
         );
+
+        getContentPane().add(rootPanel);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarC6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC6ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC6ActionPerformed
-
-    private void btnGuardarC5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC5ActionPerformed
-
-    private void btnGuardarC4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC4ActionPerformed
-
-    private void btnGuardarC3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC3ActionPerformed
-
-    private void btnGuardarC2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC2ActionPerformed
-
-    private void btnGuardarC1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC1ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        aumentarFuente();
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        disminuirFuente();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void btnCompilarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompilarActionPerformed
-        if (getTitle().contains("*") || getTitle().equals(title)) {
-            if (directorio.Save()) {
-                compilar();
-            }
-        } else {
-            codigoIntermedioSinOptimizar = "";
-            compilar();
-            CodeBlock bloqueCodigo = Functions.splitCodeInCodeBlocks(tokens,"{","}",";");
-            ArrayList<String> bloquesCodigo = bloqueCodigo.getBlocksOfCodeInOrderOfExec();
-            System.out.println("BLOQUES DE CODIGO: \n"+bloquesCodigo);
-            codigoEjecutable(bloquesCodigo,1);
-            System.out.println(codigoIntermedioSinOptimizar);
-        }
-        
-//        if (getTitle().contains("*") || getTitle().equals(title)) {
-//            if (directorio.Save()) {
-//                compilar();
-//            }
-//        } else {
-//            compilar();
-//        }
-//        btnCompilar.doClick();
-//        if (codeHasBeenCompiled) {
-//            if (!errors.isEmpty()) {
-//                JOptionPane.showMessageDialog(null, "No se puede ejecutar el código ya que se encontró uno o más errores",
-//                    "Error en la compilación", JOptionPane.ERROR_MESSAGE);
-//            } else {
-//                CodeBlock codeBlock = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";");
-//                System.out.println(codeBlock);
-//                ArrayList<String> bloquesCodigo = codeBlock.getBlocksOfCodeInOrderOfExec();
-//                System.out.println(bloquesCodigo);
-//                codigoEjecutable(bloquesCodigo,1);
-//            }
-//        }
-    }//GEN-LAST:event_btnCompilarActionPerformed
-
-    private void btnGuardarCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarCActionPerformed
-        if (directorio.SaveAs()) {
-            limpiarCampos();
-        }
-    }//GEN-LAST:event_btnGuardarCActionPerformed
-
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        if (directorio.Save()) {
-            limpiarCampos();
-        }
-    }//GEN-LAST:event_btnGuardarActionPerformed
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
+        directorio.New();
+        limpiarCampos();
+    }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirActionPerformed
         if (directorio.Open()) {
@@ -432,36 +319,60 @@ public class Compilador extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAbrirActionPerformed
 
-    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
-        directorio.New();
-        limpiarCampos();
-    }//GEN-LAST:event_btnNuevoActionPerformed
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+        if (directorio.Save()) {
+            limpiarCampos();
+        }
+    }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void btnGuardarCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarCActionPerformed
+        if (directorio.SaveAs()) {
+            limpiarCampos();
+        }
+    }//GEN-LAST:event_btnGuardarCActionPerformed
+
+    private void btnCompilarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompilarActionPerformed
+        if (getTitle().contains("*") || getTitle().equals(title)) {
+            if (directorio.Save()) {
+                compilar();
+            }
+        } else {
+            compilar();
+        }
+    }//GEN-LAST:event_btnCompilarActionPerformed
+
+    private void btnEjecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEjecutarActionPerformed
+        btnCompilar.doClick();
+        if (codeHasBeenCompiled) {
+            if (!errors.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No se puede ejecutar el código ya que se encontró uno o más errores",
+                        "Error en la compilación", JOptionPane.ERROR_MESSAGE);
+            } else {
+                CodeBlock codeBlock = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";");
+                System.out.println(codeBlock);
+                ArrayList<String> bloquesCodigo = codeBlock.getBlocksOfCodeInOrderOfExec();
+                System.out.println(bloquesCodigo);
+                codigoEjecutable(bloquesCodigo,1);
+            }
+        }
+    }//GEN-LAST:event_btnEjecutarActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        aumentarFuente();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        disminuirFuente();
+    }//GEN-LAST:event_jButton1ActionPerformed
     
     // NO USAR NO FUNCIONA
-    private void codigoEjecutable(ArrayList<String> blocksOfCode, int repeats){
-        for (int i = 1; i <= repeats; i++) {
+    private void codigoEjecutable(ArrayList<String> bloquesCodigo, int repetir){
+        for (int i = 0; i <= repetir; i++) {
             int repeatCode = -1;
-            for (int j = 0; j < blocksOfCode.size(); j++){
-                String blockOfCode = blocksOfCode.get(j);
+            for (int j = 0; 1 < repeatCode; i++){
+                String bloqueCodigo = bloquesCodigo.get(j);
                 if (repeatCode != -1){
-                    int[] posicionMarcador = CodeBlock.getPositionOfBothMarkers(blocksOfCode, blockOfCode);
-                    codigoEjecutable(new ArrayList<>(blocksOfCode.subList(posicionMarcador[0], posicionMarcador[1])),repeatCode);
-                    repeatCode = -1;
-                    i = posicionMarcador[1];
-                }
-                else{
-                    String[] sentences = blockOfCode.split(";");
-                    for (String sentence: sentences){
-                        // Generar codigo intermedio del tempos
-                        if(sentence.startsWith("tempo")){
-                            codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioTempo(sentence) + "\n";
-                        }
-                        //Remplazar varibables y generar estructura de variables
-                        if(sentence.contains("[") && sentence.contains("]")){
-                            if(sentence.contains("var")) continue;
-                            codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioNotas(sentence) + "\n";
-                        }
-                    }
+                    
                 }
             }
         }
@@ -683,13 +594,12 @@ public class Compilador extends javax.swing.JFrame {
 
             if (elementosCompas.validarTempo(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
             {
-                errors.add(new ErrorLSSL(51, " × Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
+                errors.add(new ErrorLSSL(51, "Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
             }
             it++;
-
         }// Analisis de rango tempo
-
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        
         // Analisis de valores compas
         it = 0;
         for (Production id : identProd) {
@@ -698,35 +608,37 @@ public class Compilador extends javax.swing.JFrame {
 
             if (elementosCompas.validarTamanoCompas(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
             {
-                errors.add(new ErrorLSSL(50, " × Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
+                errors.add(new ErrorLSSL(50, "Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
             }
             it++;
             
         }// Analisis de valores compas
-        //------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         //---------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Analisis de compases
         for (Production id : identProd) {
             // Obtener la produccion a evaluar
             produccionesEvaluar += id.lexemeRank(0, -1);
-            System.out.println(produccionesEvaluar);
+            
             // Variables de la evaluacion de notas
             diccionarioFiguraNota = elementosCompas.crearDiccionarioFiguraValor();
             elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
             valorCompas = elementosCompas.calcularCompas(produccionesEvaluar);
+            
             // Extraer los valores a evaluar de las producciones
             for (String element : elementosDentroCompas) {
                 sum = elementosCompas.sumaValoresCompas(element, diccionarioFiguraNota);
             }
 
             if (valorCompas > sum) { // Error: Numero de notas menor al compas
-                errors.add(new ErrorLSSL(52, " × Error: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
+                errors.add(new ErrorLSSL(52, "Error: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
             } else if (valorCompas < sum) { // Error: Numero de notas mayor al compas
-                errors.add(new ErrorLSSL(52, " × Error: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
+                errors.add(new ErrorLSSL(52, "Error: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
             }
         }// Analisis de compases
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        
     }
 
     private void colores() {
@@ -759,7 +671,7 @@ public class Compilador extends javax.swing.JFrame {
     private void rellenarTablaTokens() {
         tokens.forEach(token -> {
             Object[] data = new Object[]{id(token.getLexicalComp()), token.getLexicalComp(), token.getLexeme(), "[" + token.getLine() + ", " + token.getColumn() + "]"};
-           // Functions.addRowDataInTable(tblTokens, data);
+            Functions.addRowDataInTable(tblTokens, data);
         });
     }
 
@@ -901,7 +813,7 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     private void limpiarCampos() {
-        //Functions.clearDataInTable(tblTokens);
+        Functions.clearDataInTable(tblTokens);
         jtaOutputConsole.setText("");
         tokens.clear();
         errors.clear();
@@ -927,14 +839,16 @@ public class Compilador extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Compilador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CompiladorV1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Compilador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CompiladorV1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Compilador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CompiladorV1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Compilador.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CompiladorV1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
@@ -945,31 +859,30 @@ public class Compilador extends javax.swing.JFrame {
             } catch (UnsupportedLookAndFeelException ex) {
                 System.out.println("LookAndFeel no soportado: " + ex);
             }
-            new Compilador().setVisible(true);
+            new CompiladorV1().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAbrir;
     private javax.swing.JButton btnCompilar;
+    private javax.swing.JButton btnEjecutar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnGuardarC;
-    private javax.swing.JButton btnGuardarC1;
-    private javax.swing.JButton btnGuardarC2;
-    private javax.swing.JButton btnGuardarC3;
-    private javax.swing.JButton btnGuardarC4;
-    private javax.swing.JButton btnGuardarC5;
-    private javax.swing.JButton btnGuardarC6;
     private javax.swing.JButton btnNuevo;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jtaOutputConsole;
     private javax.swing.JTextPane jtpCode;
+    private javax.swing.JLabel lblALex;
     private javax.swing.JLabel lblASin;
     private javax.swing.JPanel rootPanel;
+    private javax.swing.JTable tblTokens;
     // End of variables declaration//GEN-END:variables
 }
