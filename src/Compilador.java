@@ -271,7 +271,7 @@ public class Compilador extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Open Sans", 2, 36)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logo3.png"))); // NOI18N
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 0, 320, 70));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, -10, 300, 80));
 
         btnGuardarC3.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardarC3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N

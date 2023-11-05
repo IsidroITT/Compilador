@@ -151,7 +151,7 @@ public class AnalisisSemantico {
             elements.add(element);
         }
 
-        return elements.toArray(new String[0]);
+        return elements.toArray(new String[elements.size()]);
     }
 
     public static void main(String[] args) {
