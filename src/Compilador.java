@@ -117,7 +117,6 @@ public class Compilador extends javax.swing.JFrame {
         jtpCode = new javax.swing.JTextPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         jtaOutputConsole = new javax.swing.JTextArea();
-        lblASin = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         btnGuardarC1 = new javax.swing.JButton();
@@ -132,9 +131,10 @@ public class Compilador extends javax.swing.JFrame {
 
         rootPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBackground(new java.awt.Color(98, 114, 164));
+        jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        btnNuevo.setBackground(new java.awt.Color(255, 153, 51));
         btnNuevo.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/newfile_85903 (1).png"))); // NOI18N
         btnNuevo.setText("Nuevo");
@@ -146,8 +146,9 @@ public class Compilador extends javax.swing.JFrame {
                 btnNuevoActionPerformed(evt);
             }
         });
-        jPanel1.add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 0, 230, 80));
+        jPanel1.add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 110, 210, 40));
 
+        btnAbrir.setBackground(new java.awt.Color(153, 153, 255));
         btnAbrir.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnAbrir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/32527 (1).png"))); // NOI18N
         btnAbrir.setText("Abrir");
@@ -159,8 +160,9 @@ public class Compilador extends javax.swing.JFrame {
                 btnAbrirActionPerformed(evt);
             }
         });
-        jPanel1.add(btnAbrir, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 0, 210, 80));
+        jPanel1.add(btnAbrir, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 150, 210, 40));
 
+        btnGuardar.setBackground(new java.awt.Color(102, 255, 204));
         btnGuardar.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/save_icon_125167 (1).png"))); // NOI18N
         btnGuardar.setText("Guardar");
@@ -172,7 +174,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 0, 270, 80));
+        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 190, 210, 40));
 
         btnGuardarC.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardarC.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/981402 (1).png"))); // NOI18N
@@ -185,7 +187,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarCActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 480, 210, 80));
+        jPanel1.add(btnGuardarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 320, 210, 80));
 
         btnCompilar.setBackground(new java.awt.Color(204, 255, 204));
         btnCompilar.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
@@ -199,16 +201,17 @@ public class Compilador extends javax.swing.JFrame {
                 btnCompilarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnCompilar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 560, 210, 90));
+        jPanel1.add(btnCompilar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 310, 210, 60));
 
         jtpCode.setBackground(new java.awt.Color(39, 41, 52));
+        jtpCode.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         jtpCode.setFont(new java.awt.Font("JetBrainsMono Nerd Font", 0, 24)); // NOI18N
         jtpCode.setForeground(new java.awt.Color(247, 247, 241));
         jtpCode.setCaretColor(new java.awt.Color(255, 255, 255));
         jtpCode.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jScrollPane1.setViewportView(jtpCode);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 1020, 480));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 820, 480));
 
         jtaOutputConsole.setEditable(false);
         jtaOutputConsole.setBackground(new java.awt.Color(229, 251, 255));
@@ -216,12 +219,7 @@ public class Compilador extends javax.swing.JFrame {
         jtaOutputConsole.setRows(5);
         jScrollPane2.setViewportView(jtaOutputConsole);
 
-        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 560, 1030, 199));
-
-        lblASin.setFont(new java.awt.Font("Open Sans Semibold", 0, 18)); // NOI18N
-        lblASin.setForeground(new java.awt.Color(52, 73, 94));
-        lblASin.setText("Analizador Sintactico");
-        jPanel1.add(lblASin, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 520, -1, -1));
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 480, 1030, 199));
 
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButton1.setText("-");
@@ -231,7 +229,7 @@ public class Compilador extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 650, 100, 50));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 370, 100, 50));
 
         jButton2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButton2.setText("+");
@@ -241,8 +239,9 @@ public class Compilador extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 650, 110, 50));
+        jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 370, 110, 50));
 
+        btnGuardarC1.setBackground(new java.awt.Color(255, 255, 204));
         btnGuardarC1.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardarC1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/32743 (1).png"))); // NOI18N
         btnGuardarC1.setText("Guardar como");
@@ -254,11 +253,12 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarC1ActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 0, 210, 80));
+        jPanel1.add(btnGuardarC1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 230, 210, -1));
 
+        btnGuardarC2.setBackground(new java.awt.Color(153, 204, 255));
         btnGuardarC2.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardarC2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/lexico.png"))); // NOI18N
-        btnGuardarC2.setText("Analizador lexico");
+        btnGuardarC2.setText("Analizadores");
         btnGuardarC2.setToolTipText("");
         btnGuardarC2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
         btnGuardarC2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -267,11 +267,11 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarC2ActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 80, 210, 80));
+        jPanel1.add(btnGuardarC2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 270, 210, 40));
 
         jLabel1.setFont(new java.awt.Font("Open Sans", 2, 36)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logo3.png"))); // NOI18N
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, -10, 300, 80));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-20, 0, -1, 80));
 
         btnGuardarC3.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardarC3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
@@ -284,7 +284,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarC3ActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 160, 210, 80));
+        jPanel1.add(btnGuardarC3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 0, 210, 80));
 
         btnGuardarC4.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardarC4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
@@ -297,7 +297,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarC4ActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 90));
+        jPanel1.add(btnGuardarC4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 80, 210, 90));
 
         btnGuardarC5.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardarC5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/GooglePlus_G_icon-icons.com_49945 (1).png"))); // NOI18N
@@ -310,7 +310,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarC5ActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 330, 210, 70));
+        jPanel1.add(btnGuardarC5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 170, 210, 70));
 
         btnGuardarC6.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGuardarC6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/300px-simple_cycle_graphsvg (1).png"))); // NOI18N
@@ -323,7 +323,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnGuardarC6ActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 400, 210, 80));
+        jPanel1.add(btnGuardarC6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 80));
 
         rootPanel.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
 
@@ -335,7 +335,9 @@ public class Compilador extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(rootPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(rootPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -972,7 +974,6 @@ public class Compilador extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jtaOutputConsole;
     private javax.swing.JTextPane jtpCode;
-    private javax.swing.JLabel lblASin;
     private javax.swing.JPanel rootPanel;
     // End of variables declaration//GEN-END:variables
 }
