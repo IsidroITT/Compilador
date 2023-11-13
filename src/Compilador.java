@@ -1,3 +1,5 @@
+import Analisis.ErroresSintacticos;
+import Analisis.TablaSimbolos;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import compilerTools.CodeBlock;
 import compilerTools.Directory;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -33,18 +36,38 @@ import javax.swing.Timer;
  */
 public class Compilador extends javax.swing.JFrame {
 
+    // Variables del editor
     private String title;
     private Directory directorio;
+
+    // Variables para analisis lexico
     private ArrayList<Token> tokens;
-    private ArrayList<ErrorLSSL> errors;
+
+    // Manejador de errores
+    private ArrayList<ErrorLSSL> errorsSintac;
+    private ArrayList<ErrorLSSL> errorsSemantic;
+
+    // Color en los tokens
     private ArrayList<TextColor> textsColor;
     private Timer timerKeyReleased;
+
+    // Variables para el analisis sintactico
     private ArrayList<Production> identProd;
     private HashMap<String, String> identificadores;
+
+    // Codigo compilado
     private boolean codeHasBeenCompiled = false;
+
+    // Variables analisis semantico
     private AnalisisSemantico elementosCompas;
+
+    // Variables codigo intermedio
     private generadorIntermedio codIntermedio;
     private String codigoIntermedioSinOptimizar;
+
+    // Variables mostrar resultado de los analisis
+    private TablaSimbolos TablaDSimbolos;
+    private ErroresSintacticos ErroresSintac;
 
     /**
      * Creates new form Compilador
@@ -56,7 +79,20 @@ public class Compilador extends javax.swing.JFrame {
         //setExtendedState(JFrame.MAXIMIZED_BOTH);
         jPanel1.setLayout(new BorderLayout());
         add(jPanel1, BorderLayout.CENTER);
+        this.setResizable(false);
+        this.setLocationRelativeTo(null);
 
+        // Acultar los analizadores
+        btnAnalizadores.setVisible(false);
+        btnGramaticas.setVisible(false);
+        btnArbolesSemanticos.setVisible(false);
+        btnArbolesSintactico.setVisible(false);
+        btnAutomatas.setVisible(false);
+        btnTablaSimbolos.setVisible(false);
+
+        // Mostrar tabla de simbolos
+        TablaDSimbolos.setLocationRelativeTo(this);
+        ErroresSintac.setLocationRelativeTo(this);
     }
 
     private void init() {
@@ -89,12 +125,16 @@ public class Compilador extends javax.swing.JFrame {
         Functions.insertAsteriskInName(this, jtpCode, () -> {
             timerKeyReleased.restart();
         });
+
         //Arrays de elementos
         tokens = new ArrayList<>();
-        errors = new ArrayList<>();
+        errorsSintac = new ArrayList<>();
+        errorsSemantic = new ArrayList<>();
         textsColor = new ArrayList<>();
         identProd = new ArrayList<>();
         identificadores = new HashMap<>();
+        TablaDSimbolos = new TablaSimbolos();
+        ErroresSintac = new ErroresSintacticos();
 
         //Autocompletado de codigo
         Functions.setAutocompleterJTextComponent(new String[]{/*UTILIZAR AL FINAL*/}, jtpCode, () -> {
@@ -111,7 +151,7 @@ public class Compilador extends javax.swing.JFrame {
         btnNuevo = new javax.swing.JButton();
         btnAbrir = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
-        btnGuardarC = new javax.swing.JButton();
+        btnTablaSimbolos = new javax.swing.JButton();
         btnCompilar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtpCode = new javax.swing.JTextPane();
@@ -120,12 +160,12 @@ public class Compilador extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         btnGuardarC1 = new javax.swing.JButton();
-        btnGuardarC2 = new javax.swing.JButton();
+        btnAnalizadores = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        btnGuardarC3 = new javax.swing.JButton();
-        btnGuardarC4 = new javax.swing.JButton();
-        btnGuardarC5 = new javax.swing.JButton();
-        btnGuardarC6 = new javax.swing.JButton();
+        btnArbolesSintactico = new javax.swing.JButton();
+        btnArbolesSemanticos = new javax.swing.JButton();
+        btnGramaticas = new javax.swing.JButton();
+        btnAutomatas = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
@@ -176,18 +216,18 @@ public class Compilador extends javax.swing.JFrame {
         });
         jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 190, 210, 40));
 
-        btnGuardarC.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/981402 (1).png"))); // NOI18N
-        btnGuardarC.setText("Tabla de simbolos");
-        btnGuardarC.setToolTipText("");
-        btnGuardarC.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC.addActionListener(new java.awt.event.ActionListener() {
+        btnTablaSimbolos.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
+        btnTablaSimbolos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/981402 (1).png"))); // NOI18N
+        btnTablaSimbolos.setText("Tabla de simbolos");
+        btnTablaSimbolos.setToolTipText("");
+        btnTablaSimbolos.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        btnTablaSimbolos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnTablaSimbolos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarCActionPerformed(evt);
+                btnTablaSimbolosActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 320, 210, 80));
+        jPanel1.add(btnTablaSimbolos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 80, 210, 80));
 
         btnCompilar.setBackground(new java.awt.Color(204, 255, 204));
         btnCompilar.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
@@ -255,75 +295,75 @@ public class Compilador extends javax.swing.JFrame {
         });
         jPanel1.add(btnGuardarC1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 230, 210, -1));
 
-        btnGuardarC2.setBackground(new java.awt.Color(153, 204, 255));
-        btnGuardarC2.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/lexico.png"))); // NOI18N
-        btnGuardarC2.setText("Analizadores");
-        btnGuardarC2.setToolTipText("");
-        btnGuardarC2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC2.addActionListener(new java.awt.event.ActionListener() {
+        btnAnalizadores.setBackground(new java.awt.Color(153, 204, 255));
+        btnAnalizadores.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
+        btnAnalizadores.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/lexico.png"))); // NOI18N
+        btnAnalizadores.setText("Analizadores");
+        btnAnalizadores.setToolTipText("");
+        btnAnalizadores.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        btnAnalizadores.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnAnalizadores.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC2ActionPerformed(evt);
+                btnAnalizadoresActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 270, 210, 40));
+        jPanel1.add(btnAnalizadores, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 270, 210, 40));
 
         jLabel1.setFont(new java.awt.Font("Open Sans", 2, 36)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logo3.png"))); // NOI18N
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-20, 0, -1, 80));
 
-        btnGuardarC3.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
-        btnGuardarC3.setText("Arbol sintantico");
-        btnGuardarC3.setToolTipText("");
-        btnGuardarC3.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC3.addActionListener(new java.awt.event.ActionListener() {
+        btnArbolesSintactico.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
+        btnArbolesSintactico.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
+        btnArbolesSintactico.setText("Arbol sintantico");
+        btnArbolesSintactico.setToolTipText("");
+        btnArbolesSintactico.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        btnArbolesSintactico.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnArbolesSintactico.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC3ActionPerformed(evt);
+                btnArbolesSintacticoActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 0, 210, 80));
+        jPanel1.add(btnArbolesSintactico, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 80));
 
-        btnGuardarC4.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
-        btnGuardarC4.setText("Arbol semantico");
-        btnGuardarC4.setToolTipText("");
-        btnGuardarC4.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC4.addActionListener(new java.awt.event.ActionListener() {
+        btnArbolesSemanticos.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
+        btnArbolesSemanticos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
+        btnArbolesSemanticos.setText("Arbol semantico");
+        btnArbolesSemanticos.setToolTipText("");
+        btnArbolesSemanticos.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        btnArbolesSemanticos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnArbolesSemanticos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC4ActionPerformed(evt);
+                btnArbolesSemanticosActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 80, 210, 90));
+        jPanel1.add(btnArbolesSemanticos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 320, 210, 90));
 
-        btnGuardarC5.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/GooglePlus_G_icon-icons.com_49945 (1).png"))); // NOI18N
-        btnGuardarC5.setText("Gramatica");
-        btnGuardarC5.setToolTipText("");
-        btnGuardarC5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC5.addActionListener(new java.awt.event.ActionListener() {
+        btnGramaticas.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
+        btnGramaticas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/GooglePlus_G_icon-icons.com_49945 (1).png"))); // NOI18N
+        btnGramaticas.setText("Gramatica");
+        btnGramaticas.setToolTipText("");
+        btnGramaticas.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        btnGramaticas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnGramaticas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC5ActionPerformed(evt);
+                btnGramaticasActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 170, 210, 70));
+        jPanel1.add(btnGramaticas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 10, 210, 70));
 
-        btnGuardarC6.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnGuardarC6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/300px-simple_cycle_graphsvg (1).png"))); // NOI18N
-        btnGuardarC6.setText("AFND");
-        btnGuardarC6.setToolTipText("");
-        btnGuardarC6.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnGuardarC6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarC6.addActionListener(new java.awt.event.ActionListener() {
+        btnAutomatas.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
+        btnAutomatas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/300px-simple_cycle_graphsvg (1).png"))); // NOI18N
+        btnAutomatas.setText("AFND");
+        btnAutomatas.setToolTipText("");
+        btnAutomatas.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        btnAutomatas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnAutomatas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarC6ActionPerformed(evt);
+                btnAutomatasActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGuardarC6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 80));
+        jPanel1.add(btnAutomatas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 160, 210, 80));
 
         rootPanel.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
 
@@ -343,25 +383,29 @@ public class Compilador extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarC6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC6ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC6ActionPerformed
+    private void btnAutomatasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAutomatasActionPerformed
+        System.out.println("Soy el botoncito de los automatitas 8D");
+    }//GEN-LAST:event_btnAutomatasActionPerformed
 
-    private void btnGuardarC5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC5ActionPerformed
+    private void btnGramaticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGramaticasActionPerformed
+        ErroresSintac.setVisible(true);
+    }//GEN-LAST:event_btnGramaticasActionPerformed
 
-    private void btnGuardarC4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC4ActionPerformed
+    private void btnArbolesSemanticosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArbolesSemanticosActionPerformed
+        System.out.println("Soy el botoncito de los arbolitos semanticos :P");
+    }//GEN-LAST:event_btnArbolesSemanticosActionPerformed
 
-    private void btnGuardarC3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC3ActionPerformed
+    private void btnArbolesSintacticoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArbolesSintacticoActionPerformed
+        System.out.println("Soy el botoncito del analizadorsito sintactico :D");
+    }//GEN-LAST:event_btnArbolesSintacticoActionPerformed
 
-    private void btnGuardarC2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarC2ActionPerformed
+    private void btnAnalizadoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalizadoresActionPerformed
+        btnGramaticas.setVisible(true);
+        //btnArbolesSemanticos.setVisible(true);
+        //btnArbolesSintactico.setVisible(true);
+        //btnAutomatas.setVisible(true);
+        btnTablaSimbolos.setVisible(true);
+    }//GEN-LAST:event_btnAnalizadoresActionPerformed
 
     private void btnGuardarC1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarC1ActionPerformed
         // TODO add your handling code here:
@@ -381,25 +425,37 @@ public class Compilador extends javax.swing.JFrame {
                 compilar();
             }
         } else {
+            // Inicializar el codigo intermedio
             codigoIntermedioSinOptimizar = "";
+
+            // Compilar el proyecto
             compilar();
+
+            // Separar los bloques de codigo por '{}' y las sentencias con ';'
             CodeBlock bloqueCodigo = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";");
             ArrayList<String> bloquesCodigo = bloqueCodigo.getBlocksOfCodeInOrderOfExec();
-            codigoEjecutable(bloquesCodigo, 1);
-            System.out.println("<----------------------------------------------------->\n CODIGO INTERMEDIO GENERADO");
-            System.out.println(codigoIntermedioSinOptimizar);
-            System.out.println("<----------------------------------------------------->\n VARIABLES ENCONTRADAS");
-            for (Map.Entry<String, String> entry : identificadores.entrySet()) {
-                System.out.println("Variable: " + entry.getKey() + " = " + entry.getValue());
-            }
+
+            // Generar codigo intermedio
+//            codigoEjecutable(bloquesCodigo, 1);
+//
+//            // Pruebas del codigo intermedio
+//            System.out.println("<----------------------------------------------------->\n CODIGO INTERMEDIO GENERADO");
+//            System.out.println(codigoIntermedioSinOptimizar);
+//
+//            // Pruebas de variables
+//            System.out.println("<----------------------------------------------------->\n VARIABLES ENCONTRADAS");
+//            for (Map.Entry<String, String> entry : identificadores.entrySet()) {
+//                System.out.println("Variable: " + entry.getKey() + " = " + entry.getValue());
+//            }
         }
+
+        // Mostrar los "analisis" realizados
+        btnAnalizadores.setVisible(true);
     }//GEN-LAST:event_btnCompilarActionPerformed
 
-    private void btnGuardarCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarCActionPerformed
-        if (directorio.SaveAs()) {
-            limpiarCampos();
-        }
-    }//GEN-LAST:event_btnGuardarCActionPerformed
+    private void btnTablaSimbolosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTablaSimbolosActionPerformed
+        TablaDSimbolos.setVisible(true);
+    }//GEN-LAST:event_btnTablaSimbolosActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         if (directorio.Save()) {
@@ -436,12 +492,12 @@ public class Compilador extends javax.swing.JFrame {
                         if (sentence.startsWith("var")) {
                             codIntermedio.agregarVariablesAlMapa(sentence, identificadores);
                         }
-                        
+
                         // Generar codigo intermedio del tempos
                         if (sentence.startsWith("tempo")) {
                             codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioTempo(sentence) + "\n";
                         }
-                        
+
                         // Ciclo de REP
                         if (sentence.contains("rep")) {
                             // Encontrar el numero de repeticiones
@@ -452,12 +508,12 @@ public class Compilador extends javax.swing.JFrame {
                             }
                             repeatCode = Integer.parseInt(parametro) - 1;
                         }
-                        
+
                         //Reemplazar variables
                         if (codIntermedio.cadenaPerteneceAlMapa(sentence, identificadores)) {
                             sentence = codIntermedio.reemplazarVariables(sentence, identificadores);
                         }
-                        
+
                         //Remplazar varibables y generar estructura de variables
                         if (sentence.contains("[") && sentence.contains("]")) {
                             if (sentence.contains("var") || sentence.contains("P")) {
@@ -489,7 +545,7 @@ public class Compilador extends javax.swing.JFrame {
         analisisLexico();
         rellenarTablaTokens();
         analisisSintactico();
-        analisisSemantico();
+        //analisisSemantico();
         mostrarConsola();
         codeHasBeenCompiled = true;
     }
@@ -519,18 +575,49 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     private void analisisSintactico() {
-        Grammar gramatica = new Grammar(tokens, errors);
-        /* ERRORES */
-        gramatica.delete(new String[]{"ERROR", "ERROR_RESERVADA"}, 1);
+        Grammar gramatica = new Grammar(tokens, errorsSintac);
+        /* ERRORES LEXICOS*/
+        gramatica.delete(new String[]{"ERROR", "ERROR_RESERVADA", "ERROR_IDENTIFICADOR"}, 
+                1,"Error Lexico: NO se esperaba el token [#,%]");
 
-        /* GRUPOS */
+        /* GRUPO de FIGURAS */
         gramatica.group("FIGURA", "(TOKEN_REDONDA|TOKEN_BLANCA|TOKEN_NEGRA|TOKEN_CORCHEA|TOKEN_SEMICORCHEA|TOKEN_FUSA|TOKEN_SEMIFUSA|"
                 + "TOKEN_SILENCIO_REDONDA|TOKEN_SILENCIO_BLANCA|TOKEN_SILENCIO_NEGRA|TOKEN_SILENCIO_CORCHEA|TOKEN_SILENCIO_SEMICORCHEA|TOKEN_SILENCIO_FUSA|TOKEN_SILENCIO_SEMIFUSA|"
                 + "TOKEN_REDONDA_PIANO|TOKEN_BLANCA_PIANO|TOKEN_NEGRA_PIANO|TOKEN_CORCHEA_PIANO|TOKEN_SEMICORCHEA_PIANO|TOKEN_FUSA_PIANO|TOKEN_SEMIFUSA_PIANO|"
                 + "TOKEN_REDONDA_LED|TOKEN_BLANCA_LED|TOKEN_NEGRA_LED|TOKEN_CORCHEA_LED|TOKEN_SEMICORCHEA_LED|TOKEN_FUSA_LED|TOKEN_SEMIFUSA_LED)", true);
-
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        /* EXPRESION DE CLAVE (IF) */
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE TOKEN_DIGITO", true);
-
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
+                2, "Error sintáctico {}: No hay una nota de clave selecionada [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_DIGITO", true,
+                3, "Error sintáctico {}: Hace falta el token de selección de clave '^' [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE", true,
+                4, "Error sintáctico {}: Hace falta una declaracon de octava en la selección de clave [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_DIGITO", true,
+                5, "Error sintáctico {}: Digito fuera de contexto [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE", true,
+                6, "Error sintáctico {}: Token de selección de clave '^' fuera de contexto [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE", true,
+                7, "Error sintáctico {}: Nota de clave sin contexto [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE FIGURA", true,
+                8, "Error sintáctico {}: No es podibles asignar una figura una clave [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "FIGURA TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
+                9, "Error sintáctico {}: No es posible asignar un valor numerico a una figura dentro de la selección de clave [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE FIGURA TOKEN_DIGITO", true,
+                10, "Error sintáctico {}: NO es posible usar una figura como selección de clave, es necesario un selector de clave '^' [#,%]");
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION FIGURA CON NOTA ----------------------------------------- */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
             gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA");
@@ -538,71 +625,101 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
             gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA");
         });
-        gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS", true);
         gramatica.group("COMPAS", "TOKEN_DIGITO TOKEN_DIVISOR_TEMPO TOKEN_DIGITO");
-        //gramatica.group("COMPAS_ERROR", "TOKEN_DIGITO TOKEN_DIGITO | TOKEN_DIGITO");
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        /* COMPAS NOTAS */
+        gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS TOKEN_FIN_SENTENCIA", true);
+        
+        gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS", true,
+                24, "Error sintáctico {}: Error en el bloque de notas del compas hace falta un terminador de sentencia ';' [#,%]");
 
+        gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_FIN_SENTENCIA", true,
+                24, "Error sintáctico {}: Hace falta un cierre de compas ']' [#,%]");
+
+        gramatica.group("COMPAS_NOTAS", "(FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS TOKEN_FIN_SENTENCIA", true,
+                25, "Error sintáctico {}: Hace falta un inicio de compas '[' [#,%]");
+
+        gramatica.group("COMPAS_NOTAS", "(FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_FIN_SENTENCIAs", true,
+                25, "Error sintáctico {}: Figuras y notas fuera de compas, hace falta '[' y ']' [#,%]");
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACIÓN COMPAS */
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true, identProd);
 
         gramatica.initialLineColumn();
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS_ERROR TOKEN_FIN_SENTENCIA", true,
-                6, "Error sintáctico {}: Falta declarar unidad de tiempo [#,%]");
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true,
+                6, "Error sintáctico {}: Falta declarar unidad de compas [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIVISOR_TEMPO TOKEN_DIGITO TOKEN_FIN_SENTENCIA", true,
-                7, "Error sintáctico {}: Falta declarar unidad de compás [#,%]");
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS", true,
+                7, "Error sintáctico {}: Falta declarar el finalizador de sentencia \';\' [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_DIGITO TOKEN_DIVISOR_TEMPO TOKEN_DIGITO TOKEN_FIN_SENTENCIA", true,
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS COMPAS TOKEN_FIN_SENTENCIA", true,
                 8, "Error sintáctico {}: Falta declarar asignación (=) [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
-                9, "Error sintáctico {}: Falta divisor (/) [#,%]");
+        gramatica.group("DECLARACION_COMPAS", " TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true,
+                9, "Error sintáctico {}: Falta colocar la variable del compas [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_FIN_SENTENCIA", true,
                 10, "Error sintáctico {}: No hay un compás asignado [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIGITO TOKEN_DIVISOR_TEMPO", true,
+        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKTOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIGITO TOKEN_DIVISOR_TEMPOEN_DIGITO TOKEN_DIVISOR_TEMPO", true,
                 11, "Error sintáctico {}: Se esperaba un fin de sentencia (;) [#,%]");
 
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_DIVISOR_TEMPO", true,
-                12, "Error sintáctico {}: Se esperaba un número después del divisor (/) [#,%]");
-
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION", true,
-                13, "Error sintáctico {}: Declaración de compás incompleta, falta especificar el compás (ejemplo: 3/4) [#,%]");
-
-        gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_DIGITO", true,
-                14, "Error sintáctico {}: Declaración de compás incompleta, falta especificar el divisor (/) [#,%]");
+                12, "Error sintáctico {}: Declaración de compás incompleta, falta especificar el compás (ejemplo: 3/4) [#,%]");
 
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS", true,
-                15, "Error sintáctico {}: Declaración de compás incompleta, falta asignar un valor (ejemplo: compas = 3/4;) [#,%]");
-
+                13, "Error sintáctico {}: Declaración de compás incompleta, falta asignar un valor (ejemplo: compas = 3/4;) [#,%]");
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACIÓN TEMPO */
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION TOKEN_DIGITO+ TOKEN_FIN_SENTENCIA", true, identProd);
 
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION", true,
-                16, "Error sintáctico {}: Declaración de tempo incompleta, falta especificar el valor del tempo [#,%]");
+        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION TOKEN_DIGITO+ ", true,
+                14, "Error sintáctico {}: Falta declarar el finalizador de sentencia \';\' [#,%]");
 
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_DIGITO+ TOKEN_FIN_SENTENCIA", true,
-                17, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
+        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
+                15, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
 
-        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO", true,
-                18, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
-
+        gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO  TOKEN_DIGITO+ TOKEN_FIN_SENTENCIA", true,
+                16, "Error sintáctico {}: Declaración de tempo incompleta, falta el simbolo de asignacion \'=\' [#,%]");
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACIÓN IDENTIFICADOR */
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true, identProd);
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS", true, identProd);
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS", true,
+                17, "Error sintáctico {}: Falta el finalizador de sentencia \';\' [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
+                18, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un bloque de notas (ejemplo: [F.n, A.b, C.n]) [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR  TOKEN_ASIGNACION COMPAS_NOTAS", true,
+                19, "Error sintáctico {}: Declaración de identificador incompleta, NO hay una palabra que pueda ser utilizada para asignación [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS", true,
+                20, "Error sintáctico {}: Declaración de identificador incompleta, falta agregar la palabra reservada 'var' para decrarar el identificador [#,%]");
 
         gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION", true,
-                19, "Error sintáctico {}: Declaración de identificador incompleta, falta especificar las notas [#,%]");
+                21, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un bloque de notas y el finalizador de sentencias (ejemplo: [F.n, A.b, C.n];) [#,%]");
 
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR COMPAS_NOTAS TOKEN_FIN_SENTENCIA", true,
-                20, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un valor (ejemplo: id = {...};) [#,%]");
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR", true,
+                22, "Error sintáctico {}: Declaración de identificador incompleta, (ejemplo: var id = [F.n, A.b, C.n];) [#,%]");
 
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR", true,
+                23, "Error sintáctico {}: Declaración de identificador incompleta, no hay información del identificar [#,%]");
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACIÓN FIGURA CON NOTA */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("BLOQUE_NOTAS_TOCAR", "(COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS)* COMPAS_NOTAS|TOKEN_IDENTIFICADOR", identProd);
+            gramatica.group("BLOQUE_NOTAS_TOCAR", "(COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS)* COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_FIN_SENTENCIA", identProd);
         });
-
-        gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS", true);
 
         gramatica.initialLineColumn();
         gramatica.group("BLOQUE_NOTAS_TOCAR", "COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS", true,
@@ -610,7 +727,9 @@ public class Compilador extends javax.swing.JFrame {
 
         gramatica.group("BLOQUE_NOTAS_TOCAR", "(COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS)+", true,
                 23, "Error sintáctico {}: Declaración de notas incompleta, falta especificar las notas o finalizar con un punto y coma (;) [#,%]");
-
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION CLAVE */
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA TOKEN_SELECION_CLAVE TOKEN_DIGITO", true);
         gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE CLAVE_IF_EXPRESION TOKEN_CIERRE_CLAVE", true);
@@ -626,7 +745,9 @@ public class Compilador extends javax.swing.JFrame {
 
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE", true,
                 28, "Error sintáctico {}: Declaración de clave incompleta, falta la palabra reservada \"\\clave\" antes de la selección de clave (ejemplo: \\clave G2;) [#,%]");
-
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION REP */
         gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR+ TOKEN_CIERRE_CLAVE", true);
 
@@ -642,32 +763,66 @@ public class Compilador extends javax.swing.JFrame {
 
         gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR* TOKEN_CIERRE_CLAVE", true,
                 32, "Error sintáctico {}: Declaración de repetición incompleta, falta especificar las repeticiones (ejemplo: \\rep 3 {...};) [#,%]");
-
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        
         /* DECLARACION SENTENCIAS */
         gramatica.initialLineColumn();
-        gramatica.group("SENTENCIAS", "(BLOQUE_NOTAS_TOCAR | TOKEN_SEPARACION_COMPAS | TOKEN_IDENTIFICADOR)+", true);
+        gramatica.group("SENTENCIAS", "(BLOQUE_NOTAS_TOCAR | TOKEN_IDENTIFICADOR | COMPAS_NOTAS)+ TOKEN_FIN_SENTENCIA", true);
 
+//        gramatica.group("SENTENCIAS", "(BLOQUE_NOTAS_TOCAR | TOKEN_SEPARACION_COMPAS | TOKEN_IDENTIFICADOR)+", true,
+//                33, "Error sintáctico {}: NO hay un finalizador de sentencia ';'[#,%]");
+        
         gramatica.initialLineColumn();
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* ESTRUCTURAS DE CONTROL */
         gramatica.group("ESTRUCTURAS_CONTROL", "(CLAVE_IF | DECLARACION_REP)", true, identProd);
-
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* FUNCIONES SALIDA FISICA */
         gramatica.group("FUNCIONES", "(TOKEN_PIANO_CONTROL | TOKEN_LEDS)", true);
 
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_CIERRE_NOTAS", true);
+            gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true);
         });
 
+        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL (SENTENCIAS)? TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true,
+                50, "Error sintáctico {}: No hay un inicio de notas '{' [#,%]");
+
+        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_FIN_SENTENCIA", true,
+                51, "Error sintáctico {}: No hay un final de notas '}' [#,%]");
+
+        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_CIERRE_NOTAS", true,
+                52, "Error sintáctico {}: No hay un final de sentencia ';' [#,%]");
+
+        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true,
+                53, "Error sintáctico {}: No hay una estrucutra de control asociada al bloque de codigo [#,%]");
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION INICIO-FIN */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)+ TOKEN_FINAL_PARTITURA", true);
+            gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)+ TOKEN_FINAL_PARTITURA TOKEN_FIN_SENTENCIA", true);
         });
 
+        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)+ TOKEN_FINAL_PARTITURA", true,
+                55, "Error sintáctico {}: No hay un final de sentencia ';' [#,%]");
+
+        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)+", true,
+                55, "Error sintáctico {}: No hay un final inidicado para la partitura '\\fin' [#,%]");
+
+
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("BLOQUE_SALIDA_FISICA", "FUNCIONES TOKEN_APERTURA_NOTAS (ESTRUCTURA_CONTROL_COMPLETA | SENTENCIAS)+ TOKEN_CIERRE_NOTAS", true);
+            gramatica.group("BLOQUE_SALIDA_FISICA", "FUNCIONES TOKEN_APERTURA_NOTAS (ESTRUCTURA_CONTROL_COMPLETA | SENTENCIAS)+ TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true);
         });
 
         gramatica.finalLineColumn();
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
         /* Mostrar gramáticas */
         gramatica.show();
     }
@@ -689,7 +844,7 @@ public class Compilador extends javax.swing.JFrame {
 
             if (elementosCompas.validarTempo(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
             {
-                errors.add(new ErrorLSSL(51, " × Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
+                errorsSemantic.add(new ErrorLSSL(51, " × Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
             }
             it++;
 
@@ -704,12 +859,12 @@ public class Compilador extends javax.swing.JFrame {
 
             if (elementosCompas.validarTamanoCompas(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
             {
-                errors.add(new ErrorLSSL(50, " × Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
+                errorsSemantic.add(new ErrorLSSL(50, " × Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
             }
             it++;
 
         }// Analisis de valores compas
-        //------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------//------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         //---------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Analisis de compases
@@ -726,12 +881,12 @@ public class Compilador extends javax.swing.JFrame {
             }
 
             if (valorCompas > sum) { // Error: Numero de notas menor al compas
-                errors.add(new ErrorLSSL(52, " × Error: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
+                errorsSemantic.add(new ErrorLSSL(52, " × Error: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
             } else if (valorCompas < sum) { // Error: Numero de notas mayor al compas
-                errors.add(new ErrorLSSL(52, " × Error: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
+                errorsSemantic.add(new ErrorLSSL(52, " × Error: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
             }
         }// Analisis de compases
-        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
     }
 
     private void colores() {
@@ -762,10 +917,26 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     private void rellenarTablaTokens() {
+        btnTablaSimbolos.setBackground(Color.green);
+        limpiarTablaTokens();
         tokens.forEach(token -> {
             Object[] data = new Object[]{id(token.getLexicalComp()), token.getLexicalComp(), token.getLexeme(), "[" + token.getLine() + ", " + token.getColumn() + "]"};
-            // Functions.addRowDataInTable(tblTokens, data);
+            Functions.addRowDataInTable(TablaDSimbolos.getTblTokens(), data);
+            System.out.println("hi");
         });
+    }
+
+    private void limpiarTablaTokens() {
+        DefaultTableModel modelo = (DefaultTableModel) TablaDSimbolos.getTblTokens().getModel();
+
+        // Limpiar todas las filas
+        modelo.setRowCount(0);
+
+        // Refrescar la vista de la tabla
+        modelo.fireTableDataChanged();
+        
+        // Asignar modelo de tabla limpia
+        TablaDSimbolos.getTblTokens().setModel(modelo);
     }
 
     public String id(String n) {
@@ -890,17 +1061,22 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     private void mostrarConsola() {
-        int sizeErrors = errors.size();
+        int sizeErrors = errorsSintac.size();
         if (sizeErrors > 0) {
-            Functions.sortErrorsByLineAndColumn(errors);
+            Functions.sortErrorsByLineAndColumn(errorsSintac);
             String strErrors = "\n";
-            for (ErrorLSSL error : errors) {
+            for (ErrorLSSL error : errorsSintac) {
                 String strError = String.valueOf(error);
                 strErrors += strError + "\n";
             }
-            jtaOutputConsole.setText("Compilación terminada...\n" + strErrors + "\nLa compilación terminó con errores...");
+            jtaOutputConsole.setText("Compilación terminada...\n\nLa compilación terminó con ERRORES... \n\n"
+                    + "Para mas información revisar \'Analizadores -> Gramaticas\'");
+            btnGramaticas.setBackground(Color.red);
+            ErroresSintac.getTxtErroresSemanticos().setText(strErrors);
         } else {
             jtaOutputConsole.setText("Compilación terminada... \n NO hubo errores");
+            ErroresSintac.getTxtErroresSemanticos().setText("NO SE ENCONTRARON ERRORES SEMANTICOS");
+            btnGramaticas.setBackground(Color.green);
         }
         jtaOutputConsole.setCaretPosition(0);
     }
@@ -909,7 +1085,7 @@ public class Compilador extends javax.swing.JFrame {
         //Functions.clearDataInTable(tblTokens);
         jtaOutputConsole.setText("");
         tokens.clear();
-        errors.clear();
+        errorsSintac.clear();
         identProd.clear();
         identificadores.clear();
         codeHasBeenCompiled = false;
@@ -956,16 +1132,16 @@ public class Compilador extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAbrir;
+    private javax.swing.JButton btnAnalizadores;
+    private javax.swing.JButton btnArbolesSemanticos;
+    private javax.swing.JButton btnArbolesSintactico;
+    private javax.swing.JButton btnAutomatas;
     private javax.swing.JButton btnCompilar;
+    private javax.swing.JButton btnGramaticas;
     private javax.swing.JButton btnGuardar;
-    private javax.swing.JButton btnGuardarC;
     private javax.swing.JButton btnGuardarC1;
-    private javax.swing.JButton btnGuardarC2;
-    private javax.swing.JButton btnGuardarC3;
-    private javax.swing.JButton btnGuardarC4;
-    private javax.swing.JButton btnGuardarC5;
-    private javax.swing.JButton btnGuardarC6;
     private javax.swing.JButton btnNuevo;
+    private javax.swing.JButton btnTablaSimbolos;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;

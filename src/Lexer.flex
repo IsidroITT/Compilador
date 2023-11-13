@@ -25,14 +25,14 @@ Letra = [A|B|C|D|E|F|G]
 Letras = [A-Za-zÑñ]
 Numeros = [0-9]*
 AlfaErrores = [a-zA-Z]
+//caracteresEspeciales = [!|@|#|$|%|&|_|+|-|~|\`|\"|\'|<|>|?|:]
 /*DigitoEscala = [1-8]*/
 Digito = [0-9]*
 /*Clave = {Letra}{Digito}*/ //G16 es un error sintactico o semantico??
 Nota = {Letra}{Digito}
 Identificador = {Letras}({Letras}|{Numeros})*
-compasNumero = {Numeros}//{Numeros}
+//compasNumero = {Numeros}//{Numeros}
 %%
-
 
 /* Comentarios o espacios en blanco */
 {Comentario}|{EspacioEnBlanco} { /*Ignorar*/ }
@@ -61,6 +61,9 @@ compasNumero = {Numeros}//{Numeros}
 /*Secciones*/
 \\"inicio" { return token(yytext(), "TOKEN_INICIO_PARTITURA", yyline, yycolumn); }
 \\"fin"	 { return token(yytext(), "TOKEN_FINAL_PARTITURA", yyline, yycolumn); }
+
+/* Identificador  */
+"$"{Identificador} { return token(yytext(), "TOKEN_IDENTIFICADOR", yyline, yycolumn); }
 
 /*Figuras*/
 "r"	 { return token(yytext(), "TOKEN_REDONDA", yyline, yycolumn); }
@@ -98,14 +101,11 @@ compasNumero = {Numeros}//{Numeros}
 "L-f"	 { return token(yytext(), "TOKEN_FUSA_LED", yyline, yycolumn); }
 "L-sf"	 { return token(yytext(), "TOKEN_SEMIFUSA_LED", yyline, yycolumn); }
 
-/* Identificador  */
-""{Identificador} { return token(yytext(), "TOKEN_IDENTIFICADOR", yyline, yycolumn); }
-
 /*Compases*/
 "/"	 { return token(yytext(), "TOKEN_DIVISOR_TEMPO", yyline, yycolumn); }
-/*"|"	 { return token(yytext(), "TOKEN_DIVISOR_COMPAS", yyline, yycolumn); }*/
+/*"|"	 { return token(yytext(), TOKEN_CIERRE_NOTAS"TOKEN_DIVISOR_COMPAS", yyline, yycolumn); }*/
 "{"	 { return token(yytext(), "TOKEN_APERTURA_NOTAS", yyline, yycolumn); }
-"}"	 { return token(yytext(), "TOKEN_CIERRE_NOTAS", yyline, yycolumn); }
+"}"	 { return token(yytext(), "", yyline, yycolumn); }
 "["	 { return token(yytext(), "TOKEN_APERTURA_COMPAS", yyline, yycolumn); }
 "]"	 { return token(yytext(), "TOKEN_CIERRE_COMPAS", yyline, yycolumn); }
 "("	 { return token(yytext(), "TOKEN_APERTURA_CLAVE", yyline, yycolumn); }
@@ -119,3 +119,4 @@ compasNumero = {Numeros}//{Numeros}
 /*ERRORES*/
 . { return token(yytext(), "ERROR", yyline, yycolumn); }
 \\{AlfaErrores}+ { return token(yytext(), "ERROR_RESERVADA", yyline, yycolumn); }
+//{caracteresEspeciales}+{AlfaErrores}+{caracteresEspeciales}+{AlfaErrores}+ { return token(yytext(), "ERROR_IDENTIFICADOR", yyline, yycolumn); }

@@ -1,4 +1,4 @@
- import compilerTools.TextColor;
+import compilerTools.TextColor;
 import java.awt.Color;
 
 %%
@@ -25,13 +25,13 @@ Letra = [A|B|C|D|E|F|G]
 Letras = [A-Za-zÑñ]
 Numeros = [0-9]
 AlfaErrores = [a-zA-Z]
+//caracteresEspeciales = [!|@|#|$|%|&|_|+|-|~|`|"|'|<|>|?|:];
 /*DigitoEscala = [1-8]*/
 Digito = [0-9]*
 /*Clave = {Letra}{Digito}*/ //G16 es un error sintáctico o semántico??
 Nota = {Letra}{Digito}
 Identificador = {Letras}({Letras}|{Numeros})*
 %%
-
 
 /* Comentarios o espacios en blanco */
 {Comentario} { return textColor(yychar, yylength(), new Color(98, 114, 164)); }
@@ -60,6 +60,11 @@ Identificador = {Letras}({Letras}|{Numeros})*
 /* Secciones */
 \\"inicio" { return textColor(yychar, yylength(), new Color(189, 147, 249)); }
 \\"fin" { return textColor(yychar, yylength(), new Color(189, 147, 249)); }
+
+\\"fin"	 { return token(yytext(), "TOKEN_FINAL_PARTITURA", yyline, yycolumn); }
+
+/* Identificador  */
+"$"{Identificador} { return textColor(yychar, yylength(), new Color(80, 250, 123)); }
 
 /* Figuras */
 "r" { return textColor(yychar, yylength(), new Color(255, 121, 198)); }
@@ -111,8 +116,8 @@ Identificador = {Letras}({Letras}|{Numeros})*
 "." { return textColor(yychar, yylength(), new Color(80, 250, 123)); }
 "^" { return textColor(yychar, yylength(), new Color(80, 250, 123)); }
 ";" { return textColor(yychar, yylength(), new Color(255, 255, 0)); }
-""{Identificador} { return textColor(yychar, yylength(), new Color(80, 250, 123)); }
 
 /* ERRORES */
 . { return textColor(yychar, yylength(), new Color(255, 0, 0)); }
 \\{AlfaErrores}+ { return textColor(yychar, yylength(), new Color(255, 0, 0)); }
+//{caracteresEspeciales}+{AlfaErrores}+{caracteresEspeciales}+{AlfaErrores}+ { return textColor(yychar, yylength(), new Color(255, 0, 0)); }
