@@ -42,8 +42,8 @@ Identificador = {Letras}({Letras}|{Numeros})*
 {Digito}  { return token(yytext(), "TOKEN_DIGITO", yyline, yycolumn); }
 
 /*Notas*/
-{Nota} { return token(yytext(), "TOKEN_NOTA", yyline, yycolumn); }
 {Letra} { return token(yytext(), "TOKEN_NOTA_CLAVE", yyline, yycolumn); }
+{Nota} { return token(yytext(), "TOKEN_NOTA", yyline, yycolumn); }
 /*{Clave} { return token(yytext(), "TOKEN_DEFINE_CLAVE", yyline, yycolumn); }*/
 "*"	 { return token(yytext(), "TOKEN_PUNTILLO", yyline, yycolumn); }
 "#"	 { return token(yytext(), "TOKEN_SOSTENIDO", yyline, yycolumn); }
@@ -105,7 +105,7 @@ Identificador = {Letras}({Letras}|{Numeros})*
 "/"	 { return token(yytext(), "TOKEN_DIVISOR_TEMPO", yyline, yycolumn); }
 /*"|"	 { return token(yytext(), TOKEN_CIERRE_NOTAS"TOKEN_DIVISOR_COMPAS", yyline, yycolumn); }*/
 "{"	 { return token(yytext(), "TOKEN_APERTURA_NOTAS", yyline, yycolumn); }
-"}"	 { return token(yytext(), "", yyline, yycolumn); }
+"}"	 { return token(yytext(), "TOKEN_CIERRE_NOTAS", yyline, yycolumn); }
 "["	 { return token(yytext(), "TOKEN_APERTURA_COMPAS", yyline, yycolumn); }
 "]"	 { return token(yytext(), "TOKEN_CIERRE_COMPAS", yyline, yycolumn); }
 "("	 { return token(yytext(), "TOKEN_APERTURA_CLAVE", yyline, yycolumn); }
@@ -119,4 +119,4 @@ Identificador = {Letras}({Letras}|{Numeros})*
 /*ERRORES*/
 . { return token(yytext(), "ERROR", yyline, yycolumn); }
 \\{AlfaErrores}+ { return token(yytext(), "ERROR_RESERVADA", yyline, yycolumn); }
-//{caracteresEspeciales}+{AlfaErrores}+{caracteresEspeciales}+{AlfaErrores}+ { return token(yytext(), "ERROR_IDENTIFICADOR", yyline, yycolumn); }
+{Identificador} { return token(yytext(), "ERROR_IDENTIFICADOR", yyline, yycolumn); }

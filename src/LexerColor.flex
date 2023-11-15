@@ -120,4 +120,4 @@ Identificador = {Letras}({Letras}|{Numeros})*
 /* ERRORES */
 . { return textColor(yychar, yylength(), new Color(255, 0, 0)); }
 \\{AlfaErrores}+ { return textColor(yychar, yylength(), new Color(255, 0, 0)); }
-//{caracteresEspeciales}+{AlfaErrores}+{caracteresEspeciales}+{AlfaErrores}+ { return textColor(yychar, yylength(), new Color(255, 0, 0)); }
+{Identificador} { return textColor(yychar, yylength(), new Color(255, 0, 0)); }
