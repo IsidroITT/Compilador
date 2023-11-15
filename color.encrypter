@@ -4,32 +4,32 @@ tempo = 120;
 var $timbre = [G2.b, F4.b,];
 
 // Notas
-	\inicio;
+	\inicio
 		$timbre;
 	    	clave(G^2){
             	[F.b, B.b,];
             	[B.r,];
-        	};
+        	}
         	$timbre;
         	[A2.b, B4.b,];
         	rep(6) {
 		   	[E4.n, E4.n, F4.n, G4.n,]; 
 			$timbre;
-		};
-	\fin;
+		}
+	\fin
 	
 // Notas piano
 var $timbrePiano = [F1.P-r,];
 
-//piano(){
+piano{
 	clave(G^2) {
         	[F.P-n, A.P-b, C.P-n,];
       	[B.P-r,];
-   	};
+   	}
    	$timbrePiano;
     	[A2.P-b, B4.P-b,];
 	rep(2) {
 		[E4.P-n, E4.P-n, F4.P-n, G4.P-n,];
 		$timbrePiano;
-	};
+	}
 }
