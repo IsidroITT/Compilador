@@ -61,8 +61,6 @@ Identificador = {Letras}({Letras}|{Numeros})*
 \\"inicio" { return textColor(yychar, yylength(), new Color(189, 147, 249)); }
 \\"fin" { return textColor(yychar, yylength(), new Color(189, 147, 249)); }
 
-\\"fin"	 { return token(yytext(), "TOKEN_FINAL_PARTITURA", yyline, yycolumn); }
-
 /* Identificador  */
 "$"{Identificador} { return textColor(yychar, yylength(), new Color(80, 250, 123)); }
 

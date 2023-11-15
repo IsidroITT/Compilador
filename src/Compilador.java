@@ -593,140 +593,14 @@ public class Compilador extends javax.swing.JFrame {
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION FIGURA CON NOTA ----------------------------------------- */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA");
+            gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS? )+");
         });
-        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                11, "Error sintáctico {}: Hace falta una separación de nota y figura '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA FIGURA", true,
-//                11, "Error sintáctico {}: Hace falta el token de selección de clave '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA FIGURA", true,
-//                11, "Error sintáctico {}: Hace falta una separación de nota y figura '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                12, "Error sintáctico {}: Hace falta una separación de notas de compas ',' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                13, "Error sintáctico {}: Hace falta el token de selección de clave '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA ", true,
-//                13, "Error sintáctico {}: Hace falta una separación de nota y figura '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA", true,
-//                13, "Error sintáctico {}: Hace falta una declaracon de octava en la selección de clave [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                14, "Error sintáctico {}: Hace falta una nota (A=La, B=Si, C=Do, D=Re, E=Mi, F=Fa, G=Sol) [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_SEPARACION_NOTA FIGURA", true,
-//                14, "Error sintáctico {}: Hace falta una nota (A=La, B=Si, C=Do, D=Re, E=Mi, F=Fa, G=Sol)' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_SEPARACION_NOTA FIGURA", true,
-//                14, "Error sintáctico {}: Hace falta una nota (A=La, B=Si, C=Do, D=Re, E=Mi, F=Fa, G=Sol)' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Declaración de figura nota incompleta  ',' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta el token de selección de clave '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(FIGURA TOKEN_SEPARACION_COMPAS)* FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta una separación de nota y figura '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta una declaracon de octava en la selección de clave [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta una separación de notas de compas ',' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta el token de selección de clave '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta una separación de nota y figura '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta una declaracon de octava en la selección de clave [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta una separación de notas de compas ',' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta el token de selección de clave '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta una separación de nota y figura '.' [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA", true,
-//                15, "Error sintáctico {}: Hace falta una declaracon de octava en la selección de clave [#,%]");
         
         //--------------------------------------------------------------------------------------------------------------------------------------------------------
         /* FIGURA NOTA CLAVE */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA");
+            gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS? )+");
         });
-        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA", true,
-//                13, "Error sintáctico {}: Hace falta una figura de nota [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA", true,
-//                10, "Error sintáctico {}: Hace falta una figura de nota [#,%]");
-//
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA", true,
-//                12, "Error sintáctico {}: Hace falta una figura de nota [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA", true,
-//                13, "Error sintáctico {}: Hace falta una separacion de compas  [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE FIGURA", true,
-//                10, "Error sintáctico {}: Hace falta una separacion de nota [#,%]");
-//
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA", true,
-//                12, "Error sintáctico {}: Hace falta una separacion de nota [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE FIGURA", true,
-//                13, "Error sintáctico {}: Hace falta una separacion de nota [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA", true,
-//                10, "Error sintáctico {}: Hace falta una separacion de nota y una figura para la nota [#,%]");
-//
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE", true,
-//                12, "Error sintáctico {}: Hace falta una separacion de nota y una figura para la nota [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE ", true,
-//                10, "Error sintáctico {}: Hace falta una separacion de nota y una figura para la nota [#,%]");
-//
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA", true,
-//                12, "Error sintáctico {}: Hace falta un valor de nota [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_SEPARACION_NOTA FIGURA", true,
-//                13, "Error sintáctico {}: Hace falta un valor de nota [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_SEPARACION_NOTA FIGURA", true,
-//                10, "Error sintáctico {}: Hace falta un valor de nota [#,%]");
-//
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(FIGURA TOKEN_SEPARACION_COMPAS)* TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA", true,
-//                12, "Error sintáctico {}: Hace falta un valor de nota y una separacion entre esta y la figura [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS)* FIGURA", true,
-//                10, "Error sintáctico {}: Hace falta un valor de nota y una separacion entre esta y la figura [#,%]");
-//
-//        gramatica.group("FIGURA_NOTA_CLAVE", "(FIGURA TOKEN_SEPARACION_COMPAS)* FIGURA", true,
-//                12, "Error sintáctico {}: Hace falta un valor de nota y una separacion entre esta y la figura [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "FIGURA", true,
-//                13, "Error sintáctico {}: Token de figura fuera de contexto o en una declaración de figura clave incompleta [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "TOKEN_SEPARACION_NOTA", true,
-//                10, "Error sintáctico {}: Token de separación de nota fuera de contexto [#,%]");
-//
-//        gramatica.group("FIGURA_NOTA_CLAVE", "TOKEN_NOTA_CLAVE", true,
-//                12, "Error sintáctico {}: Token de nota clave fuera de contexto [#,%]");
-//        
-//        gramatica.group("FIGURA_NOTA_CLAVE", "TOKEN_SEPARACION_COMPAS", true,
-//                13, "Error sintáctico {}: Token separación de compas fuera de contexto [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -754,27 +628,6 @@ public class Compilador extends javax.swing.JFrame {
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACIÓN IDENTIFICADOR */
         gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS", true, identProd);
-
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS", true,
-                17, "Error sintáctico {}: Falta el finalizador de sentencia \';\' [#,%]");
-
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
-                18, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un bloque de notas (ejemplo: [F.n, A.b, C.n]) [#,%]");
-
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR  TOKEN_ASIGNACION COMPAS_NOTAS", true,
-                19, "Error sintáctico {}: Declaración de identificador incompleta, NO hay una palabra que pueda ser utilizada para asignación [#,%]");
-
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS", true,
-                20, "Error sintáctico {}: Declaración de identificador incompleta, falta agregar la palabra reservada 'var' para decrarar el identificador [#,%]");
-
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION", true,
-                21, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un bloque de notas y el finalizador de sentencias (ejemplo: [F.n, A.b, C.n];) [#,%]");
-
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR", true,
-                22, "Error sintáctico {}: Declaración de identificador incompleta, (ejemplo: var id = [F.n, A.b, C.n];) [#,%]");
-
-        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR", true,
-                23, "Error sintáctico {}: Declaración de identificador incompleta, no hay información del identificar [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -784,29 +637,16 @@ public class Compilador extends javax.swing.JFrame {
         });
 
         gramatica.initialLineColumn();
-        gramatica.group("BLOQUE_NOTAS_TOCAR", "COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_FIN_SENTENCIA", true,
-                22, "Error sintáctico {}: Declaración de notas incompleta, falta especificar las notas o finalizar con un punto y coma (;) [#,%]");
-
-        gramatica.group("BLOQUE_NOTAS_TOCAR", "(COMPAS_NOTAS|TOKEN_IDENTIFICADOR TOKEN_SEPARACION_COMPAS)+", true,
-                23, "Error sintáctico {}: Declaración de notas incompleta, falta especificar las notas o finalizar con un punto y coma (;) [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION CLAVE */
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA TOKEN_SELECION_CLAVE TOKEN_DIGITO", true);
+        //--------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //--------------------------------------------------------------------------------------------------------------------------------------------------------
+        /* CLAVE DE IF COMPLETA */
         gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE CLAVE_IF_EXPRESION TOKEN_CIERRE_CLAVE", true);
-
-        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE", true,
-                25, "Error sintáctico {}: Declaración de clave incompleta, falta asignar un valor (ejemplo: clave = G2;) [#,%]");
-
-        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE", true,
-                26, "Error sintáctico {}: Declaración de clave incompleta, falta asignar un valor (ejemplo: clave = G2;) [#,%]");
-
-        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
-                27, "Error sintáctico {}: Declaración de clave incompleta, falta la palabra reservada \"\\clave\" antes de la selección de clave (ejemplo: \\clave G2;) [#,%]");
-
-        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE", true,
-                28, "Error sintáctico {}: Declaración de clave incompleta, falta la palabra reservada \"\\clave\" antes de la selección de clave (ejemplo: \\clave G2;) [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -814,32 +654,18 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE TOKEN_DIGITO TOKEN_CIERRE_CLAVE", true);
 
         gramatica.initialLineColumn();
-        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR* TOKEN_CIERRE_CLAVE", true,
-                29, "Error sintáctico {}: Declaración de repetición incompleta, falta especificar las repeticiones o el contenido (ejemplo: \\rep {...};) [#,%]");
-
-        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR+ TOKEN_CIERRE_CLAVE", true,
-                30, "Error sintáctico {}: Declaración de repetición incompleta, falta el contenido (ejemplo: \\rep {...};) [#,%]");
-
-        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR+ TOKEN_CIERRE_CLAVE", true,
-                31, "Error sintáctico {}: Declaración de repetición incompleta, falta especificar las repeticiones (ejemplo: \\rep 3 {...};) [#,%]");
-
-        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE COMPAS_ERROR* TOKEN_CIERRE_CLAVE", true,
-                32, "Error sintáctico {}: Declaración de repetición incompleta, falta especificar las repeticiones (ejemplo: \\rep 3 {...};) [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         
         
         /* DECLARACION SENTENCIAS */
         gramatica.initialLineColumn();
         gramatica.group("SENTENCIAS", "(BLOQUE_NOTAS_TOCAR | TOKEN_IDENTIFICADOR | COMPAS_NOTAS)+ TOKEN_FIN_SENTENCIA", true);
-
-//        gramatica.group("SENTENCIAS", "(BLOQUE_NOTAS_TOCAR | TOKEN_SEPARACION_COMPAS | TOKEN_IDENTIFICADOR)+", true,
-//                33, "Error sintáctico {}: NO hay un finalizador de sentencia ';'[#,%]");
         
         gramatica.initialLineColumn();
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         
-        //-------------------------------------------------------------------------------------------------------------------------------------------------------
-        /* ESTRUCTURAS DE CONTROL */
+        //------------------------------------------------------------------------------------------------------------------------------------------------------
+        /* ESTRUCTURAS DE CONTROL */        
         gramatica.group("ESTRUCTURAS_CONTROL", "(CLAVE_IF | DECLARACION_REP)", true, identProd);
         
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -849,20 +675,20 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("FUNCIONES", "TOKEN_PIANO_CONTROL", true);
 
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
-            gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true);
+            gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)* TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true);
         });
 
-        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL (SENTENCIAS)? TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true,
-                50, "Error sintáctico {}: No hay un inicio de notas '{' [#,%]");
-
-        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_FIN_SENTENCIA", true,
-                51, "Error sintáctico {}: No hay un final de notas '}' [#,%]");
-
-        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_CIERRE_NOTAS", true,
-                52, "Error sintáctico {}: No hay un final de sentencia ';' [#,%]");
-
-        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "TOKEN_APERTURA_NOTAS (SENTENCIAS)? TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true,
-                53, "Error sintáctico {}: No hay una estrucutra de control asociada al bloque de codigo [#,%]");
+//        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL (SENTENCIAS)* TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true,
+//                501, "Error sintáctico {}: No hay un inicio de notas '{' [#,%]");
+//
+//        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)* TOKEN_FIN_SENTENCIA", true,
+//                511, "Error sintáctico {}: No hay un final de notas '}' [#,%]");
+//
+//        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)* TOKEN_CIERRE_NOTAS", true,
+//                521, "Error sintáctico {}: No hay un final de sentencia ';' [#,%]");
+//
+//        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "TOKEN_APERTURA_NOTAS (SENTENCIAS)* TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true,
+//                531, "Error sintáctico {}: No hay una estrucutra de control asociada al bloque de codigo [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -871,23 +697,23 @@ public class Compilador extends javax.swing.JFrame {
             gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA TOKEN_FIN_SENTENCIA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA TOKEN_FIN_SENTENCIA", true);
         });
 
-        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA TOKEN_FIN_SENTENCIA", true,
-                55, "Error sintáctico {}: No hay un final de sentencia ';' en el \\inicio [#,%]");
-
-        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA TOKEN_FIN_SENTENCIA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA", true,
-                56, "Error sintáctico {}: No hay un final de sentencia ';' en el \\fin [#,%]");
-        
-        gramatica.group("BLOQUE_INICIO_FIN", "(SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA TOKEN_FIN_SENTENCIA", true,
-                57, "Error sintáctico {}: Hace falta la sentencia de inicio de musica '\\inicio;' [#,%]");
-
-        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA TOKEN_FIN_SENTENCIA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)?", true,
-                58, "Error sintáctico {}: Hace falta la sentencia de fin de musica '\\fin;' [#,%]");
-        
-        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA", true,
-                59, "Error sintáctico {}: No hay un final de sentencia en el \\inicio y \\fin ';' [#,%]");
-
-        gramatica.group("BLOQUE_INICIO_FIN", "(SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)?", true,
-                60, "Error sintáctico {}: Hacen falta las sentencias iniciadoras de musica '\\inicio' y '\\fin'  [#,%]");
+//        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA TOKEN_FIN_SENTENCIA", true,
+//                55, "Error sintáctico {}: No hay un final de sentencia ';' en el \\inicio [#,%]");
+//
+//        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA TOKEN_FIN_SENTENCIA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA", true,
+//                56, "Error sintáctico {}: No hay un final de sentencia ';' en el \\fin [#,%]");
+//        
+//        gramatica.group("BLOQUE_INICIO_FIN", "(SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA TOKEN_FIN_SENTENCIA", true,
+//                57, "Error sintáctico {}: Hace falta la sentencia de inicio de musica '\\inicio;' [#,%]");
+//
+//        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA TOKEN_FIN_SENTENCIA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)?", true,
+//                58, "Error sintáctico {}: Hace falta la sentencia de fin de musica '\\fin;' [#,%]");
+//        
+//        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA", true,
+//                59, "Error sintáctico {}: No hay un final de sentencia en el \\inicio y \\fin ';' [#,%]");
+//
+//        gramatica.group("BLOQUE_INICIO_FIN", "(SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)?", true,
+//                60, "Error sintáctico {}: Hacen falta las sentencias iniciadoras de musica '\\inicio' y '\\fin'  [#,%]");
 
 
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
@@ -898,6 +724,7 @@ public class Compilador extends javax.swing.JFrame {
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
+        
         /* ERRORES DE SINTACTICOS */
         
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
@@ -910,109 +737,265 @@ public class Compilador extends javax.swing.JFrame {
                 4, "Error sintáctico {}: Hace falta una declaracon de octava en la selección de clave [#,%]");
         
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE TOKEN_SELECION_CLAVE FIGURA", true,
-                8, "Error sintáctico {}: No es podibles asignar una figura una clave [#,%]");
+                5, "Error sintáctico {}: No es podibles asignar una figura una clave [#,%]");
         
         gramatica.group("CLAVE_IF_EXPRESION", "FIGURA TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
-                9, "Error sintáctico {}: No es posible asignar un valor numerico a una figura dentro de la selección de clave [#,%]");
+                6, "Error sintáctico {}: No es posible asignar un valor numerico a una figura dentro de la selección de clave [#,%]");
         
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE FIGURA TOKEN_DIGITO", true,
-                10, "Error sintáctico {}: NO es posible usar una figura como selección de clave, es necesario un selector de clave '^' [#,%]");
+                7, "Error sintáctico {}: NO es posible usar una figura como selección de clave, es necesario un selector de clave '^' [#,%]");
         
         gramatica.group("COMPAS", "TOKEN_DIVISOR_TEMPO TOKEN_DIGITO", true,
-                24, "Error sintáctico {}: Declaracion de compas incompleta (Ejemplo: 3/4) [#,%]");
+                8, "Error sintáctico {}: Declaracion de compas incompleta (Ejemplo: 3/4) [#,%]");
         
         gramatica.group("COMPAS", "TOKEN_DIGITO TOKEN_DIVISOR_TEMPO", true,
-                24, "Error sintáctico {}: Declaracion de compas incompleta (Ejemplo: 3/4) [#,%]");
+                9, "Error sintáctico {}: Declaracion de compas incompleta (Ejemplo: 3/4) [#,%]");
         
         gramatica.group("COMPAS", "TOKEN_DIVISOR_TEMPO", true,
-                24, "Error sintáctico {}: Declaracion de compas incompleta (Ejemplo: 3/4) [#,%]");
+                10, "Error sintáctico {}: Declaracion de compas incompleta (Ejemplo: 3/4) [#,%]");
         
-            gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_DIGITO", true,
-                5, "Error sintáctico {}: Digito fuera de contexto [#,%]");
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_DIGITO", true,
+                11, "Error sintáctico {}: Digito fuera de contexto [#,%]");
         
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE", true,
-                6, "Error sintáctico {}: Token de selección de clave '^' fuera de contexto [#,%]");
+                12, "Error sintáctico {}: Token de selección de clave '^' fuera de contexto [#,%]");
         
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA_CLAVE", true,
-                7, "Error sintáctico {}: Nota de clave sin contexto [#,%]");
+                13, "Error sintáctico {}: Nota de clave sin contexto [#,%]");
         
         gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS", true,
-                24, "Error sintáctico {}: Error en el bloque de notas del compas hace falta un terminador de sentencia ';' [#,%]");
+                14, "Error sintáctico {}: Error en el bloque de notas del compas hace falta un terminador de sentencia ';' [#,%]");
 
         gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_FIN_SENTENCIA", true,
-                24, "Error sintáctico {}: Hace falta un cierre de compas ']' [#,%]");
+                15, "Error sintáctico {}: Hace falta un cierre de compas ']' [#,%]");
 
         gramatica.group("COMPAS_NOTAS", "(FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS TOKEN_FIN_SENTENCIA", true,
-                25, "Error sintáctico {}: Hace falta un inicio de compas '[' [#,%]");
+                16, "Error sintáctico {}: Hace falta un inicio de compas '[' [#,%]");
 
         gramatica.group("COMPAS_NOTAS", "(FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_FIN_SENTENCIA", true,
-                25, "Error sintáctico {}: Figuras y notas fuera de compas, hace falta '[' y ']' [#,%]");
+                17, "Error sintáctico {}: Figuras y notas fuera de compas, hace falta '[' y ']' [#,%]");
 
         gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS TOKEN_CIERRE_COMPAS TOKEN_FIN_SENTENCIA", true,
-                24, "Error sintáctico {}: Declaración de compas de notas vacio [#,%]");
+                18, "Error sintáctico {}: Declaración de compas de notas vacio [#,%]");
 
         gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS (FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ ", true,
-                25, "Error sintáctico {}: Hace falta un fin de compas y un terminador de sentencia '];' [#,%]");
+                19, "Error sintáctico {}: Hace falta un fin de compas y un terminador de sentencia '];' [#,%]");
         
         gramatica.group("COMPAS_NOTAS", "(FIGURA_NOTA|FIGURA_NOTA_CLAVE)+ TOKEN_CIERRE_COMPAS TOKEN_FIN_SENTENCIA", true,
-                24, "Error sintáctico {}: Error en el bloque de notas del compas hace falta un terminador de sentencia ';' [#,%]");
+                20, "Error sintáctico {}: Error en el bloque de notas del compas hace falta un terminador de sentencia ';' [#,%]");
  
         gramatica.group("COMPAS_NOTAS", "TOKEN_APERTURA_COMPAS", true,
-                25, "Error sintáctico {}: Declaracion de compas incompleta, solo se ha detectado una apertura de compas [#,%]");
+                21, "Error sintáctico {}: Declaracion de compas incompleta, solo se ha detectado una apertura de compas [#,%]");
         
         gramatica.group("COMPAS_NOTAS", "TOKEN_CIERRE_COMPAS", true,
-                24, "Error sintáctico {}: Error en el bloque de notas del compas hace falta un terminador de sentencia ';' [#,%]");
+                22, "Error sintáctico {}: Error en el bloque de notas del compas hace falta un terminador de sentencia ';' [#,%]");
         
          gramatica.group("COMPAS_NOTAS", "(FIGURA_NOTA|FIGURA_NOTA_CLAVE)+", true,
-                24, "Error sintáctico {}: Error en el bloque de notas, compas incompleto hace falta '[',']' y ';' (Ejemplo: [F.n, A.b, C.n];) [#,%]");
+                23, "Error sintáctico {}: Error en el bloque de notas, compas incompleto hace falta '[',']' y ';' (Ejemplo: [F.n, A.b, C.n];) [#,%]");
         
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
-                6, "Error sintáctico {}: Falta declarar unidad de compas [#,%]");
+                24, "Error sintáctico {}: Falta declarar unidad de compas [#,%]");
 
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION COMPAS", true,
-                7, "Error sintáctico {}: Falta declarar el finalizador de sentencia \';\' [#,%]");
+                25, "Error sintáctico {}: Falta declarar el finalizador de sentencia \';\' [#,%]");
 
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS COMPAS TOKEN_FIN_SENTENCIA", true,
-                8, "Error sintáctico {}: Falta declarar asignación (=) [#,%]");
+                26, "Error sintáctico {}: Falta declarar asignación (=) [#,%]");
 
         gramatica.group("DECLARACION_COMPAS", " TOKEN_ASIGNACION COMPAS TOKEN_FIN_SENTENCIA", true,
-                9, "Error sintáctico {}: Falta colocar la variable del compas [#,%]");
+                27, "Error sintáctico {}: Falta colocar la variable del compas [#,%]");
 
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_FIN_SENTENCIA", true,
-                10, "Error sintáctico {}: No hay un compás asignado [#,%]");
+                28, "Error sintáctico {}: No hay un compás asignado [#,%]");
 
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS TOKEN_ASIGNACION", true,
-                12, "Error sintáctico {}: Declaración de compás incompleta, falta especificar el compás (ejemplo: 3/4) [#,%]");
+                29, "Error sintáctico {}: Declaración de compás incompleta, falta especificar el compás (ejemplo: 3/4) [#,%]");
         
         gramatica.group("DECLARACION_COMPAS", "TOKEN_COMPAS", true,
-                13, "Error sintáctico {}: Declaración de compás incompleta, falta asignar un valor (ejemplo: compas = 3/4;) [#,%]");
+                30, "Error sintáctico {}: Declaración de compás incompleta, falta asignar un valor (ejemplo: compas = 3/4;) [#,%]");
         
         gramatica.group("DECLARACION_COMPAS", "TOKEN_ASIGNACION", true,
-                10, "Error sintáctico {}: Token de asignacionde compas fuera de contexto[#,%]");
+                31, "Error sintáctico {}: Token de asignacionde compas fuera de contexto[#,%]");
 
         gramatica.group("DECLARACION_COMPAS", "COMPAS", true,
-                12, "Error sintáctico {}: Declaración de compás incompleta, fuera de contexto [#,%]");
+                32, "Error sintáctico {}: Declaración de compás incompleta, fuera de contexto [#,%]");
         
          gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION TOKEN_DIGITO+ ", true,
-                14, "Error sintáctico {}: Falta declarar el finalizador de sentencia ';' [#,%]");
+                33, "Error sintáctico {}: Falta declarar el finalizador de sentencia ';' [#,%]");
 
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
-                15, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
+                34, "Error sintáctico {}: Declaración de tempo incompleta, falta asignar un valor (ejemplo: tempo = 120;) [#,%]");
 
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_DIGITO+ TOKEN_FIN_SENTENCIA", true,
-                16, "Error sintáctico {}: Declaración de tempo incompleta, falta el simbolo de asignacion '=' [#,%]");
+                35, "Error sintáctico {}: Declaración de tempo incompleta, falta el simbolo de asignacion '=' [#,%]");
         
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO TOKEN_FIN_SENTENCIA ", true,
-                14, "Error sintáctico {}: NO hay un valor de tempo asignado [#,%]");
+                36, "Error sintáctico {}: NO hay un valor de tempo asignado [#,%]");
 
         gramatica.group("DECLARACION_TEMPO", "TOKEN_ASIGNACION TOKEN_DIGITO+ TOKEN_FIN_SENTENCIA", true,
-                15, "Error sintáctico {}: NO se encuentra la palabra clave 'tempo' para hacer la asignación [#,%]");
+                37, "Error sintáctico {}: NO se encuentra la palabra clave 'tempo' para hacer la asignación [#,%]");
 
         gramatica.group("DECLARACION_TEMPO", "TOKEN_DIGITO+ TOKEN_FIN_SENTENCIA", true,
-                16, "Error sintáctico {}: Digito con final de sentencia fuera de contexto, puede hacer falta una asignación de tempo [#,%]");
+                38, "Error sintáctico {}: Digito con final de sentencia fuera de contexto, puede hacer falta una asignación de tempo [#,%]");
         
         gramatica.group("DECLARACION_TEMPO", "TOKEN_TEMPO", true,
-                17,"Error sintáctico {}: Token de tempo fuera de contexto [#,%]");
+                39,"Error sintáctico {}: Token de tempo fuera de contexto [#,%]");
+        
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS", true,
+                40, "Error sintáctico {}: Falta el finalizador de sentencia \';\' [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION TOKEN_FIN_SENTENCIA", true,
+                41, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un bloque de notas (ejemplo: [F.n, A.b, C.n]) [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR  TOKEN_ASIGNACION COMPAS_NOTAS", true,
+                42, "Error sintáctico {}: Declaración de identificador incompleta, NO hay una palabra que pueda ser utilizada para asignación [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_IDENTIFICADOR TOKEN_ASIGNACION COMPAS_NOTAS", true,
+                43, "Error sintáctico {}: Declaración de identificador incompleta, falta agregar la palabra reservada 'var' para decrarar el identificador [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR TOKEN_ASIGNACION", true,
+                44, "Error sintáctico {}: Declaración de identificador incompleta, falta asignar un bloque de notas y el finalizador de sentencias (ejemplo: [F.n, A.b, C.n];) [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR TOKEN_IDENTIFICADOR", true,
+                45, "Error sintáctico {}: Declaración de identificador incompleta, (ejemplo: var id = [F.n, A.b, C.n];) [#,%]");
+
+        gramatica.group("DECLARACION_IDENTIFICADOR", "TOKEN_VAR", true,
+                46, "Error sintáctico {}: Declaración de identificador incompleta, no hay información del identificar [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA TOKEN_SELECION_CLAVE", true,
+                47, "Error sintáctico {}: Declaración de clave incompleta, hace falta un valor de octava [#,%]");
+
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA TOKEN_DIGITO", true,
+                48, "Error sintáctico {}: Declaración de clave incompleta, no un selector de clave '^' [#,%]");
+
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
+                49, "Error sintáctico {}: Declaración de clave incompleta, no hay una nota a la cual asignar una octava [#,%]");
+
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_NOTA", true,
+                50, "Error sintáctico {}: Nota de clave fuera de contexto [#,%]");
+        
+        gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE", true,
+                51, "Error sintáctico {}: Selección de clave fuera de contexto [#,%]");
+        
+        gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE CLAVE_IF_EXPRESION", true,
+                52, "Error sintáctico {}: Hace falta un cierre de clave ')'[#,%]");
+
+        gramatica.group("CLAVE_IF", "TOKEN_CLAVE CLAVE_IF_EXPRESION TOKEN_CIERRE_CLAVE", true,
+                53, "Error sintáctico {}: Hace falta una apertura de clave '('[#,%]");
+
+        gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE TOKEN_CIERRE_CLAVE", true,
+                54, "Error sintáctico {}: Hace falta una valor de clave dentro de la declaracion [#,%]");
+        
+        gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE (TOKEN_DIGITO | TOKEN_TEMPO | TOKEN_ASIGNACION | TOKEN_VAR | TOKEN_IDENTIFICADOR | ERROR_IDENTIFICADOR | COMPAS_ERROR) TOKEN_CIERRE_CLAVE", true,
+                55, "Error sintáctico {}: Valor de clave invalido[#,%]");
+
+        gramatica.group("CLAVE_IF", "TOKEN_APERTURA_CLAVE CLAVE_IF_EXPRESION TOKEN_CIERRE_CLAVE", true,
+                56, "Error sintáctico {}: Hace falta la palabra reservada 'clave' para la sentencia [#,%]");
+
+        gramatica.group("CLAVE_IF", "TOKEN_CLAVE", true,
+                57, "Error sintáctico {}: Token de clave fuera de contexto [#,%]");
+        
+        gramatica.group("CLAVE_IF", "TOKEN_APERTURA_CLAVE", true,
+                58, "Error sintáctico {}: Token de apertura de clave fuera de contexto [#,%]");
+
+        gramatica.group("CLAVE_IF", "TOKEN_CIERRE_CLAVE", true,
+                59, "Error sintáctico {}: Token de cierre de clave fuera de contexto [#,%]");
+
+        gramatica.group("CLAVE_IF", "CLAVE_IF_EXPRESION", true,
+                60, "Error sintáctico {}: Expresion de asignacion de clave fuera de contexto [#,%]");
+        
+        gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_CIERRE_CLAVE", true,
+                61, "Error sintáctico {}: Declaracion de clave invalida, no hay una apertura de clave '(' ni un valor de clave [#,%]");
+         
+        gramatica.group("CLAVE_IF", "TOKEN_CLAVE TOKEN_APERTURA_CLAVE", true,
+                62, "Error sintáctico {}: Declaracionde de clave invalida, no hay un cierre de clave ')' ni un valor de clave [#,%]");
+          
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA FIGURA )+", true,
+                63, "Error sintáctico {}: Hace falta una separacion de figura nota ',' [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA_CLAVE FIGURA TOKEN_SEPARACION_COMPAS? )+", true,
+                64, "Error sintáctico {}: Hace falta una entre figura y nota '.' [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_NOTA TOKEN_SEPARACION_COMPAS? )+", true,
+                65, "Error sintáctico {}: Hace falta un valor de figura [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS? )+", true,
+                66, "Error sintáctico {}: Hace falta una nota (A=La, B=Si, C=Do, D=Re, E=Mi, F=Fa, G=Sol) [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA_CLAVE TOKEN_SEPARACION_COMPAS? )+", true,
+                67, "Error sintáctico {}: No se encontro la separacion de figura y nota, ni un valor para de figura [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "( FIGURA TOKEN_SEPARACION_COMPAS? )+", true,
+                68, "Error sintáctico {}: No se ha encontrado un token de nota, ni el token de separacion de nota y figura '.' [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "TOKEN_SEPARACION_COMPAS", true,
+                69, "Error sintáctico {}: Separacion de compas fuera de contexto [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "FIGURA", true,
+                70, "Error sintáctico {}: Figura fuera de contexto [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "TOKEN_SEPARACION_NOTA", true,
+                71, "Error sintáctico {}: Token de separacion de nota fuera de contexto [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "TOKEN_NOTA_CLAVE", true,
+                72, "Error sintáctico {}: Token de nota fuera de contexto [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA )+", true,
+                73, "Error sintáctico {}: Hace falta una separacion de figura nota ',' [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA FIGURA TOKEN_SEPARACION_COMPAS? )+", true,
+                74, "Error sintáctico {}: Hace falta una entre figura y nota '.' [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA TOKEN_SEPARACION_COMPAS? )+", true,
+                75, "Error sintáctico {}: Hace falta un valor de figura [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_SEPARACION_NOTA FIGURA TOKEN_SEPARACION_COMPAS? )+", true,
+                76, "Error sintáctico {}: Hace falta una nota (A=La, B=Si, C=Do, D=Re, E=Mi, F=Fa, G=Sol) [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_COMPAS? )+", true,
+                77, "Error sintáctico {}: No se encontro la separacion de figura y nota, ni un valor para de figura [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "( FIGURA TOKEN_SEPARACION_COMPAS? )+", true,
+                78, "Error sintáctico {}: No se ha encontrado un token de nota, ni el token de separacion de nota y figura '.' [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "TOKEN_SEPARACION_COMPAS", true,
+                79, "Error sintáctico {}: Separacion de compas fuera de contexto [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "FIGURA", true,
+                80, "Error sintáctico {}: Figura fuera de contexto [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "TOKEN_SEPARACION_NOTA", true,
+                81, "Error sintáctico {}: Token de separacion de nota fuera de contexto [#,%]");
+        
+        gramatica.group("FIGURA_NOTA", "TOKEN_NOTA", true,
+                82, "Error sintáctico {}: Token de nota fuera de contexto [#,%]");
+        
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE TOKEN_DIGITO", true,
+                83, "Error sintáctico {}: Hace falta un cierre de repeticion ')' [#,%]");
+
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE (TOKEN_DIGITO | TOKEN_TEMPO | TOKEN_ASIGNACION | TOKEN_VAR | TOKEN_IDENTIFICADOR | ERROR_IDENTIFICADOR | COMPAS_ERROR) TOKEN_CIERRE_CLAVE", true,
+                84, "Error sintáctico {}: Declaración de repetición incompleta, falta el contenido (ejemplo: \\rep {...};) [#,%]");
+
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_DIGITO TOKEN_CIERRE_CLAVE", true,
+                85, "Error sintáctico {}: Hace falta una apertura de selecion de repeticion '(' [#,%]");
+
+        gramatica.group("DECLARACION_REP", "TOKEN_APERTURA_CLAVE TOKEN_DIGITO TOKEN_CIERRE_CLAVE", true,
+                86, "Error sintáctico {}: Hace falta la declaracion de repeticion [#,%]");
+        
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE TOKEN_CIERRE_CLAVE", true,
+                87, "Error sintáctico {}: No hay un valor asignado a la repeticion [#,%]");
+
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_APERTURA_CLAVE", true,
+                89, "Error sintáctico {}: Declaracion de repeticion incompleta, hace falta un valor de repeticion y un cierre de repeticion ')' [#,%]");
+        
+        gramatica.group("DECLARACION_REP", "TOKEN_REP TOKEN_CIERRE_CLAVE", true,
+                90, "Error sintáctico {}: Declaracion de repeticion incompleta, hace falta un valor de repeticion y una apertura de repeticion '(' [#,%]");
+
+        gramatica.group("DECLARACION_REP", "TOKEN_REP", true,
+                91, "Error sintáctico {}: Token de repeticion fuera de contexto [#,%]");
+        
+        gramatica.group("SENTENCIAS", "TOKEN_IDENTIFICADOR", true,
+                92, "Error sintáctico {}: NO hay un finalizador de sentencia ';'[#,%]");
         
         /* Mostrar gramáticas */
         gramatica.show();
