@@ -7,10 +7,16 @@
  *
  * @author kobayashi
  */
+import compilerTools.ErrorLSSL;
+import compilerTools.Production;
+import compilerTools.Token;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -129,16 +135,6 @@ public class AnalisisSemantico {
 
         return false;
     }
-    
-    // AUN NO FUNCIONA, VUELVA CUANDO FUNCIONE
-    public static boolean validateClave(String clave) {
-        String regex = "[A-Za-z]+(\\^\\d+)";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(clave);
-
-        return matcher.matches();
-    }
 
     public static String[] extractParenthesizedElements(String input) {
         List<String> elements = new ArrayList<>();
@@ -154,34 +150,312 @@ public class AnalisisSemantico {
         return elements.toArray(new String[elements.size()]);
     }
 
-    public static void main(String[] args) {
-        String input = "compas = 4 / 4 ;tempo = 208 ;var timbre = [ F1 . r ] ;var timbrePiano = [ E7 . P-n , G2 . P-b , F1 . P-n ] ;[ F . n , A . b , C . n ][ B . r ]timbre , [ A2 . b , B4 . b ][ E4 . n , E4 . n , F4 . n , G4 . n ]timbre[ F . P-n , A . P-b , C . P-n ][ B . P-r ]timbrePiano , [ A2 . P-b , B4 . P-b ][ E4 . P-n , E4 . P-n , F4 . P-n , G4 . P-n ]timbrePianoclave ( G ^ 2 )clave ( G ^ 2 )compas = 4 / 4 ;tempo = 208 ;var timbre = [ F1 . r ] ;var timbrePiano = [ E7 . P-n , G2 . P-b , F1 . P-n ] ;[ F . n , A . b , C . n ][ B . r ]timbre , [ A2 . b , B4 . b ][ E4 . n , E4 . n , F4 . n , G4 . n ]timbre[ F . P-n , A . P-b , C . P-n ][ B . P-r ]timbrePiano , [ A2 . P-b , B4 . P-b ][ E4 . P-n , E4 . P-n , F4 . P-n , G4 . P-n ]timbrePianoclave ( G ^ 2 )clave ( G ^ 2 )";
+    // Metodos de pertenencia de compas y tempo
+    public static void verificarTexto(String texto, ArrayList<ErrorLSSL> errorsSemantics) {
+        String[] palabrasClave = {"compas =", "tempo ="};
+        Stack<String> pila = new Stack<>();
+        int lineasAnalizadas = 0;
 
-        String[] lines = input.split(";");
+        String[] lineas = texto.split("\\n");
 
-        List<String> elementosEntreParentesis = new ArrayList<>();
+        for (String linea : lineas) {
+            // Ignorar líneas vacías y comentarios
+            if (!linea.trim().isEmpty() && !linea.trim().startsWith("//")) {
+                lineasAnalizadas++;
+            }
 
-        for (String line : lines) {
-            String[] tokens = line.split("\\s+|,");
-
-            for (String token : tokens) {
-                if (validateClave(token.trim())) {
-                    System.out.println("Clave válida: " + token);
-                } else {
-                    System.out.println("Clave no válida: " + token);
+            for (String palabraClave : palabrasClave) {
+                if (linea.startsWith("//")) {
+                    continue;
                 }
+                if (linea.contains(palabraClave)) {
+                    pila.push(palabraClave);
+                }
+            }
 
-                // Buscar elementos entre paréntesis que cumplan con el patrón de clave
-                String[] parenthesizedElements = extractParenthesizedElements(token.trim());
-                for (String element : parenthesizedElements) {
-                    if (validateClave(element)) {
-                        elementosEntreParentesis.add(element);
-                    }
+            if (lineasAnalizadas >= 5) {
+                break;
+            }
+        }
+
+        if (!pila.contains("compas =") && !pila.contains("tempo =")) {
+            errorsSemantics.add(new ErrorLSSL(101, " × Error: Faltan ambas sentencias (tempo y compas) en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
+        } else {
+            if (!pila.contains("compas =")) {
+                errorsSemantics.add(new ErrorLSSL(102, " × Error: Falta 'compas' en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
+            }
+            if (!pila.contains("tempo =")) {
+                errorsSemantics.add(new ErrorLSSL(103, " × Error: Falta 'tempo' en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
+            }
+        }
+    }
+
+    // Variables sin declarar
+    public static Stack<ElementoPila> guardarElementosConDolarEnPila(String cadena) {
+        Stack<ElementoPila> pila = new Stack<>();
+        String[] lineas = cadena.split("\n");
+
+        for (int i = 0; i < lineas.length; i++) {
+            String linea = lineas[i].replaceAll(";", "");
+            String[] palabras = linea.split("\\s+");
+
+            for (String palabra : palabras) {
+                if (palabra.startsWith("$") || (palabra.startsWith("var") && palabra.length() > 4 && palabra.charAt(3) == '$')) {
+                    pila.push(new ElementoPila(palabra, i + 1));
                 }
             }
         }
 
-        System.out.println("Elementos entre paréntesis válidos: " + elementosEntreParentesis);
+        return pila;
     }
 
+    public static void contarRepetidos(Stack<ElementoPila> pila, ArrayList<ErrorLSSL> errorsSemantics, String cadena) {
+        Map<String, Integer> conteo = new HashMap<>();
+
+        while (!pila.isEmpty()) {
+            ElementoPila elemento = pila.pop();
+            conteo.put(elemento.getCadena(), conteo.getOrDefault(elemento.getCadena(), 0) + 1);
+        }
+
+        for (Map.Entry<String, Integer> entry : conteo.entrySet()) {
+            if (entry.getValue() == 1) {
+                String cadenaError = entry.getKey();
+                int numeroLinea = encontrarNumeroLinea(cadena, cadenaError);
+                if (numeroLinea != -1) {
+                    errorsSemantics.add(new ErrorLSSL(104, " × Error: La sentencia '" + cadenaError + "' es una variable que no está declarada en la línea " + numeroLinea, new Token("{", "}", 1, 1)));
+                }
+            }
+        }
+    }
+
+    private static int encontrarNumeroLinea(String cadena, String cadenaError) {
+        String[] lineas = cadena.split("\n");
+        for (int i = 0; i < lineas.length; i++) {
+            if (lineas[i].contains(cadenaError)) {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+
+    // Validar clave
+    public static String[] buscarClavesEnTexto(String texto) {
+        Pattern patron = Pattern.compile("(\\bclave\\([^0-9].*?\\))\\s*\\{([^\\}]*)\\}");
+        Matcher matcher = patron.matcher(texto);
+
+        List<ClaveEncontrada> coincidencias = new ArrayList<>();
+
+        int numeroLinea = 1;
+        while (matcher.find()) {
+            String posibleClave = matcher.group(0);
+            coincidencias.add(new ClaveEncontrada(posibleClave, obtenerNumeroLinea(texto, matcher.start())));
+        }
+
+        String[] claves = new String[coincidencias.size()];
+        for (int i = 0; i < coincidencias.size(); i++) {
+            claves[i] = coincidencias.get(i).getClave();
+        }
+
+        return claves;
+    }
+
+    public static void validarClaves(String[] claves, ArrayList<ErrorLSSL> errorsSemantics, String texto) {
+        for (String clave : claves) {
+            if (!validarClave(clave)) {
+                int numeroLinea = obtenerNumeroLinea(texto, texto.indexOf(clave));
+                errorsSemantics.add(new ErrorLSSL(105, " × Error: La clave '" + clave + "' no es válida en la línea " + numeroLinea, new Token("{", "}", 1, 1)));
+            }
+        }
+    }
+
+    private static boolean validarClave(String clave) {
+        Stack<Character> pila = new Stack<>();
+        boolean dentroCorchetes = false;
+
+        for (char c : clave.toCharArray()) {
+            if (c == '[') {
+                dentroCorchetes = true;
+            } else if (c == ']') {
+                dentroCorchetes = false;
+                pila.clear(); // Reiniciar la pila al salir de los corchetes
+            } else if (dentroCorchetes && Character.isDigit(c)) {
+                if (!pila.isEmpty() && pila.peek() == '.') {
+                    return false; // Si hay un número antes del punto, la clave no es válida
+                }
+                pila.push(c);
+            } else if (c == '.') {
+                if (!pila.isEmpty() && Character.isDigit(pila.peek())) {
+                    return false; // Si hay un número antes del punto, la clave no es válida
+                }
+                pila.push(c);
+            }
+        }
+
+        return true;
+    }
+
+    private static int obtenerNumeroLinea(String texto, int indice) {
+        String[] lineas = texto.split("\n");
+        int contador = 0;
+        for (String linea : lineas) {
+            contador += linea.length() + 1; // Sumar la longitud de la línea y el carácter de nueva línea
+            if (contador > indice) {
+                return contador - linea.length(); // Regresar el número de línea
+            }
+        }
+        return -1;
+    }
+
+    // No combinar notas de música con notas de piano
+    public static String[] obtenerElementosPuntoComa(String[] elementosCorchetes) {
+        List<String> elementosPuntoComa = new ArrayList<>();
+
+        for (String elementos : elementosCorchetes) {
+            String[] elementosSeparados = elementos.split(",\\s*");
+
+            for (String elemento : elementosSeparados) {
+                String[] partes = elemento.split("\\.");
+                if (partes.length > 1) {
+                    elementosPuntoComa.add(partes[1]);
+                }
+            }
+        }
+
+        return elementosPuntoComa.toArray(new String[0]);
+    }
+
+    public static boolean verificarElementosMixtos(String[] elementos) {
+        boolean empiezanConP = false;
+        boolean noEmpiezanConP = false;
+
+        for (String elemento : elementos) {
+            if (elemento.startsWith("P")) {
+                empiezanConP = true;
+            } else {
+                noEmpiezanConP = true;
+            }
+
+            // Si se encuentra una mezcla de elementos, retornar true (error)
+            if (empiezanConP && noEmpiezanConP) {
+                return true;
+            }
+        }
+
+        // Si no se encontró mezcla, retornar false (sin error)
+        return false;
+    }
+
+    // Validar valores maximos en las repeticiones
+    public static void validarRepeticiones(String entrada, ArrayList<ErrorLSSL> errorsSemantics) {
+        Pattern patron = Pattern.compile("rep\\((\\d+)\\)");
+        Matcher matcher = patron.matcher(entrada);
+
+        int numeroLinea = 1;
+        while (matcher.find()) {
+            int valorRepeticion = Integer.parseInt(matcher.group(1));
+            if (valorRepeticion < 2 || valorRepeticion > 35) {
+                errorsSemantics.add(new ErrorLSSL(105, "Error: Valor de repetición inválido (" + valorRepeticion + ") el rango de repetición es de minimo 2 y maximo 35, en la línea " + obtenerNumeroLineaREP(entrada, matcher.start(),valorRepeticion ), new Token("{", "}", 1, 1)));
+                return;
+            }
+        }
+    }
+
+    private static int obtenerNumeroLineaREP(String entrada, int indice, int fallo) {
+        String[] lineas = entrada.split("\n");
+        int contador = 0;
+        for (String linea : lineas) {
+            contador ++; // Sumar la longitud de la línea y el carácter de nueva línea
+            if (linea.contains("rep("+fallo+")")) {
+                return contador; // Regresar el número de línea
+            }
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        String codigo = "compas = 4/4;\n"
+                + "tempo = 208;\n"
+                + "var $timbre = [G2.b, F4.b,];\n"
+                + "\n"
+                + "// Notas\n"
+                + "	\\\\inicio;\n"
+                + "		$timbreHola;\n"
+                + "	    	clave(G^2){\n"
+                + "            	[F.b, B.b];\n"
+                + "            	[B.r,];\n"
+                + "        	};\n"
+                + "        	var $timbre;\n"
+                + "        	[A2.b, B4.b,];\n"
+                + "        	rep(5) {\n"
+                + "		   	[E4.n, E4.n, F4.n, G4.n,]; \n"
+                + "			$timbre;\n"
+                + "		};\n"
+                + "	\\\\fin;\n"
+                + "	\n"
+                + "// Notas piano\n"
+                + "var $timbrePiano = [F1.P-r,];\n"
+                + "\n"
+                + "piano{\n"
+                + "	clave(G^2) {\n"
+                + "        	[F.P-n, A.P-b, C.P-n,];\n"
+                + "      	[B.P-r,];\n"
+                + "   	};\n"
+                + "   	$timbrePiano;\n"
+                + "    	[A2.P-b, B4.P-b,];\n"
+                + "	rep(70) {\n"
+                + "		[E4.P-n, E4.P-n, F4.P-n, G4.P-n,];\n"
+                + "		$timbrePiano;\n"
+                + "	};\n"
+                + "};";
+
+        //verificarRepeticiones(codigo);
+//        String entrada = "clave(G^2){ [F.b, B.P-b,]; [B.r,]; };";
+//
+//        String[] elementosCorchetes = extraerElementosCorchetesCompas(entrada);
+//        String[] elementosPuntoComa = obtenerElementosPuntoComa(elementosCorchetes);
+//
+//        if (verificarElementosMixtos(elementosPuntoComa)) {
+//            System.out.println("Error: Se encontraron elementos mixtos en el arreglo.");
+//        } else {
+//            System.out.println("Todos los elementos comienzan con 'P' o ninguno lo hace.");
+//        }
+    }
+}
+
+class ElementoPila {
+
+    private String cadena;
+    private int numeroLinea;
+
+    public ElementoPila(String cadena, int numeroLinea) {
+        this.cadena = cadena;
+        this.numeroLinea = numeroLinea;
+    }
+
+    public String getCadena() {
+        return cadena;
+    }
+
+    public int getNumeroLinea() {
+        return numeroLinea;
+    }
+}
+
+class ClaveEncontrada {
+
+    private final String clave;
+    private final int numeroLinea;
+
+    public ClaveEncontrada(String clave, int numeroLinea) {
+        this.clave = clave;
+        this.numeroLinea = numeroLinea;
+    }
+
+    public String getClave() {
+        return clave;
+    }
+
+    public int getNumeroLinea() {
+        return numeroLinea;
+    }
 }

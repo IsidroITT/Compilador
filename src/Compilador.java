@@ -64,7 +64,7 @@ public class Compilador extends javax.swing.JFrame {
     private boolean codeHasBeenCompiled = false;
 
     // Variables analisis semantico
-    private AnalisisSemantico elementosCompas;
+    private AnalisisSemantico analizadorSemantico;
 
     // Variables codigo intermedio
     private generadorIntermedio codIntermedio;
@@ -329,7 +329,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnArbolesSintacticoActionPerformed(evt);
             }
         });
-        jPanel1.add(btnArbolesSintactico, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 80));
+        jPanel1.add(btnArbolesSintactico, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 250, 210, 80));
 
         btnArbolesSemanticos.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnArbolesSemanticos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
@@ -342,7 +342,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnArbolesSemanticosActionPerformed(evt);
             }
         });
-        jPanel1.add(btnArbolesSemanticos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 320, 210, 90));
+        jPanel1.add(btnArbolesSemanticos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 160, 210, 90));
 
         btnGramaticas.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGramaticas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/GooglePlus_G_icon-icons.com_49945 (1).png"))); // NOI18N
@@ -368,7 +368,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnAutomatasActionPerformed(evt);
             }
         });
-        jPanel1.add(btnAutomatas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 160, 210, 80));
+        jPanel1.add(btnAutomatas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 330, 210, 80));
 
         rootPanel.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
 
@@ -550,8 +550,9 @@ public class Compilador extends javax.swing.JFrame {
         analisisLexico();
         rellenarTablaTokens();
         analisisSintactico();
-        //analisisSemantico();
+        analisisSemantico();
         mostrarConsola();
+        mostrarConsolaSemantica();
         codeHasBeenCompiled = true;
     }
 
@@ -681,8 +682,6 @@ public class Compilador extends javax.swing.JFrame {
             gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "ESTRUCTURAS_CONTROL TOKEN_APERTURA_NOTAS (SENTENCIAS)* TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true);
         });
 
-//        gramatica.group("ESTRUCTURA_CONTROL_COMPLETA", "TOKEN_CIERRE_NOTAS", true,
-//                521, "Error sintáctico {}: No hay un final de sentencia ';' [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION INICIO-FIN */
@@ -690,12 +689,6 @@ public class Compilador extends javax.swing.JFrame {
             gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA TOKEN_FIN_SENTENCIA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA TOKEN_FIN_SENTENCIA", true);
         });
 
-//        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA", true,
-//                55, "Error sintáctico {}: No hay un final de sentencia ';' en el \\inicio [#,%]");
-//
-//        gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_FINAL_PARTITURA", true,
-//                56, "Error sintáctico {}: No hay un final de sentencia ';' en el \\fin [#,%]");
-//        
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
             gramatica.group("BLOQUE_SALIDA_FISICA", "FUNCIONES TOKEN_APERTURA_NOTAS (ESTRUCTURA_CONTROL_COMPLETA | SENTENCIAS)+ TOKEN_CIERRE_NOTAS TOKEN_FIN_SENTENCIA", true);
         });
@@ -708,8 +701,11 @@ public class Compilador extends javax.swing.JFrame {
         // Verificar llaves
         verificarLlaves();
         verificarTokens();
-        
+
         // Continuar con errores sintacticos
+        gramatica.group("FIGURA_NOTA", "(TOKEN_NOTA TOKEN_SEPARACION_NOTA FIGURA )+", true,
+                73, "Error sintáctico {}: Hace falta una separacion de figura nota ',' [#,%]");
+
         gramatica.group("CLAVE_IF_EXPRESION", "TOKEN_SELECION_CLAVE TOKEN_DIGITO", true,
                 2, "Error sintáctico {}: No hay una nota de clave selecionada [#,%]");
 
@@ -983,7 +979,7 @@ public class Compilador extends javax.swing.JFrame {
         /* Mostrar gramáticas */
         gramatica.show();
     }
-    
+
     private void verificarLlaves() {
         Stack<Character> stack = new Stack<>();
 
@@ -993,7 +989,7 @@ public class Compilador extends javax.swing.JFrame {
                 stack.push(caracter);
             } else if (caracter == '}') {
                 if (stack.isEmpty()) {
-                    errorsSintac.add(new ErrorLSSL(93, " × Error: Llave cerrada sin ser abierta en la posición ", new Token("{","}",1,1)));
+                    errorsSintac.add(new ErrorLSSL(93, " × Error: Llave cerrada sin ser abierta en la posición ", new Token("{", "}", 1, 1)));
                     return;
                 } else {
                     stack.pop();
@@ -1002,7 +998,7 @@ public class Compilador extends javax.swing.JFrame {
         }
 
         if (!stack.isEmpty()) {
-            errorsSintac.add(new ErrorLSSL(93, " × Error: Llave abierta sin ser cerrada", new Token("{","}",1,1)));
+            errorsSintac.add(new ErrorLSSL(94, " × Error: Llave abierta sin ser cerrada", new Token("{", "}", 1, 1)));
             while (!stack.isEmpty()) {
                 char llave = stack.pop();
                 System.out.println("Llave sin cerrar en la pila: " + llave);
@@ -1024,7 +1020,7 @@ public class Compilador extends javax.swing.JFrame {
                 posicion += "\\inicio".length();
             } else if (jtpCode.getText().startsWith("\\fin", posicion)) {
                 if (stack.isEmpty() || !stack.pop().equals("\\inicio")) {
-                    errorsSintac.add(new ErrorLSSL(94, " × Error: Token \\fin sin el correspondiente \\inicio en la línea " + linea + ", posición " + posicion, new Token("\\inicio","\\inicio",1,1)));
+                    errorsSintac.add(new ErrorLSSL(95, " × Error: Token \\fin sin el correspondiente \\inicio en la línea " + linea + ", posición " + posicion, new Token("\\inicio", "\\inicio", 1, 1)));
                     return;
                 }
                 posicion += "\\fin".length();
@@ -1037,7 +1033,7 @@ public class Compilador extends javax.swing.JFrame {
         }
 
         if (!stack.isEmpty()) {
-            errorsSintac.add(new ErrorLSSL(94, " × Error: Token \\inicio sin el correspondiente \\fin", new Token("{","}",1,1)));
+            errorsSintac.add(new ErrorLSSL(96, " × Error: Token \\inicio sin el correspondiente \\fin", new Token("{", "}", 1, 1)));
             while (!stack.isEmpty()) {
                 String token = stack.pop();
                 System.out.println("Token \\inicio sin el correspondiente \\fin en la pila: " + token);
@@ -1046,7 +1042,7 @@ public class Compilador extends javax.swing.JFrame {
             System.out.println("Todos los tokens están balanceados.");
         }
     }
-    
+
     private void analisisSemantico() {
         // Variables auxiliares
         int it = 0;
@@ -1054,59 +1050,106 @@ public class Compilador extends javax.swing.JFrame {
         double valorCompas;
         String produccionesEvaluar = "";
         String[] elementosDentroCompas;
-        Map<String, Double> diccionarioFiguraNota = elementosCompas.crearDiccionarioFiguraValor();
+        Map<String, Double> diccionarioFiguraNota = analizadorSemantico.crearDiccionarioFiguraValor();
 
-        //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Analisis de rango tempo
         for (Production id : identProd) {
             // Obtener la produccion a evaluar
             produccionesEvaluar += id.lexemeRank(0, -1);
-
-            if (elementosCompas.validarTempo(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
+            if (analizadorSemantico.validarTempo(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
             {
-                errorsSemantic.add(new ErrorLSSL(51, " × Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
+                errorsSemantic.add(new ErrorLSSL(97, " × Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
             }
             it++;
 
         }// Analisis de rango tempo
-
+        produccionesEvaluar = "";
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Analisis de valores compas
         it = 0;
         for (Production id : identProd) {
             // Obtener la produccion a evaluar
-            produccionesEvaluar += id.lexemeRank(0, -1);
+            produccionesEvaluar = id.lexemeRank(0, -1);
 
-            if (elementosCompas.validarTamanoCompas(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
+            if (analizadorSemantico.validarTamanoCompas(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
             {
-                errorsSemantic.add(new ErrorLSSL(50, " × Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
+                errorsSemantic.add(new ErrorLSSL(98, " × Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
             }
             it++;
 
         }// Analisis de valores compas
-        //------------------------------------------------------------------------------------------------------------------------------------------------------------------//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        produccionesEvaluar = "";
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Analisis de compases
         for (Production id : identProd) {
             // Obtener la produccion a evaluar
             produccionesEvaluar += id.lexemeRank(0, -1);
+
             // Variables de la evaluacion de notas
-            diccionarioFiguraNota = elementosCompas.crearDiccionarioFiguraValor();
-            elementosDentroCompas = elementosCompas.extraerElementosCorchetesCompas(produccionesEvaluar);
-            valorCompas = elementosCompas.calcularCompas(produccionesEvaluar);
+            diccionarioFiguraNota = analizadorSemantico.crearDiccionarioFiguraValor();
+            elementosDentroCompas = analizadorSemantico.extraerElementosCorchetesCompas(produccionesEvaluar);
+            valorCompas = analizadorSemantico.calcularCompas(produccionesEvaluar);
+
             // Extraer los valores a evaluar de las producciones
             for (String element : elementosDentroCompas) {
-                sum = elementosCompas.sumaValoresCompas(element, diccionarioFiguraNota);
+                sum = analizadorSemantico.sumaValoresCompas(element, diccionarioFiguraNota);
             }
 
+            if (sum == 0){continue;}
             if (valorCompas > sum) { // Error: Numero de notas menor al compas
-                errorsSemantic.add(new ErrorLSSL(52, " × Error: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
+                errorsSemantic.add(new ErrorLSSL(99, " × Error: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
             } else if (valorCompas < sum) { // Error: Numero de notas mayor al compas
-                errorsSemantic.add(new ErrorLSSL(52, " × Error: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
+                errorsSemantic.add(new ErrorLSSL(100, " × Error: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
             }
         }// Analisis de compases
-        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        produccionesEvaluar = "";
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Elementos mixtos
+        for (Production id : identProd) {
+            // Obtener la produccion a evaluar
+            produccionesEvaluar += id.lexemeRank(0, -1);
+
+            String[] elementosCorchetes = analizadorSemantico.extraerElementosCorchetesCompas(produccionesEvaluar);
+            String[] elementosPuntoComa = analizadorSemantico.obtenerElementosPuntoComa(elementosCorchetes);
+            
+            if (analizadorSemantico.verificarElementosMixtos(elementosPuntoComa)) {
+                //System.out.println("Error: Se encontraron elementos mixtos en el arreglo, linea: "+id.getLine());
+            } else {
+                //System.out.println("Todos los elementos comienzan con 'P' o ninguno lo hace, linea:"+id.getLine());
+            }
+        }// Elementos mixtos
+        produccionesEvaluar = "";
+        //--------------------------------------------------------------------------------------- ----------------------------------------------------------------------------
+
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Numero maximo de repeticiones
+        analizadorSemantico.validarRepeticiones(jtpCode.getText(),errorsSemantic);
+        // Numero maximo de repeticiones
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Analisis, siempre deben aparecer compas y tempo
+        analizadorSemantico.verificarTexto(jtpCode.getText().toString(), errorsSemantic);
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Comprobar variables sin declarar
+        Stack<ElementoPila> pila = analizadorSemantico.guardarElementosConDolarEnPila(jtpCode.getText());
+        analizadorSemantico.contarRepetidos(pila, errorsSemantic, jtpCode.getText());
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Comprobar numeros dentro de claves
+        String[] claves = analizadorSemantico.buscarClavesEnTexto(jtpCode.getText());
+        analizadorSemantico.validarClaves(claves, errorsSemantic, jtpCode.getText());
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        
+        
     }
 
     private void colores() {
@@ -1300,11 +1343,33 @@ public class Compilador extends javax.swing.JFrame {
         jtaOutputConsole.setCaretPosition(0);
     }
 
+    private void mostrarConsolaSemantica() {
+        int sizeErrors = errorsSemantic.size();
+        if (sizeErrors > 0) {
+            Functions.sortErrorsByLineAndColumn(errorsSemantic);
+            String strErrors = "\n";
+            for (ErrorLSSL error : errorsSemantic) {
+                String strError = String.valueOf(error);
+                strErrors += strError + "\n";
+            }
+            jtaOutputConsole.setText("Compilación terminada...\n\nLa compilación terminó con ERRORES... \n\n"
+                    + strErrors);
+            btnArbolesSemanticos.setBackground(Color.red);
+            //ErroresSintac.getTxtErroresSemanticos().setText(strErrors);
+        } else {
+            jtaOutputConsole.setText("Compilación terminada... \n NO hubo errores");
+            //ErroresSintac.getTxtErroresSemanticos().setText("NO SE ENCONTRARON ERRORES");
+            btnArbolesSemanticos.setBackground(Color.green);
+        }
+        jtaOutputConsole.setCaretPosition(0);
+    }
+
     private void limpiarCampos() {
         //Functions.clearDataInTable(tblTokens);
         jtaOutputConsole.setText("");
         tokens.clear();
         errorsSintac.clear();
+        errorsSemantic.clear();
         identProd.clear();
         identificadores.clear();
         codeHasBeenCompiled = false;
