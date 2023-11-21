@@ -56,6 +56,7 @@ Identificador = {Letras}({Letras}|{Numeros})*
 "led" { return textColor(yychar, yylength(), new Color(241, 250, 140)); }
 "rep" { return textColor(yychar, yylength(), new Color(241, 250, 140)); }
 "var" { return textColor(yychar, yylength(), new Color(241, 250, 140)); }
+"fn"  { return textColor(yychar, yylength(), new Color(241, 250, 140)); }
 
 /* Secciones */
 \\"inicio" { return textColor(yychar, yylength(), new Color(189, 147, 249)); }
@@ -63,6 +64,7 @@ Identificador = {Letras}({Letras}|{Numeros})*
 
 /* Identificador  */
 "$"{Identificador} { return textColor(yychar, yylength(), new Color(80, 250, 123)); }
+"#"{Identificador} { return textColor(yychar, yylength(), new Color(255, 184, 108)); }
 
 /* Figuras */
 "r" { return textColor(yychar, yylength(), new Color(255, 121, 198)); }

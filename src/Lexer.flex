@@ -57,6 +57,7 @@ Identificador = {Letras}({Letras}|{Numeros})*
 "led" { return token(yytext(), "TOKEN_LEDS", yyline, yycolumn); }
 "rep" { return token(yytext(), "TOKEN_REP", yyline, yycolumn); }
 "var" { return token(yytext(), "TOKEN_VAR", yyline, yycolumn); }
+"fn"  { return token(yytext(), "TOKEN_FUNCION", yyline, yycolumn); }
 
 /*Secciones*/
 \\"inicio" { return token(yytext(), "TOKEN_INICIO_PARTITURA", yyline, yycolumn); }
@@ -64,6 +65,7 @@ Identificador = {Letras}({Letras}|{Numeros})*
 
 /* Identificador  */
 "$"{Identificador} { return token(yytext(), "TOKEN_IDENTIFICADOR", yyline, yycolumn); }
+"#"{Identificador} { return token(yytext(), "TOKEN_IDENTIFICADOR_FUNCION", yyline, yycolumn); }
 
 /*Figuras*/
 "r"	 { return token(yytext(), "TOKEN_REDONDA", yyline, yycolumn); }

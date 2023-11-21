@@ -8,14 +8,11 @@
  * @author kobayashi
  */
 import compilerTools.ErrorLSSL;
-import compilerTools.Production;
 import compilerTools.Token;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -116,7 +113,6 @@ public class AnalisisSemantico {
             if (elementosCompas.length == 2) {
                 int numerador = Integer.parseInt(elementosCompas[0].trim());
                 int denominador = Integer.parseInt(elementosCompas[1].trim());
-
                 return numerador > 10 || denominador > 10;
             }
         }
@@ -263,7 +259,7 @@ public class AnalisisSemantico {
         for (String clave : claves) {
             if (!validarClave(clave)) {
                 int numeroLinea = obtenerNumeroLinea(texto, texto.indexOf(clave));
-                errorsSemantics.add(new ErrorLSSL(105, " × Error: La clave '" + clave + "' no es válida en la línea " + numeroLinea, new Token("{", "}", 1, 1)));
+                errorsSemantics.add(new ErrorLSSL(105, " × Error: La clave contiene numero de octava en las notas \n'" + clave + "'\n no es válida en la línea " + numeroLinea, new Token("{", "}", 1, 1)));
             }
         }
     }

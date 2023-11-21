@@ -1,6 +1,22 @@
-compas = 4/4;
+compas = 10/10;
 tempo = 208;
 var $timbre = [G2.b, F4.b,];
+var $timbreFuncion = [G2.n, F4.n, A3.n, B3.n,];
+
+// Funciones dentro del lenguaje
+fn #miFuncioncita(){
+	$timbreFuncion;
+    	clave(G^2){
+           	[F.b, B.b,];
+           	[B.r,];
+     	};
+	$timbreFuncion;
+     	[A2.b, B4.b,];
+     	rep(3){
+	   	[E4.n, E4.n, F4.n, G4.n,]; 
+		$timbre;
+	};
+};
 
 // Notas
 	\inicio;
@@ -9,20 +25,22 @@ var $timbre = [G2.b, F4.b,];
             	[F.b, B.b,];
             	[B.r,];
         	};
+		#miFuncioncita();
         	$timbre;
         	[A2.b, B4.b,];
-        	rep(35){
+        	rep(3){
 		   	[E4.n, E4.n, F4.n, G4.n,]; 
 			$timbre;
 		};
 	\fin;
 	
+
 // Notas piano
 var $timbrePiano = [F3.P-r,];
 
 piano{
 	clave(G^2) {
-        	[F.n, A.b, C.P-n,];
+        	[F.P-n, A.P-b, C.P-n,];
       	[B.P-r,];
    	};
    	$timbrePiano;

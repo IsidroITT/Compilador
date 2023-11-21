@@ -15,33 +15,6 @@ import java.util.regex.Pattern;
 public class generadorIntermedio {
 
     public static void main(String[] args) {
-        //----------------------------------------------------------------------
-        // Convertir tempo
-        String entradaTempo = "tempo = 89";
-        System.out.println(codigoIntermedioTempo(entradaTempo));
-        //----------------------------------------------------------------------
-
-        //----------------------------------------------------------------------
-        // Notas a sonido
-        String entradaNotas = "[ F . n , A . b , C . n ]";
-        System.out.println(codigoIntermedioNotas(entradaNotas));
-        //----------------------------------------------------------------------
-        
-        //----------------------------------------------------------------------
-        // Generar variables
-        String entradaVariables = "var timbrePiano = [ G2 . b , F4 . b ]; var velocidad = [ 120 ];";
-
-        // Crear un mapa para almacenar las variables
-        Map<String, String> variablesMap = new HashMap<>();
-
-        // Llamar a la función para agregar variables al mapa
-        agregarVariablesAlMapa(entradaVariables, variablesMap);
-
-        // Imprimir las variables en el mapa
-        for (Map.Entry<String, String> entry : variablesMap.entrySet()) {
-            System.out.println("Variable: " + entry.getKey() + " = " + entry.getValue());
-        }
-        //----------------------------------------------------------------------
     }
 
     //--------------------------------------------------------------------------
@@ -56,7 +29,7 @@ public class generadorIntermedio {
 
         return aplicarReglaDeTres("tempo", valorOriginal, dividendoReglaTres, divisorReglaTres);
     }
-    
+
     private static int obtenerValorOriginal(String entrada) {
         String[] partes = entrada.split("=");
         String valorStr = partes[1].trim();
@@ -65,13 +38,16 @@ public class generadorIntermedio {
 
     private static String aplicarReglaDeTres(String variable, int valorOriginal, double dividendoReglaTres, double divisorReglaTres) {
         // Generar la cadena de salida
-        String cadenaSalida = "float t1 = " + valorOriginal + " * " + divisorReglaTres + ";\n";
-        cadenaSalida += "float t2 = t1 / " + dividendoReglaTres + ";\n";
-        cadenaSalida += "int " + variable + " = round(t2);";
+        String cadenaSalida = "(t1, *, " + valorOriginal + ", " + divisorReglaTres + ")\n";
+        cadenaSalida += "(t2, /, t1, " + dividendoReglaTres + ")\n";
+        cadenaSalida += "(" + variable + ",round, ,t2)";
+//        String cadenaSalida = "float t1 = " + valorOriginal + " * " + divisorReglaTres + ";\n";
+//        cadenaSalida += "float t2 = t1 / " + dividendoReglaTres + ";\n";
+//        cadenaSalida += "int " + variable + " = round(t2);";
 
         return cadenaSalida;
     }
-    
+
     private static double codigoTempoOptimizado(int valorOriginal, double divisor, double dividendo) {
         return (valorOriginal * divisor) / dividendo;
     }
@@ -104,8 +80,8 @@ public class generadorIntermedio {
         diccionarioFiguraValor.put("P-sf", 64);
         // Eliminar corchetes iniciales y finales
         cadena = cadena.substring(1, cadena.length() - 2);
-        
-        if(cadena.contains("[") || cadena.contains("]") || cadena.contains(" ")){
+
+        if (cadena.contains("[") || cadena.contains("]") || cadena.contains(" ")) {
             cadena = cadena.replaceAll("\\[|\\]", "");
         }
         String[] notas = cadena.split(",");
@@ -132,8 +108,8 @@ public class generadorIntermedio {
     //--------------------------------------------------------------------------
     // Metodos de tratamiento de variables
     public static void agregarVariablesAlMapa(String entrada, Map<String, String> variables) {
-        // Crear una expresión regular para encontrar las variables
-        Pattern pattern = Pattern.compile("var\\s+(\\w+)\\s*=\\s*\\[(.*?)\\]");
+        // Crear una expresión regular para encontrar las variables con el formato dado
+        Pattern pattern = Pattern.compile("var\\s+\\$(\\w+)\\s*=\\s*\\[(.*?)]");
 
         Matcher matcher = pattern.matcher(entrada);
 
@@ -143,7 +119,7 @@ public class generadorIntermedio {
             variables.put(nombreVariable, "[" + valorVariable + "]");
         }
     }
-    
+
     public static String reemplazarVariables(String texto, Map<String, String> variables) {
         // Crear una expresión regular para encontrar variables entre llaves {}
         Pattern pattern = Pattern.compile("\\b(\\w+)\\b");
@@ -153,10 +129,8 @@ public class generadorIntermedio {
         // Realizar el reemplazo de variables
         while (matcher.find()) {
             String variable = matcher.group(1);
-            System.out.println("VARIABLE: " + variable);
             if (variables.containsKey(variable)) {
                 String valor = variables.get(variable);
-                System.out.println("VALOR: " + valor);
                 matcher.appendReplacement(resultado, valor);
             }
         }
@@ -164,11 +138,77 @@ public class generadorIntermedio {
 
         return resultado.toString();
     }
-    
+
     public static boolean cadenaPerteneceAlMapa(String cadena, Map<String, String> variables) {
-        if(cadena.contains(" "))
-            cadena = cadena.replaceFirst(" ", "");
+        if (cadena.contains(" ")) {
+            cadena = cadena.replace(" ", "");
+        }
+        if (cadena.contains("$")) {
+            cadena = cadena.replace("$", "");
+        }
+        if (cadena.contains("\t")) {
+            cadena = cadena.replace("\t", "");
+        }
         return variables.containsKey(cadena);
     }
+    //--------------------------------------------------------------------------
+
+    //--------------------------------------------------------------------------
+    // LIMPIAR DECLARACIONES DE VARIABLES
+    public static String eliminarLineasVar(String[] lineas) {
+        StringBuilder textoSinVar = new StringBuilder();
+
+        for (String linea : lineas) {
+            if (!linea.trim().startsWith("var")) {
+                textoSinVar.append(linea).append("\n");
+            }
+        }
+
+        return textoSinVar.toString();
+    }
+    //--------------------------------------------------------------------------
+
+    //--------------------------------------------------------------------------
+    // Ajustar clave
+    public static String agregarCuatroAntesPunto(String texto) {
+        // Usamos expresiones regulares para buscar y reemplazar los puntos precedidos por un número
+        return texto.replaceAll("(\\d)([a-zA-Z])\\.", "$14.");
+    }
+    //--------------------------------------------------------------------------
+
+    //--------------------------------------------------------------------------
+    // Salos de funcion
+    public static String renombrarFuncion(String texto) {
+        Pattern pattern = Pattern.compile("fn\\s+#(\\w+)\\(\\)\\{");
+        Matcher matcher = pattern.matcher(texto);
+
+        StringBuffer resultado = new StringBuffer();
+
+        while (matcher.find()) {
+            String nombreFuncion = matcher.group(1);
+            String reemplazo = "lbl Fn" + nombreFuncion + "(){";
+            matcher.appendReplacement(resultado, reemplazo);
+        }
+
+        matcher.appendTail(resultado);
+        return resultado.toString();
+    }
+
+    public static String llamarFuncion(String texto) {
+        Pattern pattern = Pattern.compile("(?<!fn\\s+)#(\\w+)\\(\\)\\{");
+        Matcher matcher = pattern.matcher(texto);
+
+        StringBuffer resultado = new StringBuffer();
+
+        while (matcher.find()) {
+            String nombreFuncion = matcher.group(1);
+            String reemplazo = "lbl Fn" + nombreFuncion + "(){";
+            matcher.appendReplacement(resultado, reemplazo);
+        }
+
+        matcher.appendTail(resultado);
+        return resultado.toString();
+    }
+
     //--------------------------------------------------------------------------
 }
