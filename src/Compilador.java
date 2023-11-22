@@ -3,7 +3,6 @@ import Analisis.ErroresSintacticos;
 import Analisis.TablaSimbolos;
 import Analisis.CodigoIntermedio;
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import compilerTools.CodeBlock;
 import compilerTools.Directory;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -16,6 +15,8 @@ import compilerTools.Token;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -46,8 +47,8 @@ public class Compilador extends javax.swing.JFrame {
     private ArrayList<Token> tokens;
 
     // Manejador de errores
-    private ArrayList<ErrorLSSL> errorsSintac;
-    private ArrayList<ErrorLSSL> errorsSemantic;
+    private ArrayList<ErrorLSSL> errors;
+    private Map<Integer, String> diccionarioErroresImagenes;
 
     // Color en los tokens
     private ArrayList<TextColor> textsColor;
@@ -131,8 +132,7 @@ public class Compilador extends javax.swing.JFrame {
 
         //Arrays de elementos
         tokens = new ArrayList<>();
-        errorsSintac = new ArrayList<>();
-        errorsSemantic = new ArrayList<>();
+        errors = new ArrayList<>();
         textsColor = new ArrayList<>();
         identProd = new ArrayList<>();
         identificadores = new HashMap<>();
@@ -159,8 +159,6 @@ public class Compilador extends javax.swing.JFrame {
         btnCompilar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtpCode = new javax.swing.JTextPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jtaOutputConsole = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         btnGuardarC1 = new javax.swing.JButton();
@@ -170,6 +168,8 @@ public class Compilador extends javax.swing.JFrame {
         btnArbolesSemanticos = new javax.swing.JButton();
         btnGramaticas = new javax.swing.JButton();
         btnAutomatas = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblErrores = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
@@ -256,14 +256,6 @@ public class Compilador extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jtpCode);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, 820, 480));
-
-        jtaOutputConsole.setEditable(false);
-        jtaOutputConsole.setBackground(new java.awt.Color(229, 251, 255));
-        jtaOutputConsole.setColumns(20);
-        jtaOutputConsole.setRows(5);
-        jScrollPane2.setViewportView(jtaOutputConsole);
-
-        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 480, 1030, 199));
 
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButton1.setText("-");
@@ -368,6 +360,26 @@ public class Compilador extends javax.swing.JFrame {
         });
         jPanel1.add(btnAutomatas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 80));
 
+        tblErrores.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Error", "Imagen"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(tblErrores);
+
+        jPanel1.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 480, 1240, 230));
+
         rootPanel.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -378,9 +390,7 @@ public class Compilador extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(rootPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(rootPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -495,20 +505,20 @@ public class Compilador extends javax.swing.JFrame {
                 codIntermdioAmedias[i - 1] = linea;
             }
         }
-        
+
         // Crear saltos para funciones
-        for (String linea: codIntermdioAmedias){
-            if(linea.contains("fn #")){
+        for (String linea : codIntermdioAmedias) {
+            if (linea.contains("fn #")) {
                 String salto = codIntermedio.renombrarFuncion(linea);
-                salto = salto.substring(0, salto.length()-3);
-                codigoIntermedioSinOptimizar +="\n"+ salto + "\n";
+                salto = salto.substring(0, salto.length() - 3);
+                codigoIntermedioSinOptimizar += "\n" + salto + "\n";
                 continue;
             }
-            if(linea.contains("#")){
+            if (linea.contains("#")) {
                 String llamado = codIntermedio.llamarFuncion(linea);
-                llamado = llamado.substring(0, llamado.length()-2);
-                codigoIntermedioSinOptimizar +="\n"+ llamado + "\n";
-                System.out.println("HOLA "+linea);
+                llamado = llamado.substring(0, llamado.length() - 2);
+                codigoIntermedioSinOptimizar += "\n" + llamado + "\n";
+                System.out.println("HOLA " + linea);
             }
         }
 
@@ -540,7 +550,6 @@ public class Compilador extends javax.swing.JFrame {
         analisisSintactico();
         analisisSemantico();
         mostrarConsola();
-        mostrarConsolaSemantica();
         codeHasBeenCompiled = true;
     }
 
@@ -569,7 +578,7 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     private void analisisSintactico() {
-        Grammar gramatica = new Grammar(tokens, errorsSintac);
+        Grammar gramatica = new Grammar(tokens, errors);
         /* ERRORES LEXICOS*/
         gramatica.delete(new String[]{"ERROR", "ERROR_RESERVADA", "ERROR_IDENTIFICADOR"},
                 1, "Error Lexico: NO se esperaba el token [#,%]");
@@ -661,34 +670,10 @@ public class Compilador extends javax.swing.JFrame {
         /* DECLARACION FUNCION */
         gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION TOKEN_IDENTIFICADOR_FUNCION TOKEN_APERTURA_CLAVE TOKEN_CIERRE_CLAVE", true, identProd);
 
-        gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION", true,
-                2, "Error sintáctico {}: Declaracion de funcion sin nombre [#,%]");
-
-        gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION TOKEN_IDENTIFICADOR_FUNCION TOKEN_CIERRE_CLAVE", true,
-                2, "Error sintáctico {}: Declaracion de funcion incompleta, hace falta un token de apertura '(' [#,%]");
-
-        gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION TOKEN_IDENTIFICADOR_FUNCION TOKEN_APERTURA_CLAVE", true,
-                2, "Error sintáctico {}: Declaracion de funcion incompleta, hace falta un token de cierre ')' [#,%]");
-
-        gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION TOKEN_IDENTIFICADOR_FUNCION", true,
-                2, "Error sintáctico {}: Declaracion de funcion incompleta, hacen falta '()' despues del nombre de la funcion [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
-
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION FUNCION */
         gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_APERTURA_CLAVE TOKEN_CIERRE_CLAVE TOKEN_FIN_SENTENCIA");
-
-        gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_CIERRE_CLAVE TOKEN_FIN_SENTENCIA", true,
-                2, "Error sintáctico {}: Identificador de funcion incompleta, hace falta un token de apertura '(' [#,%]");
-
-        gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_APERTURA_CLAVE TOKEN_FIN_SENTENCIA", true,
-                2, "Error sintáctico {}: Identificador de funcion incompleto, hace falta un token de cierre ')' [#,%]");
-
-        gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_FIN_SENTENCIA", true,
-                2, "Error sintáctico {}: Declaracion de funcion incompleta, hacen falta '()' despues del nombre de la funcion [#,%]");
-
-        gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_APERTURA_CLAVE TOKEN_CIERRE_CLAVE", true,
-                2, "Error sintáctico {}: Identificador de funcion incompleta, hace falta un fin de sentencia ';' [#,%]");
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -705,7 +690,7 @@ public class Compilador extends javax.swing.JFrame {
         });
         //-------------------------------------------------------------------------------------------------------------------------------------------------------
 
-//-------------------------------------------------------------------------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
         /* DECLARACION INICIO-FIN */
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
             gramatica.group("BLOQUE_INICIO_FIN", "TOKEN_INICIO_PARTITURA TOKEN_FIN_SENTENCIA (SENTENCIAS | ESTRUCTURA_CONTROL_COMPLETA)? TOKEN_FINAL_PARTITURA TOKEN_FIN_SENTENCIA", true);
@@ -998,6 +983,30 @@ public class Compilador extends javax.swing.JFrame {
         gramatica.group("SENTENCIAS", "TOKEN_IDENTIFICADOR", true,
                 92, "Error sintáctico {}: NO hay un finalizador de sentencia ';'[#,%]");
 
+        gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION", true,
+                93, "Error sintáctico {}: Declaracion de funcion sin nombre [#,%]");
+
+        gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION TOKEN_IDENTIFICADOR_FUNCION TOKEN_CIERRE_CLAVE", true,
+                94, "Error sintáctico {}: Declaracion de funcion incompleta, hace falta un token de apertura '(' [#,%]");
+
+        gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION TOKEN_IDENTIFICADOR_FUNCION TOKEN_APERTURA_CLAVE", true,
+                95, "Error sintáctico {}: Declaracion de funcion incompleta, hace falta un token de cierre ')' [#,%]");
+
+        gramatica.group("DECLARACION_FUNCION", "TOKEN_FUNCION TOKEN_IDENTIFICADOR_FUNCION", true,
+                96, "Error sintáctico {}: Declaracion de funcion incompleta, hacen falta '()' despues del nombre de la funcion [#,%]");
+
+        gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_CIERRE_CLAVE TOKEN_FIN_SENTENCIA", true,
+                97, "Error sintáctico {}: Identificador de funcion incompleta, hace falta un token de apertura '(' [#,%]");
+
+        gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_APERTURA_CLAVE TOKEN_FIN_SENTENCIA", true,
+                98, "Error sintáctico {}: Identificador de funcion incompleto, hace falta un token de cierre ')' [#,%]");
+
+        gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_FIN_SENTENCIA", true,
+                99, "Error sintáctico {}: Declaracion de funcion incompleta, hacen falta '()' despues del nombre de la funcion [#,%]");
+
+        gramatica.group("FUNCION_EJECUTAR", "TOKEN_IDENTIFICADOR_FUNCION TOKEN_APERTURA_CLAVE TOKEN_CIERRE_CLAVE", true,
+                100, "Error sintáctico {}: Identificador de funcion incompleta, hace falta un fin de sentencia ';' [#,%]");
+
         /* Mostrar gramáticas */
         gramatica.show();
     }
@@ -1011,7 +1020,7 @@ public class Compilador extends javax.swing.JFrame {
                 stack.push(caracter);
             } else if (caracter == '}') {
                 if (stack.isEmpty()) {
-                    errorsSintac.add(new ErrorLSSL(93, " × Error: Llave cerrada sin ser abierta en la posición ", new Token("{", "}", 1, 1)));
+                    errors.add(new ErrorLSSL(111, "Error sintactico {}: Llave cerrada sin ser abierta en la posición ", new Token("{", "}", 1, 1)));
                     return;
                 } else {
                     stack.pop();
@@ -1020,7 +1029,7 @@ public class Compilador extends javax.swing.JFrame {
         }
 
         if (!stack.isEmpty()) {
-            errorsSintac.add(new ErrorLSSL(94, " × Error: Llave abierta sin ser cerrada", new Token("{", "}", 1, 1)));
+            errors.add(new ErrorLSSL(112, "Error sintactico {}: Llave abierta sin ser cerrada", new Token("{", "}", 1, 1)));
             while (!stack.isEmpty()) {
                 char llave = stack.pop();
                 System.out.println("Llave sin cerrar en la pila: " + llave);
@@ -1042,7 +1051,7 @@ public class Compilador extends javax.swing.JFrame {
                 posicion += "\\inicio".length();
             } else if (jtpCode.getText().startsWith("\\fin", posicion)) {
                 if (stack.isEmpty() || !stack.pop().equals("\\inicio")) {
-                    errorsSintac.add(new ErrorLSSL(95, " × Error: Token \\fin sin el correspondiente \\inicio en la línea " + linea + ", posición " + posicion, new Token("\\inicio", "\\inicio", 1, 1)));
+                    errors.add(new ErrorLSSL(113, "Error sintactico {}: Token \\fin sin el correspondiente \\inicio en la línea " + linea + ", posición " + posicion, new Token("\\inicio", "\\inicio", 1, 1)));
                     return;
                 }
                 posicion += "\\fin".length();
@@ -1055,7 +1064,7 @@ public class Compilador extends javax.swing.JFrame {
         }
 
         if (!stack.isEmpty()) {
-            errorsSintac.add(new ErrorLSSL(96, " × Error: Token \\inicio sin el correspondiente \\fin", new Token("{", "}", 1, 1)));
+            errors.add(new ErrorLSSL(114, "Error sintactico {}: Token \\inicio sin el correspondiente \\fin", new Token("{", "}", 1, 1)));
             while (!stack.isEmpty()) {
                 String token = stack.pop();
                 System.out.println("Token \\inicio sin el correspondiente \\fin en la pila: " + token);
@@ -1081,7 +1090,7 @@ public class Compilador extends javax.swing.JFrame {
             produccionesEvaluar += id.lexemeRank(0, -1);
             if (analizadorSemantico.validarTempo(produccionesEvaluar) && it == 1) // Error: Numero de notas menor al compas
             {
-                errorsSemantic.add(new ErrorLSSL(97, " × Error: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
+                errors.add(new ErrorLSSL(101, "Error semantico {}: El valor del tempo es invalido (no puede ser MENOR a 40 o MAYOR a 208) en la linea: " + id.getLine(), id, true));
             }
             it++;
 
@@ -1093,7 +1102,7 @@ public class Compilador extends javax.swing.JFrame {
             produccionesEvaluar = id.lexemeRank(0, -1);
             if (analizadorSemantico.validarTamanoCompas(produccionesEvaluar)) // Error: Numero de notas menor al compas
             {
-                errorsSemantic.add(new ErrorLSSL(98, " × Error: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
+                errors.add(new ErrorLSSL(102, "Error semantico {}: El valor del compas es invalido (numerador o denominador > 10) en la linea: " + id.getLine(), id, true));
             }
         }// Analisis de valores compas
         produccionesEvaluar = "";
@@ -1119,9 +1128,9 @@ public class Compilador extends javax.swing.JFrame {
                 continue;
             }
             if (valorCompas > sum) { // Error: Numero de notas menor al compas
-                errorsSemantic.add(new ErrorLSSL(99, " × Error: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
+                errors.add(new ErrorLSSL(103, "Error semantico {}: Las notas son menores al compas (" + valorCompas + " > " + sum + ") en la linea: " + id.getLine(), id, true));
             } else if (valorCompas < sum) { // Error: Numero de notas mayor al compas
-                errorsSemantic.add(new ErrorLSSL(100, " × Error: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
+                errors.add(new ErrorLSSL(104, "Error semantico {}: Las notas son mayores al compas (" + valorCompas + " < " + sum + ") en la linea: " + id.getLine(), id, true));
             }
         }// Analisis de compases
         produccionesEvaluar = "";
@@ -1147,25 +1156,25 @@ public class Compilador extends javax.swing.JFrame {
 
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Numero maximo de repeticiones
-        analizadorSemantico.validarRepeticiones(jtpCode.getText(), errorsSemantic);
+        analizadorSemantico.validarRepeticiones(jtpCode.getText(), errors);
         // Numero maximo de repeticiones
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Analisis, siempre deben aparecer compas y tempo
-        analizadorSemantico.verificarTexto(jtpCode.getText().toString(), errorsSemantic);
+        analizadorSemantico.verificarTexto(jtpCode.getText().toString(), errors);
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Comprobar variables sin declarar
         Stack<ElementoPila> pila = analizadorSemantico.guardarElementosConDolarEnPila(jtpCode.getText());
-        analizadorSemantico.contarRepetidos(pila, errorsSemantic, jtpCode.getText());
+        analizadorSemantico.contarRepetidos(pila, errors, jtpCode.getText());
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
         // Comprobar numeros dentro de claves
         String[] claves = analizadorSemantico.buscarClavesEnTexto(jtpCode.getText());
-        analizadorSemantico.validarClaves(claves, errorsSemantic, jtpCode.getText());
+        analizadorSemantico.validarClaves(claves, errors, jtpCode.getText());
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     }
@@ -1345,53 +1354,196 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     private void mostrarConsola() {
-        int sizeErrors = errorsSintac.size();
+        // Contar numero de errores
+        int sizeErrors = errors.size();
+
+        // Crear tabla
+        DefaultTableModel modeloTblErrores = (DefaultTableModel) tblErrores.getModel();
+
+        // Acciones si hay errores en la tabla
         if (sizeErrors > 0) {
-            Functions.sortErrorsByLineAndColumn(errorsSintac);
+            // Action listener para abrir imagenes
+            // Agregar un MouseListener a la segunda columna para abrir la imagen al hacer clic
+            tblErrores.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int row = tblErrores.rowAtPoint(e.getPoint());
+                    int col = tblErrores.columnAtPoint(e.getPoint());
+                    if (row >= 0 && col >= 0) {
+                        Object value = tblErrores.getValueAt(row, col);
+                        if (value != null) {
+                            System.out.println("Texto de la celda: " + value.toString());
+                        }
+                    }
+                }
+            });
+
+            // Generar diccionario de errores
+            generarDiccionarioErrores();
+
+            // Agregrar filas a la tabla
+            modeloTblErrores.setRowCount(sizeErrors);
+
+            modeloTblErrores.fireTableDataChanged();
+
+            // Cargar nuevo modelo en la tabla
+            tblErrores.setModel(modeloTblErrores);
+
+            // Ordenar por linea
+            Functions.sortErrorsByLineAndColumn(errors);
+
+            // Iniciarlizar variables auxiliares
             String strErrors = "\n";
-            for (ErrorLSSL error : errorsSintac) {
+            int i = 0;
+
+            // Agregar errores a la tabla
+            for (ErrorLSSL error : errors) {
                 String strError = String.valueOf(error);
-                strErrors += strError + "\n";
+                System.out.println(error.toString());
+                tblErrores.setValueAt(strError, i, 0);
+                i++;
             }
-            jtaOutputConsole.setText("Compilación terminada...\n\nLa compilación terminó con ERRORES... \n\n"
-                    + "Para mas información revisar \'Analizadores -> Gramaticas\'");
             btnGramaticas.setBackground(Color.red);
-            ErroresSintac.getTxtErroresSemanticos().setText(strErrors);
         } else {
-            jtaOutputConsole.setText("Compilación terminada... \n NO hubo errores");
-            ErroresSintac.getTxtErroresSemanticos().setText("NO SE ENCONTRARON ERRORES SEMANTICOS");
             btnGramaticas.setBackground(Color.green);
         }
-        jtaOutputConsole.setCaretPosition(0);
     }
 
-    private void mostrarConsolaSemantica() {
-        int sizeErrors = errorsSemantic.size();
-        if (sizeErrors > 0) {
-            Functions.sortErrorsByLineAndColumn(errorsSemantic);
-            String strErrors = "\n";
-            for (ErrorLSSL error : errorsSemantic) {
-                String strError = String.valueOf(error);
-                strErrors += strError + "\n";
-            }
-            jtaOutputConsole.setText("Compilación terminada...\n\nLa compilación terminó con ERRORES... \n\n"
-                    + strErrors);
-            btnArbolesSemanticos.setBackground(Color.red);
-            //ErroresSintac.getTxtErroresSemanticos().setText(strErrors);
-        } else {
-            jtaOutputConsole.setText("Compilación terminada... \n NO hubo errores");
-            //ErroresSintac.getTxtErroresSemanticos().setText("NO SE ENCONTRARON ERRORES");
-            btnArbolesSemanticos.setBackground(Color.green);
-        }
-        jtaOutputConsole.setCaretPosition(0);
+    private void generarDiccionarioErrores() {
+        diccionarioErroresImagenes = new HashMap<>();
+
+        // Agregar relaciones al diccionario (número de error -> ruta de la imagen)
+        //diccionarioErroresImagenes.put(1, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(2, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(3, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(4, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(5, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(6, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(7, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(8, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Compas.jpeg");
+        diccionarioErroresImagenes.put(9, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Compas.jpeg");
+        diccionarioErroresImagenes.put(10, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Compas.jpeg");
+        diccionarioErroresImagenes.put(11, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+
+        diccionarioErroresImagenes.put(12, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(13, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(14, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(15, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(16, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(17, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(18, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(19, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(20, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(21, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(22, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+
+        diccionarioErroresImagenes.put(23, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(24, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(25, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(26, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(27, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(28, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(29, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(30, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(31, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(32, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(33, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
+
+        diccionarioErroresImagenes.put(34, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(35, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(36, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(37, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(38, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(39, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(40, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(41, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(42, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(43, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(44, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
+
+        diccionarioErroresImagenes.put(45, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(46, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(47, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(48, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(49, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(50, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(51, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(52, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(53, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(54, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(55, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+
+        diccionarioErroresImagenes.put(56, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(57, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(58, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(59, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(60, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(61, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(62, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(63, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(64, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(65, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(66, "ruta/a/imagen2.jpg");
+
+        diccionarioErroresImagenes.put(67, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(68, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(69, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(70, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(71, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(72, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(73, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(74, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(75, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(76, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(77, "ruta/a/imagen2.jpg");
+
+        diccionarioErroresImagenes.put(78, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(79, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(80, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(81, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(82, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(83, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(84, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(85, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(86, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(87, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(88, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+
+        diccionarioErroresImagenes.put(89, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(90, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(91, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(92, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Sentencias.jpeg");
+        diccionarioErroresImagenes.put(93, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(94, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(95, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(96, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(97, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(98, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(99, "ruta/a/imagen2.jpg");
+
+        diccionarioErroresImagenes.put(100, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(101, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(102, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(103, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(104, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(105, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(106, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(107, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(108, "ruta/a/imagen3.jpg");
+        diccionarioErroresImagenes.put(109, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(110, "ruta/a/imagen2.jpg");
+        
+        diccionarioErroresImagenes.put(111, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/EstructuraControlCompleta.jpeg");
+        diccionarioErroresImagenes.put(112, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/EstructuraControlCompleta.jpeg");
+        diccionarioErroresImagenes.put(113, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/BloqueInicioFin.jpeg");
+        diccionarioErroresImagenes.put(114, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/BloqueInicioFin.jpeg");
     }
 
     private void limpiarCampos() {
         //Functions.clearDataInTable(tblTokens);
-        jtaOutputConsole.setText("");
+        //jtaOutputConsole.setText("");
         tokens.clear();
-        errorsSintac.clear();
-        errorsSemantic.clear();
+        errors.clear();
         identProd.clear();
         identificadores.clear();
         codeHasBeenCompiled = false;
@@ -1453,9 +1605,9 @@ public class Compilador extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jtaOutputConsole;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextPane jtpCode;
     private javax.swing.JPanel rootPanel;
+    private javax.swing.JTable tblErrores;
     // End of variables declaration//GEN-END:variables
 }

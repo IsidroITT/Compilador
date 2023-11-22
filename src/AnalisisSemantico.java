@@ -175,13 +175,13 @@ public class AnalisisSemantico {
         }
 
         if (!pila.contains("compas =") && !pila.contains("tempo =")) {
-            errorsSemantics.add(new ErrorLSSL(101, " × Error: Faltan ambas sentencias (tempo y compas) en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
+            errorsSemantics.add(new ErrorLSSL(105, "Error semantico {}: Faltan ambas sentencias (tempo y compas) en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
         } else {
             if (!pila.contains("compas =")) {
-                errorsSemantics.add(new ErrorLSSL(102, " × Error: Falta 'compas' en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
+                errorsSemantics.add(new ErrorLSSL(106, "Error semantico {}: Falta 'compas' en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
             }
             if (!pila.contains("tempo =")) {
-                errorsSemantics.add(new ErrorLSSL(103, " × Error: Falta 'tempo' en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
+                errorsSemantics.add(new ErrorLSSL(107, "Error semantico {}: Falta 'tempo' en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
             }
         }
     }
@@ -218,7 +218,7 @@ public class AnalisisSemantico {
                 String cadenaError = entry.getKey();
                 int numeroLinea = encontrarNumeroLinea(cadena, cadenaError);
                 if (numeroLinea != -1) {
-                    errorsSemantics.add(new ErrorLSSL(104, " × Error: La sentencia '" + cadenaError + "' es una variable que no está declarada en la línea " + numeroLinea, new Token("{", "}", 1, 1)));
+                    errorsSemantics.add(new ErrorLSSL(108, "Error semantico {}: La sentencia '" + cadenaError + "' es una variable que no está declarada en la línea " + numeroLinea, new Token("{", "}", 1, 1)));
                 }
             }
         }
@@ -259,7 +259,7 @@ public class AnalisisSemantico {
         for (String clave : claves) {
             if (!validarClave(clave)) {
                 int numeroLinea = obtenerNumeroLinea(texto, texto.indexOf(clave));
-                errorsSemantics.add(new ErrorLSSL(105, " × Error: La clave contiene numero de octava en las notas \n'" + clave + "'\n no es válida en la línea " + numeroLinea, new Token("{", "}", 1, 1)));
+                errorsSemantics.add(new ErrorLSSL(109, "Error semantico {}: La clave contiene numero de octava en las notas \n'" + clave + "'\n no es válida en la línea " + numeroLinea, new Token("{", "}", 1, 1)));
             }
         }
     }
@@ -350,7 +350,7 @@ public class AnalisisSemantico {
         while (matcher.find()) {
             int valorRepeticion = Integer.parseInt(matcher.group(1));
             if (valorRepeticion < 2 || valorRepeticion > 35) {
-                errorsSemantics.add(new ErrorLSSL(105, "Error: Valor de repetición inválido (" + valorRepeticion + ") el rango de repetición es de minimo 2 y maximo 35, en la línea " + obtenerNumeroLineaREP(entrada, matcher.start(),valorRepeticion ), new Token("{", "}", 1, 1)));
+                errorsSemantics.add(new ErrorLSSL(110, "Error semantico {}: Valor de repetición inválido (" + valorRepeticion + ") el rango de repetición es de minimo 2 y maximo 35, en la línea " + obtenerNumeroLineaREP(entrada, matcher.start(),valorRepeticion ), new Token("{", "}", 1, 1)));
                 return;
             }
         }
@@ -369,52 +369,6 @@ public class AnalisisSemantico {
     }
 
     public static void main(String[] args) {
-        String codigo = "compas = 4/4;\n"
-                + "tempo = 208;\n"
-                + "var $timbre = [G2.b, F4.b,];\n"
-                + "\n"
-                + "// Notas\n"
-                + "	\\\\inicio;\n"
-                + "		$timbreHola;\n"
-                + "	    	clave(G^2){\n"
-                + "            	[F.b, B.b];\n"
-                + "            	[B.r,];\n"
-                + "        	};\n"
-                + "        	var $timbre;\n"
-                + "        	[A2.b, B4.b,];\n"
-                + "        	rep(5) {\n"
-                + "		   	[E4.n, E4.n, F4.n, G4.n,]; \n"
-                + "			$timbre;\n"
-                + "		};\n"
-                + "	\\\\fin;\n"
-                + "	\n"
-                + "// Notas piano\n"
-                + "var $timbrePiano = [F1.P-r,];\n"
-                + "\n"
-                + "piano{\n"
-                + "	clave(G^2) {\n"
-                + "        	[F.P-n, A.P-b, C.P-n,];\n"
-                + "      	[B.P-r,];\n"
-                + "   	};\n"
-                + "   	$timbrePiano;\n"
-                + "    	[A2.P-b, B4.P-b,];\n"
-                + "	rep(70) {\n"
-                + "		[E4.P-n, E4.P-n, F4.P-n, G4.P-n,];\n"
-                + "		$timbrePiano;\n"
-                + "	};\n"
-                + "};";
-
-        //verificarRepeticiones(codigo);
-//        String entrada = "clave(G^2){ [F.b, B.P-b,]; [B.r,]; };";
-//
-//        String[] elementosCorchetes = extraerElementosCorchetesCompas(entrada);
-//        String[] elementosPuntoComa = obtenerElementosPuntoComa(elementosCorchetes);
-//
-//        if (verificarElementosMixtos(elementosPuntoComa)) {
-//            System.out.println("Error: Se encontraron elementos mixtos en el arreglo.");
-//        } else {
-//            System.out.println("Todos los elementos comienzan con 'P' o ninguno lo hace.");
-//        }
     }
 }
 

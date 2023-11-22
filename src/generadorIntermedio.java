@@ -202,7 +202,7 @@ public class generadorIntermedio {
 
         while (matcher.find()) {
             String nombreFuncion = matcher.group(1);
-            String reemplazo = "lbl Fn" + nombreFuncion + "(){";
+            String reemplazo = "lbl Fn" + nombreFuncion + ":(){";
             matcher.appendReplacement(resultado, reemplazo);
         }
 
