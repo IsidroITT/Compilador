@@ -113,7 +113,7 @@ public class AnalisisSemantico {
             if (elementosCompas.length == 2) {
                 int numerador = Integer.parseInt(elementosCompas[0].trim());
                 int denominador = Integer.parseInt(elementosCompas[1].trim());
-                return numerador > 10 || denominador > 10;
+                return numerador > 10 || denominador > 10 || numerador < 1 || denominador < 1;
             }
         }
         return false;

@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
@@ -1372,7 +1375,7 @@ public class Compilador extends javax.swing.JFrame {
                     if (row >= 0 && col >= 0) {
                         Object value = tblErrores.getValueAt(row, col);
                         if (value != null) {
-                            System.out.println("Texto de la celda: " + value.toString());
+                            mostrarImagen(value.toString());
                         }
                     }
                 }
@@ -1393,19 +1396,49 @@ public class Compilador extends javax.swing.JFrame {
             Functions.sortErrorsByLineAndColumn(errors);
 
             // Iniciarlizar variables auxiliares
-            String strErrors = "\n";
+            // Expresión regular para encontrar el número antes de ':'
+            Pattern pattern = Pattern.compile("\\d+(?=:)");
+            String imagenError = "";
             int i = 0;
 
             // Agregar errores a la tabla
             for (ErrorLSSL error : errors) {
+                // String del error
                 String strError = String.valueOf(error);
-                System.out.println(error.toString());
+
+                // Encontrar el número en el texto1
+                Matcher matcher = pattern.matcher(strError);
+                if (matcher.find()) {
+                    String numeroError = matcher.group();
+                    imagenError = diccionarioErroresImagenes.get(Integer.parseInt(numeroError));
+                }
+                
                 tblErrores.setValueAt(strError, i, 0);
+                tblErrores.setValueAt(imagenError, i, 1);
                 i++;
             }
-            btnGramaticas.setBackground(Color.red);
         } else {
-            btnGramaticas.setBackground(Color.green);
+            JOptionPane.showMessageDialog(this, "El código compilo sin errores", "Compilación terminada", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    private void mostrarImagen(String linkImagen){
+        try {
+            String osName = System.getProperty("os.name").toLowerCase();
+
+            if (osName.contains("win")) {
+                // Sistema operativo Windows
+                ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "start", linkImagen);
+                processBuilder.start();
+            } else if (osName.contains("nix") || osName.contains("nux") || osName.contains("mac")) {
+                // Sistemas operativos Unix (Linux, macOS)
+                ProcessBuilder processBuilder = new ProcessBuilder("xdg-open", linkImagen);
+                processBuilder.start();
+            } else {
+                System.out.println("Sistema operativo no soportado para abrir imágenes.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -1480,28 +1513,28 @@ public class Compilador extends javax.swing.JFrame {
         diccionarioErroresImagenes.put(60, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
         diccionarioErroresImagenes.put(61, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
         diccionarioErroresImagenes.put(62, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(63, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(64, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(65, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(66, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(63, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(64, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(65, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(66, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
 
-        diccionarioErroresImagenes.put(67, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(68, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(69, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(70, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(71, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(72, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(73, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(74, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(75, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(76, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(77, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(67, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(68, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(69, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(70, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(71, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(72, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(73, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(74, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(75, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(76, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(77, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
 
-        diccionarioErroresImagenes.put(78, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(79, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(80, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(81, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(82, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(78, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(79, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(80, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(81, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(82, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
         diccionarioErroresImagenes.put(83, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
         diccionarioErroresImagenes.put(84, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
         diccionarioErroresImagenes.put(85, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
@@ -1513,15 +1546,15 @@ public class Compilador extends javax.swing.JFrame {
         diccionarioErroresImagenes.put(90, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
         diccionarioErroresImagenes.put(91, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
         diccionarioErroresImagenes.put(92, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Sentencias.jpeg");
-        diccionarioErroresImagenes.put(93, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(94, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(95, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(96, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(97, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(98, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(99, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(93, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionFuncion.jpg");
+        diccionarioErroresImagenes.put(94, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionFuncion.jpg");
+        diccionarioErroresImagenes.put(95, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionFuncion.jpg");
+        diccionarioErroresImagenes.put(96, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionFuncion.jpg");
+        diccionarioErroresImagenes.put(97, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FuncionEjecutar.jpg");
+        diccionarioErroresImagenes.put(98, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FuncionEjecutar.jpg");
+        diccionarioErroresImagenes.put(99, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FuncionEjecutar.jpg");
 
-        diccionarioErroresImagenes.put(100, "ruta/a/imagen1.jpg");
+        diccionarioErroresImagenes.put(100, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FuncionEjecutar.jpg");
         diccionarioErroresImagenes.put(101, "ruta/a/imagen2.jpg");
         diccionarioErroresImagenes.put(102, "ruta/a/imagen3.jpg");
         diccionarioErroresImagenes.put(103, "ruta/a/imagen1.jpg");
@@ -1532,7 +1565,7 @@ public class Compilador extends javax.swing.JFrame {
         diccionarioErroresImagenes.put(108, "ruta/a/imagen3.jpg");
         diccionarioErroresImagenes.put(109, "ruta/a/imagen1.jpg");
         diccionarioErroresImagenes.put(110, "ruta/a/imagen2.jpg");
-        
+
         diccionarioErroresImagenes.put(111, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/EstructuraControlCompleta.jpeg");
         diccionarioErroresImagenes.put(112, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/EstructuraControlCompleta.jpeg");
         diccionarioErroresImagenes.put(113, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/BloqueInicioFin.jpeg");
@@ -1540,8 +1573,7 @@ public class Compilador extends javax.swing.JFrame {
     }
 
     private void limpiarCampos() {
-        //Functions.clearDataInTable(tblTokens);
-        //jtaOutputConsole.setText("");
+        Functions.clearDataInTable(tblErrores);
         tokens.clear();
         errors.clear();
         identProd.clear();
