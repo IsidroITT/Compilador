@@ -49,11 +49,25 @@ public class Imagenes extends JFrame{
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new Imagenes();
+         String imagePath = "./imagenes/ImgGramaticas/BloqueInicioFin.jpeg"; // Ruta de la imagen en tu computadora
+
+        try {
+            String osName = System.getProperty("os.name").toLowerCase();
+
+            if (osName.contains("win")) {
+                // Sistema operativo Windows
+                ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "start", imagePath);
+                processBuilder.start();
+            } else if (osName.contains("nix") || osName.contains("nux") || osName.contains("mac")) {
+                // Sistemas operativos Unix (Linux, macOS)
+                ProcessBuilder processBuilder = new ProcessBuilder("xdg-open", imagePath);
+                processBuilder.start();
+            } else {
+                System.out.println("Sistema operativo no soportado para abrir imágenes.");
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
 }

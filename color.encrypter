@@ -1,52 +1,13 @@
-compas = 10/10;
-tempo = 208;
-var $timbre = [G2.b, F4.b,];
-var $timbreFuncion = [G2.n, F4.n, A3.n, B3.n,];
+compas = 4/4;
+tempo = 110;
+var $chido = [E2.c, E2.c, E3.c, E2.c, E2.c, D3.c, E2.c, E2.c,];
+var $linea2 = [C3.c, E2.c, E2.c, A2.c, E2.c, E2.c, B2.c, C3.c,];
+\inicio;
+//Primeros 4 compases
+	$chido;
+	$linea2;
+	$chido;
+	[C3.c, E2.c, E2.c, A2.b, A2.c,];
 
-// Funciones dentro del lenguaje
-fn #miFuncioncita(){
-	$timbreFuncion;
-    	clave(G^2){
-           	[F.b, B.b,];
-           	[B.r,];
-     	};
-	$timbreFuncion;
-     	[A2.b, B4.b,];
-     	rep(3){
-	   	[E4.n, E4.n, F4.n, G4.n,]; 
-		$timbre;
-	};
-};
-
-// Notas
-	\inicio;
-		$timbre;
-	    	clave(G^2){
-            	[F.b, B.b,];
-            	[B.r,];
-        	};
-		#miFuncioncita();
-        	$timbre;
-        	[A2.b, B4.b,];
-        	rep(3){
-		   	[E4.n, E4.n, F4.n, G4.n,]; 
-			$timbre;
-		};
-	\fin;
-	
-
-// Notas piano
-var $timbrePiano = [F3.P-r,];
-
-piano{
-	clave(G^2) {
-        	[F.P-n, A.P-b, C.P-n,];
-      	[B.P-r,];
-   	};
-   	$timbrePiano;
-    	[A2.P-b, B4.P-b,];
-	rep(2) {
-		[E4.P-n, E4.P-n, F4.P-n, G4.P-n,];
-		$timbrePiano;
-	};
-};
+// Segundos 4 compases
+\fin;
