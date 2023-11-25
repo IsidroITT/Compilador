@@ -62,7 +62,7 @@ public class Compilador extends javax.swing.JFrame {
     private HashMap<String, String> identificadores;
 
     // Codigo compilado
-    private boolean codeHasBeenCompiled = false;
+    private boolean codeHasBeenCompiled = true;
 
     // Variables analisis semantico
     private AnalisisSemantico analizadorSemantico;
@@ -70,6 +70,9 @@ public class Compilador extends javax.swing.JFrame {
     // Variables codigo intermedio
     private generadorIntermedio codIntermedio;
     private String codigoIntermedioSinOptimizar;
+    
+    // Variables codigo objeto
+    private String notasxd = "";
 
     // Variables mostrar resultado de los analisis
     private TablaSimbolos TablaDSimbolos;
@@ -447,6 +450,8 @@ public class Compilador extends javax.swing.JFrame {
             // Compilar el proyecto
             compilar();
             intermedio();
+            codObjetoBuzzer buzzerCod = new codObjetoBuzzer();
+            buzzerCod.generateCodigoBuzzer(notasxd,title.substring(0, title.length()-4));
             mostrarCodigoIntermedio.getTxtIntermedio().setText(codigoIntermedioSinOptimizar);
         }
 
@@ -480,6 +485,7 @@ public class Compilador extends javax.swing.JFrame {
         // Primera evaluacion -Encontrar variables y tempo-
         String codLimpio = jtpCode.getText().replace(";", "");
         String[] codIntermdioAmedias = codLimpio.split("\n");
+        //codIntermedio.setSaltos(0);
         for (String linea : codIntermdioAmedias) {
             // Agregar variables al mapa
             if (linea.contains("var")) {
@@ -494,6 +500,9 @@ public class Compilador extends javax.swing.JFrame {
 
         // Limpiar variables
         codLimpio = codIntermedio.eliminarLineasVar(codIntermdioAmedias);
+        
+        // Agregar if's intemedios
+        codLimpio = codIntermedio.remplazarIF(codLimpio);
         codIntermdioAmedias = codLimpio.split("\n");
 
         // Reemplazar variables        
@@ -513,27 +522,59 @@ public class Compilador extends javax.swing.JFrame {
         for (String linea : codIntermdioAmedias) {
             if (linea.contains("fn #")) {
                 String salto = codIntermedio.renombrarFuncion(linea);
-                salto = salto.substring(0, salto.length() - 3);
+                if (salto.contains(" ")) {
+                    salto = salto.replace(" ", "");
+                }
+                if (salto.contains("\t")) {
+                    salto = salto.replace("\t", "");
+                }
                 codigoIntermedioSinOptimizar += "\n" + salto + "\n";
                 continue;
             }
-            if (linea.contains("#")) {
-                String llamado = codIntermedio.llamarFuncion(linea);
-                llamado = llamado.substring(0, llamado.length() - 2);
-                codigoIntermedioSinOptimizar += "\n" + llamado + "\n";
-                System.out.println("HOLA " + linea);
-            }
-        }
 
-        // Reemplazar notas xd
-        for (String linea : codIntermdioAmedias) {
+            if (linea.contains("TRUE") || linea.contains("FALSE") || linea.contains("L")) {
+                if (linea.contains("\t")) {
+                    linea = linea.replace("\t", "");
+                }
+                codigoIntermedioSinOptimizar += "\n" + linea + "\n";
+            }
+            
+            if (linea.contains("rep")){
+                 codigoIntermedioSinOptimizar += codIntermedio.repsIf(linea) + "\n";
+            }
+
             if (linea.contains("[") && linea.contains("]")) {
                 if (linea.contains("var") || linea.contains(".P-")) {
                     continue;
                 }
                 codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioNotas(linea) + "\n";
+                notasxd += codIntermedio.codigoIntermedioNotas(linea) + "\n";
+            }
+
+            if (linea.contains("#")) {
+                String llamado = codIntermedio.llamarFuncion(linea);
+                llamado = llamado.substring(0, llamado.length() - 2);
+                if (llamado.contains(" ")) {
+                    llamado = llamado.replace(" ", "");
+                }
+                if (llamado.contains("\t")) {
+                    llamado = llamado.replace("\t", "");
+                }
+                llamado = llamado.replace("#", "jmp ");
+                codigoIntermedioSinOptimizar += llamado + "\n";
+                System.out.println("HOLA " + linea);
             }
         }
+
+//        // Reemplazar notas xd
+//        for (String linea : codIntermdioAmedias) {
+//            if (linea.contains("[") && linea.contains("]")) {
+//                if (linea.contains("var") || linea.contains(".P-")) {
+//                    continue;
+//                }
+//                codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioNotas(linea) + "\n";
+//            }
+//        }
     }
 
     private void aumentarFuente() {
@@ -553,7 +594,7 @@ public class Compilador extends javax.swing.JFrame {
         analisisSintactico();
         analisisSemantico();
         mostrarConsola();
-        codeHasBeenCompiled = true;
+        //codeHasBeenCompiled = true;
     }
 
     private void analisisLexico() {
@@ -1365,6 +1406,7 @@ public class Compilador extends javax.swing.JFrame {
 
         // Acciones si hay errores en la tabla
         if (sizeErrors > 0) {
+            codeHasBeenCompiled = false;
             // Action listener para abrir imagenes
             // Agregar un MouseListener a la segunda columna para abrir la imagen al hacer clic
             tblErrores.addMouseListener(new MouseAdapter() {
@@ -1412,17 +1454,18 @@ public class Compilador extends javax.swing.JFrame {
                     String numeroError = matcher.group();
                     imagenError = diccionarioErroresImagenes.get(Integer.parseInt(numeroError));
                 }
-                
+
                 tblErrores.setValueAt(strError, i, 0);
                 tblErrores.setValueAt(imagenError, i, 1);
                 i++;
             }
         } else {
             JOptionPane.showMessageDialog(this, "El código compilo sin errores", "Compilación terminada", JOptionPane.INFORMATION_MESSAGE);
+            codeHasBeenCompiled = true;
         }
     }
-    
-    private void mostrarImagen(String linkImagen){
+
+    private void mostrarImagen(String linkImagen) {
         try {
             String osName = System.getProperty("os.name").toLowerCase();
 
@@ -1447,129 +1490,130 @@ public class Compilador extends javax.swing.JFrame {
 
         // Agregar relaciones al diccionario (número de error -> ruta de la imagen)
         //diccionarioErroresImagenes.put(1, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(2, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(3, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(4, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(5, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(6, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(7, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(8, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Compas.jpeg");
-        diccionarioErroresImagenes.put(9, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Compas.jpeg");
-        diccionarioErroresImagenes.put(10, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Compas.jpeg");
-        diccionarioErroresImagenes.put(11, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
+        String base = "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/";
+        diccionarioErroresImagenes.put(2, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(3, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(4, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(5, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(6, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(7, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(8, base + "Compas.jpeg");
+        diccionarioErroresImagenes.put(9, base + "Compas.jpeg");
+        diccionarioErroresImagenes.put(10, base + "Compas.jpeg");
+        diccionarioErroresImagenes.put(11, base + "ClaveIfExpresion.jpeg");
 
-        diccionarioErroresImagenes.put(12, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(13, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(14, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(15, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(16, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(17, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(18, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(19, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(20, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(21, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(22, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(12, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(13, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(14, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(15, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(16, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(17, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(18, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(19, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(20, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(21, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(22, base + "CompasNotas.jpeg");
 
-        diccionarioErroresImagenes.put(23, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/CompasNotas.jpeg");
-        diccionarioErroresImagenes.put(24, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(25, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(26, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(27, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(28, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(29, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(30, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(31, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(32, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Declaracion compas.jpeg");
-        diccionarioErroresImagenes.put(33, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(23, base + "CompasNotas.jpeg");
+        diccionarioErroresImagenes.put(24, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(25, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(26, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(27, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(28, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(29, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(30, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(31, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(32, base + "Declaracion compas.jpeg");
+        diccionarioErroresImagenes.put(33, base + "DeclaracionTempo.jpeg");
 
-        diccionarioErroresImagenes.put(34, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
-        diccionarioErroresImagenes.put(35, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
-        diccionarioErroresImagenes.put(36, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
-        diccionarioErroresImagenes.put(37, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
-        diccionarioErroresImagenes.put(38, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
-        diccionarioErroresImagenes.put(39, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionTempo.jpeg");
-        diccionarioErroresImagenes.put(40, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
-        diccionarioErroresImagenes.put(41, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
-        diccionarioErroresImagenes.put(42, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
-        diccionarioErroresImagenes.put(43, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
-        diccionarioErroresImagenes.put(44, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(34, base + "DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(35, base + "DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(36, base + "DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(37, base + "DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(38, base + "DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(39, base + "DeclaracionTempo.jpeg");
+        diccionarioErroresImagenes.put(40, base + "DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(41, base + "DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(42, base + "DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(43, base + "DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(44, base + "DeclaracionIdentificador.jpeg");
 
-        diccionarioErroresImagenes.put(45, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
-        diccionarioErroresImagenes.put(46, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionIdentificador.jpeg");
-        diccionarioErroresImagenes.put(47, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(48, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(49, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(50, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(51, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIfExpresion.jpeg");
-        diccionarioErroresImagenes.put(52, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(53, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(54, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(55, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(45, base + "DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(46, base + "DeclaracionIdentificador.jpeg");
+        diccionarioErroresImagenes.put(47, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(48, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(49, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(50, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(51, base + "ClaveIfExpresion.jpeg");
+        diccionarioErroresImagenes.put(52, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(53, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(54, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(55, base + "ClaveIf.jpeg");
 
-        diccionarioErroresImagenes.put(56, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(57, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(58, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(59, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(60, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(61, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(62, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/ClaveIf.jpeg");
-        diccionarioErroresImagenes.put(63, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(64, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(65, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(66, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(56, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(57, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(58, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(59, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(60, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(61, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(62, base + "ClaveIf.jpeg");
+        diccionarioErroresImagenes.put(63, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(64, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(65, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(66, base + "FiguraNota.jpg");
 
-        diccionarioErroresImagenes.put(67, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(68, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(69, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(70, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(71, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(72, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(73, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(74, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(75, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(76, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(77, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
+        diccionarioErroresImagenes.put(67, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(68, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(69, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(70, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(71, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(72, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(73, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(74, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(75, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(76, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(77, base + "FiguraNota.jpg");
 
-        diccionarioErroresImagenes.put(78, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(79, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(80, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(81, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(82, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FiguraNota.jpg");
-        diccionarioErroresImagenes.put(83, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
-        diccionarioErroresImagenes.put(84, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
-        diccionarioErroresImagenes.put(85, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
-        diccionarioErroresImagenes.put(86, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
-        diccionarioErroresImagenes.put(87, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
-        diccionarioErroresImagenes.put(88, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(78, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(79, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(80, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(81, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(82, base + "FiguraNota.jpg");
+        diccionarioErroresImagenes.put(83, base + "DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(84, base + "DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(85, base + "DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(86, base + "DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(87, base + "DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(88, base + "DeclaracionRep.jpeg");
 
-        diccionarioErroresImagenes.put(89, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
-        diccionarioErroresImagenes.put(90, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
-        diccionarioErroresImagenes.put(91, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionRep.jpeg");
-        diccionarioErroresImagenes.put(92, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/Sentencias.jpeg");
-        diccionarioErroresImagenes.put(93, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionFuncion.jpg");
-        diccionarioErroresImagenes.put(94, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionFuncion.jpg");
-        diccionarioErroresImagenes.put(95, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionFuncion.jpg");
-        diccionarioErroresImagenes.put(96, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/DeclaracionFuncion.jpg");
-        diccionarioErroresImagenes.put(97, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FuncionEjecutar.jpg");
-        diccionarioErroresImagenes.put(98, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FuncionEjecutar.jpg");
-        diccionarioErroresImagenes.put(99, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FuncionEjecutar.jpg");
+        diccionarioErroresImagenes.put(89, base + "DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(90, base + "DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(91, base + "DeclaracionRep.jpeg");
+        diccionarioErroresImagenes.put(92, base + "Sentencias.jpeg");
+        diccionarioErroresImagenes.put(93, base + "DeclaracionFuncion.jpg");
+        diccionarioErroresImagenes.put(94, base + "DeclaracionFuncion.jpg");
+        diccionarioErroresImagenes.put(95, base + "DeclaracionFuncion.jpg");
+        diccionarioErroresImagenes.put(96, base + "DeclaracionFuncion.jpg");
+        diccionarioErroresImagenes.put(97, base + "FuncionEjecutar.jpg");
+        diccionarioErroresImagenes.put(98, base + "FuncionEjecutar.jpg");
+        diccionarioErroresImagenes.put(99, base + "FuncionEjecutar.jpg");
 
-        diccionarioErroresImagenes.put(100, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/FuncionEjecutar.jpg");
-        diccionarioErroresImagenes.put(101, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(102, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(103, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(104, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(105, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(106, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(107, "ruta/a/imagen2.jpg");
-        diccionarioErroresImagenes.put(108, "ruta/a/imagen3.jpg");
-        diccionarioErroresImagenes.put(109, "ruta/a/imagen1.jpg");
-        diccionarioErroresImagenes.put(110, "ruta/a/imagen2.jpg");
+        diccionarioErroresImagenes.put(100, base + "FuncionEjecutar.jpg");
+        diccionarioErroresImagenes.put(101, base + "ValidarTempo.jpeg");
+        diccionarioErroresImagenes.put(102, base + "ValidarTamanoCompas.jpeg");
+        diccionarioErroresImagenes.put(103, base + "SumaValoresCompas.jpeg");
+        diccionarioErroresImagenes.put(104, base + "SumaValoresCompas.jpeg");
+        diccionarioErroresImagenes.put(105, base + "VerificarTexto.jpeg");
+        diccionarioErroresImagenes.put(106, base + "VerificarTexto.jpeg");
+        diccionarioErroresImagenes.put(107, base + "VerificarTexto.jpeg");
+        diccionarioErroresImagenes.put(108, base + "ContarRepetidos.jpeg");
+        diccionarioErroresImagenes.put(109, base + "ValidarClaves.jpeg");
+        diccionarioErroresImagenes.put(110, base + "ValidarRepeticiones.jpeg");
 
-        diccionarioErroresImagenes.put(111, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/EstructuraControlCompleta.jpeg");
-        diccionarioErroresImagenes.put(112, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/EstructuraControlCompleta.jpeg");
-        diccionarioErroresImagenes.put(113, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/BloqueInicioFin.jpeg");
-        diccionarioErroresImagenes.put(114, "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/BloqueInicioFin.jpeg");
+        diccionarioErroresImagenes.put(111, base + "EstructuraControlCompleta.jpeg");
+        diccionarioErroresImagenes.put(112, base + "EstructuraControlCompleta.jpeg");
+        diccionarioErroresImagenes.put(113, base + "BloqueInicioFin.jpeg");
+        diccionarioErroresImagenes.put(114, base + "BloqueInicioFin.jpeg");
     }
 
     private void limpiarCampos() {

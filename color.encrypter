@@ -1,19 +1,22 @@
+// Declaraciones iniciales
 compas = 4/4;
 tempo = 208;
-var $timbre = [G2., F4.b,];
+
+// Variables para buzzer
+var $timbre = [G2.b, F4.b,];
 var $timbreFuncion = [G2.n, F4.n, A3.n, B3.n,];
 
 // Funciones dentro del lenguaje
 fn #miFuncioncita(){
 	$timbreFuncion;
-    	clave(G^2){
-           	[F.b, B.b,];
-           	[B.r,];
+    	clave(F^2){
+           	[A.b, A.b,];
+           	[A.r,];
      	};
 	$timbreFuncion;
-     	[A2.b, B4.b,];
+     	[A2.b, A4.b,];
      	rep(3){
-	   	[E4.n, E4.n, F4.n, G4.n,]; 
+	   	[A4.n, A4.n, A4.n, A4.n,]; 
 		$timbre;
 	};
 };
@@ -35,9 +38,10 @@ fn #miFuncioncita(){
 	\fin;
 	
 
-// Notas piano
+// Variables para piano
 var $timbrePiano = [F3.P-r,];
 
+// Notas del piano
 piano{
 	clave(G^2) {
         	[F.P-n, A.P-b, C.P-n,];

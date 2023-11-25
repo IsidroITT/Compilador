@@ -90,18 +90,19 @@
 #define REST      0
 
 
-// change this to make the song slower or faster
+// Cambia esto para hacer la canción más lenta o más rápida
 int tempo = 225;
 
-// change this to whichever pin you want to use
-int buzzer = 11;
+// Cambia esto al pin que desees utilizar
+int buzzer = 9;
 
-// notes of the moledy followed by the duration.
-// a 4 means a quarter note, 8 an eighteenth , 16 sixteenth, so on
-// !!negative numbers are used to represent dotted notes,
-// so -4 means a dotted quarter note, that is, a quarter plus an eighteenth!!
-// This code uses PROGMEM to fit the melody to flash as it was to long to fit
-// in SRAM. It may not work on other Arduino arquitectures other than AVR
+// Notas de la melodía seguidas por la duración.
+// un 4 significa una negra, 8 dieciseisava, 16 corchea, y así sucesivamente
+// ¡¡los números negativos se usan para representar notas con puntillo,
+// entonces -4 significa una negra con puntillo, es decir, una negra más una dieciseisava!!
+// Este código usa PROGMEM para ajustar la melodía a la memoria flash ya que era demasiado larga
+// para ajustarse en la SRAM. Puede que no funcione en otras arquitecturas de Arduino que no sean AVR
+
 const int melody[] PROGMEM = {
 
   // At Doom's Gate (E1M1)
@@ -221,42 +222,42 @@ const int melody[] PROGMEM = {
 };
 
 
-// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
-// there are two values per note (pitch and duration), so for each note there are four bytes
+// sizeof devuelve el número de bytes, cada valor int está compuesto por dos bytes (16 bits)
+// hay dos valores por nota (tono y duración), por lo que para cada nota hay cuatro bytes
 int notes = sizeof(melody) / sizeof(melody[0]) / 2;
 
-// this calculates the duration of a whole note in ms
+// esto calcula la duración de una nota entera en milisegundos
 int wholenote = (60000 * 4) / tempo;
 
 int divider = 0, noteDuration = 0;
 
 void setup() {
-  // iterate over the notes of the melody.
-  // Remember, the array is twice the number of notes (notes + durations)
+  // iterar sobre las notas de la melodía.
+// Recuerda, el array es el doble del número de notas (notas + duraciones)
   for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
 
-    // calculates the duration of each note
+    // calcula la duración de cada nota
     divider = pgm_read_word_near(melody+thisNote + 1);
     if (divider > 0) {
-      // regular note, just proceed
+      // nota regular, simplemente procede
       noteDuration = (wholenote) / divider;
     } else if (divider < 0) {
-      // dotted notes are represented with negative durations!!
+      // ¡¡las notas con puntillo se representan con duraciones negativas!!
       noteDuration = (wholenote) / abs(divider);
-      noteDuration *= 1.5; // increases the duration in half for dotted notes
+      noteDuration *= 1.5; // aumenta la duración a la mitad para notas con puntillo
     }
 
-    // we only play the note for 90% of the duration, leaving 10% as a pause
+    // solo reproducimos la nota durante el 90% de la duración, dejando un 10% como pausa
     tone(buzzer, pgm_read_word_near(melody+thisNote), noteDuration * 0.9);
 
-    // Wait for the specief duration before playing the next note.
+    // Espera la duración especificada antes de reproducir la siguiente nota.
     delay(noteDuration);
 
-    // stop the waveform generation before the next note.
+    // detiene la generación de la forma de onda antes de la siguiente nota.
     noTone(buzzer);
   }
 }
 
 void loop() {
-  // no need to repeat the melody.
+  // no es necesario repetir la melodía.
 }

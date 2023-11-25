@@ -14,9 +14,13 @@ import java.util.regex.Pattern;
 
 public class generadorIntermedio {
 
-    public static void main(String[] args) {
+    private static int saltos = 0;
+
+    public static void setSaltos(int saltos) {
+        generadorIntermedio.saltos = saltos;
     }
 
+    
     //--------------------------------------------------------------------------
     //CodigoTempo
     public static String codigoIntermedioTempo(String entradaTempo) {
@@ -41,10 +45,6 @@ public class generadorIntermedio {
         String cadenaSalida = "(t1, *, " + valorOriginal + ", " + divisorReglaTres + ")\n";
         cadenaSalida += "(t2, /, t1, " + dividendoReglaTres + ")\n";
         cadenaSalida += "(" + variable + ",round, ,t2)";
-//        String cadenaSalida = "float t1 = " + valorOriginal + " * " + divisorReglaTres + ";\n";
-//        cadenaSalida += "float t2 = t1 / " + dividendoReglaTres + ";\n";
-//        cadenaSalida += "int " + variable + " = round(t2);";
-
         return cadenaSalida;
     }
 
@@ -186,7 +186,7 @@ public class generadorIntermedio {
 
         while (matcher.find()) {
             String nombreFuncion = matcher.group(1);
-            String reemplazo = "lbl Fn" + nombreFuncion + "(){";
+            String reemplazo = "lbl Fn" + nombreFuncion + ":";
             matcher.appendReplacement(resultado, reemplazo);
         }
 
@@ -209,6 +209,36 @@ public class generadorIntermedio {
         matcher.appendTail(resultado);
         return resultado.toString();
     }
+    //--------------------------------------------------------------------------
 
+    //--------------------------------------------------------------------------
+    // IF's
+    public static String remplazarIF(String texto) {
+        // Reemplazo para 'clave(G^2)'
+        String output1 = texto.replaceAll("clave\\(G\\^2\\)", "IF TRUE GOTO L" + saltos + "\nL" + saltos + ":\n ");
+        saltos++;
+        // Modificación en la expresión regular para evitar coincidencias con 'clave(G^2)'
+        return output1.replaceAll("clave\\((?!G\\^2\\))([A-G])\\^([0-9])\\)", "IF FALSE GOTO L" + saltos + "\nL" + saltos + ":\n");
+    }
+    //--------------------------------------------------------------------------
+
+    //--------------------------------------------------------------------------
+    // Generar repeticiones
+    // Validar valores maximos en las repeticiones
+    public static String repsIf(String entrada) {
+        Pattern patron = Pattern.compile("rep\\((\\d+)\\)");
+        Matcher matcher = patron.matcher(entrada);
+        String repIntermedio = "";
+
+        while (matcher.find()) {
+            saltos++;
+            int valorRepeticion = Integer.parseInt(matcher.group(1));
+            repIntermedio = "(A, = , ," + valorRepeticion + ")\n"
+                    + "L"+saltos+" IF A > 0 GOTO L" + (saltos + 1) + " \nL" + (saltos + 1) + ":\n";
+            saltos++;
+            return repIntermedio;
+        }
+        return repIntermedio;
+    }
     //--------------------------------------------------------------------------
 }

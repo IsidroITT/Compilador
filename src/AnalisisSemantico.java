@@ -148,7 +148,7 @@ public class AnalisisSemantico {
 
     // Metodos de pertenencia de compas y tempo
     public static void verificarTexto(String texto, ArrayList<ErrorLSSL> errorsSemantics) {
-        String[] palabrasClave = {"compas =", "tempo ="};
+        String[] palabrasClave = {"compas", "tempo"};
         Stack<String> pila = new Stack<>();
         int lineasAnalizadas = 0;
 
@@ -174,13 +174,13 @@ public class AnalisisSemantico {
             }
         }
 
-        if (!pila.contains("compas =") && !pila.contains("tempo =")) {
+        if (!pila.contains("compas") && !pila.contains("tempo")) {
             errorsSemantics.add(new ErrorLSSL(105, "Error semantico {}: Faltan ambas sentencias (tempo y compas) en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
         } else {
-            if (!pila.contains("compas =")) {
+            if (!pila.contains("compas")) {
                 errorsSemantics.add(new ErrorLSSL(106, "Error semantico {}: Falta 'compas' en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
             }
-            if (!pila.contains("tempo =")) {
+            if (!pila.contains("tempo")) {
                 errorsSemantics.add(new ErrorLSSL(107, "Error semantico {}: Falta 'tempo' en las primeras 5 líneas. ", new Token("{", "}", 1, 1)));
             }
         }

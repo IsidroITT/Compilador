@@ -20,6 +20,7 @@ public class CodigoIntermedio extends javax.swing.JFrame {
         initComponents();
         this.setTitle("CÓDIGO INTERMEDIO");
         this.txtIntermedio.setText("NO HAY CÓDIGO INTERMEIDO GENERADO");
+        this.setResizable(false);
     }
 
     /**
@@ -37,7 +38,6 @@ public class CodigoIntermedio extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        txtIntermedio.setEditable(false);
         txtIntermedio.setColumns(20);
         txtIntermedio.setFont(new java.awt.Font("Cantarell", 0, 28)); // NOI18N
         txtIntermedio.setRows(5);
