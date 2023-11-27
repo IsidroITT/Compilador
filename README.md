@@ -10,7 +10,7 @@ TODO:
 - [x] Analisis Sintáctico (Listo a un 95%, falta agregar un par de errores pero no afectan al semantico)
 - [x] Analisis Semántico
 - [x] Nuevas ventajas
-- [ ] Codigo intermedio
+- [x] Codigo intermedio
 - [ ] Codigo intermedio optimizado
 - [ ] Ganas de vivir
 - [x] Automatas AFND

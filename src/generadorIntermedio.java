@@ -16,11 +16,16 @@ public class generadorIntermedio {
 
     private static int saltos = 0;
 
+    private static Map<String, String> diccionarioNotasClave = new HashMap<>();
+
+    public generadorIntermedio() {
+        generarDiccionarioNotasClave();
+    }
+
     public static void setSaltos(int saltos) {
         generadorIntermedio.saltos = saltos;
     }
 
-    
     //--------------------------------------------------------------------------
     //CodigoTempo
     public static String codigoIntermedioTempo(String entradaTempo) {
@@ -33,7 +38,7 @@ public class generadorIntermedio {
 
         return aplicarReglaDeTres("tempo", valorOriginal, dividendoReglaTres, divisorReglaTres);
     }
-    
+
     public static int codigoBuzzerTempo(String entradaTempo) {
         // Divisor y dividendo en la regla de tres
         double divisorReglaTres = 225.0;
@@ -42,7 +47,7 @@ public class generadorIntermedio {
         // Obtener el valor original
         int valorOriginal = obtenerValorOriginal(entradaTempo);
 
-        return codigoTempoOptimizado(valorOriginal, divisorReglaTres,dividendoReglaTres);
+        return codigoTempoOptimizado(valorOriginal, divisorReglaTres, dividendoReglaTres);
     }
 
     private static int obtenerValorOriginal(String entrada) {
@@ -67,6 +72,7 @@ public class generadorIntermedio {
     //--------------------------------------------------------------------------
     // Notas
     public static String codigoIntermedioNotas(String cadena) {
+        generarDiccionarioNotasClave();
         Map<String, Integer> diccionarioFiguraValor = new HashMap<>();
         diccionarioFiguraValor.put("r", 1);
         diccionarioFiguraValor.put("b", 2);
@@ -99,10 +105,25 @@ public class generadorIntermedio {
         StringBuilder resultado = new StringBuilder();
 
         for (String nota : notas) {
-            String[] partes = nota.trim().split("\\.");
+            // Normalizar cadena
+            if (nota.contains(" ")) {
+                nota = nota.replace(" ", "");
+            }
+            if (nota.contains("\t")) {
+                nota = nota.replace("\t", "");
+            }
+            String[] partes = nota.split("\\.");
             if (partes.length == 2) {
-                String notaNombre = partes[0].trim();
-                String figura = partes[1].trim();
+                // Reemplazar notas de clave xd
+                System.out.println(partes[0]);
+                if (diccionarioNotasClave.containsKey(partes[0])) {
+                    partes[0] = diccionarioNotasClave.get(partes[0]);
+                }
+                System.out.println(partes[0]);
+                String notaNombre = partes[0];
+                System.out.println("NOTA: " + notaNombre);
+                String figura = partes[1];
+                System.out.println("FIGURA: " + figura);
                 int valor = diccionarioFiguraValor.get(figura);
                 resultado.append("NOTE_" + notaNombre + ", " + valor + ", ");
             }
@@ -245,11 +266,21 @@ public class generadorIntermedio {
             saltos++;
             int valorRepeticion = Integer.parseInt(matcher.group(1));
             repIntermedio = "(A, = , ," + valorRepeticion + ")\n"
-                    + "L"+saltos+" IF A > 0 GOTO L" + (saltos + 1) + " \nL" + (saltos + 1) + ":\n";
+                    + "L" + saltos + " IF A > 0 GOTO L" + (saltos + 1) + " \nL" + (saltos + 1) + ":\n";
             saltos++;
             return repIntermedio;
         }
         return repIntermedio;
     }
     //--------------------------------------------------------------------------
+
+    private static void generarDiccionarioNotasClave() {
+        diccionarioNotasClave.put("A", "A3");
+        diccionarioNotasClave.put("B", "B3");
+        diccionarioNotasClave.put("C", "C4");
+        diccionarioNotasClave.put("D", "D4");
+        diccionarioNotasClave.put("E", "E4");
+        diccionarioNotasClave.put("F", "F4");
+        diccionarioNotasClave.put("G", "G4");
+    }
 }
