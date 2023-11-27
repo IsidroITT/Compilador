@@ -70,9 +70,14 @@ public class Compilador extends javax.swing.JFrame {
     // Variables codigo intermedio
     private generadorIntermedio codIntermedio;
     private String codigoIntermedioSinOptimizar;
-    
+    private codObjetoPiano funcionesPiano;
+    private codObjetoBuzzer buzzerCod;
+
     // Variables codigo objeto
     private String notasxd = "";
+    private String funcionesxd = "";
+    private String nombreArchivo = "";
+    private int TEMPO_BUZZER = 0;
 
     // Variables mostrar resultado de los analisis
     private TablaSimbolos TablaDSimbolos;
@@ -145,6 +150,8 @@ public class Compilador extends javax.swing.JFrame {
         TablaDSimbolos = new TablaSimbolos();
         ErroresSintac = new ErroresSintacticos();
         mostrarCodigoIntermedio = new CodigoIntermedio();
+        funcionesPiano = new codObjetoPiano();
+        buzzerCod = new codObjetoBuzzer();
 
         //Autocompletado de codigo
         Functions.setAutocompleterJTextComponent(new String[]{/*UTILIZAR AL FINAL*/}, jtpCode, () -> {
@@ -450,8 +457,10 @@ public class Compilador extends javax.swing.JFrame {
             // Compilar el proyecto
             compilar();
             intermedio();
-            codObjetoBuzzer buzzerCod = new codObjetoBuzzer();
-            buzzerCod.generateCodigoBuzzer(notasxd,title.substring(0, title.length()-4));
+            nombreArchivo = this.getTitle().substring(0, this.getTitle().length() - 4);
+            buzzerCod.generateCodigoBuzzer(notasxd, nombreArchivo, TEMPO_BUZZER);
+            funcionesPiano.generateCodigoPiano(funcionesxd, nombreArchivo, "");
+
             mostrarCodigoIntermedio.getTxtIntermedio().setText(codigoIntermedioSinOptimizar);
         }
 
@@ -485,7 +494,7 @@ public class Compilador extends javax.swing.JFrame {
         // Primera evaluacion -Encontrar variables y tempo-
         String codLimpio = jtpCode.getText().replace(";", "");
         String[] codIntermdioAmedias = codLimpio.split("\n");
-        //codIntermedio.setSaltos(0);
+
         for (String linea : codIntermdioAmedias) {
             // Agregar variables al mapa
             if (linea.contains("var")) {
@@ -495,12 +504,13 @@ public class Compilador extends javax.swing.JFrame {
             // Generar codigo intermedio del tempos
             if (linea.startsWith("tempo")) {
                 codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioTempo(linea) + "\n";
+                TEMPO_BUZZER = codIntermedio.codigoBuzzerTempo(linea);
             }
         }
 
         // Limpiar variables
         codLimpio = codIntermedio.eliminarLineasVar(codIntermdioAmedias);
-        
+
         // Agregar if's intemedios
         codLimpio = codIntermedio.remplazarIF(codLimpio);
         codIntermdioAmedias = codLimpio.split("\n");
@@ -518,8 +528,11 @@ public class Compilador extends javax.swing.JFrame {
             }
         }
 
-        // Crear saltos para funciones
+        // Analisis completo
+        i = 0;
         for (String linea : codIntermdioAmedias) {
+            i++;
+            // Agregar etiquetas a funciones
             if (linea.contains("fn #")) {
                 String salto = codIntermedio.renombrarFuncion(linea);
                 if (salto.contains(" ")) {
@@ -532,25 +545,30 @@ public class Compilador extends javax.swing.JFrame {
                 continue;
             }
 
+            // Agregra saltos a condicionales
             if (linea.contains("TRUE") || linea.contains("FALSE") || linea.contains("L")) {
                 if (linea.contains("\t")) {
                     linea = linea.replace("\t", "");
                 }
                 codigoIntermedioSinOptimizar += "\n" + linea + "\n";
             }
-            
-            if (linea.contains("rep")){
-                 codigoIntermedioSinOptimizar += codIntermedio.repsIf(linea) + "\n";
+
+            // Agregrar saltos a repeticiones
+            if (linea.contains("rep")) {
+                codigoIntermedioSinOptimizar += codIntermedio.repsIf(linea) + "\n";
             }
 
+            // Reemplazar compases buzzer
             if (linea.contains("[") && linea.contains("]")) {
-                if (linea.contains("var") || linea.contains(".P-")) {
-                    continue;
-                }
                 codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioNotas(linea) + "\n";
-                notasxd += codIntermedio.codigoIntermedioNotas(linea) + "\n";
             }
 
+            // Generar funciones del piano
+            if (linea.contains(".P-")) {
+                //funcionesxd += funcionesPiano.generarFuncionesPiano(linea);
+            }
+
+            // Crear saltos a funciones
             if (linea.contains("#")) {
                 String llamado = codIntermedio.llamarFuncion(linea);
                 llamado = llamado.substring(0, llamado.length() - 2);
@@ -562,19 +580,39 @@ public class Compilador extends javax.swing.JFrame {
                 }
                 llamado = llamado.replace("#", "jmp ");
                 codigoIntermedioSinOptimizar += llamado + "\n";
-                System.out.println("HOLA " + linea);
             }
         }
 
-//        // Reemplazar notas xd
-//        for (String linea : codIntermdioAmedias) {
-//            if (linea.contains("[") && linea.contains("]")) {
-//                if (linea.contains("var") || linea.contains(".P-")) {
-//                    continue;
-//                }
-//                codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioNotas(linea) + "\n";
-//            }
-//        }
+        // Limpiar repeticiones para generar notas completas de ciclos
+        codLimpio = funcionesPiano.procesarRepeticiones(codLimpio);
+        codIntermdioAmedias = codLimpio.split("\n");
+
+        // Reemplazar variables otra vez xd
+        i = 0;
+        for (String linea : codIntermdioAmedias) {
+            i++;
+            if (codIntermedio.cadenaPerteneceAlMapa(linea, identificadores)) {
+                linea = codIntermedio.reemplazarVariables(linea, identificadores);
+                if (linea.contains("$")) {
+                    linea = linea.replace("$", "");
+                }
+                codIntermdioAmedias[i - 1] = linea;
+            }
+        }
+
+        for (String linea : codIntermdioAmedias) {
+
+            // Reemplazar compases buzzer
+            if (linea.contains("[") && linea.contains("]")) {
+                //codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioNotas(linea) + "\n";
+                notasxd += codIntermedio.codigoIntermedioNotas(linea) + ",\n";
+            }
+
+            // Generar funciones del piano
+            if (linea.contains(".P-")) {
+                funcionesxd += funcionesPiano.generarFuncionesPiano(linea);
+            }
+        }
     }
 
     private void aumentarFuente() {
@@ -594,7 +632,6 @@ public class Compilador extends javax.swing.JFrame {
         analisisSintactico();
         analisisSemantico();
         mostrarConsola();
-        //codeHasBeenCompiled = true;
     }
 
     private void analisisLexico() {
@@ -1623,6 +1660,9 @@ public class Compilador extends javax.swing.JFrame {
         identProd.clear();
         identificadores.clear();
         codeHasBeenCompiled = false;
+        notasxd = "";
+        funcionesxd = "";
+        nombreArchivo = "";
     }
 
     /**

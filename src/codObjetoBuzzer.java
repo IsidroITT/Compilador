@@ -15,8 +15,8 @@ public class codObjetoBuzzer {
 
     String codigoEjemplo = "";
 
-    public void generateCodigoBuzzer(String notasxd, String nombreArchivo) {
-        String ruta = "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/objetoBuzzer/"+nombreArchivo+".ino";
+    public void generateCodigoBuzzer(String notasxd, String nombreArchivo, int tempo) {
+        String ruta = "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/objetoBuzzer/"+nombreArchivo+"Buzzer.ino";
         codigoEjemplo = "#define NOTE_B0  31\n"
                 + "#define NOTE_C1  33\n"
                 + "#define NOTE_CS1 35\n"
@@ -110,10 +110,10 @@ public class codObjetoBuzzer {
                 + "\n"
                 + "\n"
                 + "// Cambia esto para hacer la canción más lenta o más rápida\n"
-                + "int tempo = 225;\n"
+                + "int tempo = "+tempo+";\n"
                 + "\n"
                 + "// Cambia esto al pin que desees utilizar\n"
-                + "int buzzer = 9;\n"
+                + "int buzzer = 19;\n"
                 + "\n"
                 + "// Notas de la melodía seguidas por la duración.\n"
                 + "// un 4 significa una negra, 8 dieciseisava, 16 corchea, y así sucesivamente\n"

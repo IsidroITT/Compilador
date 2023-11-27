@@ -33,6 +33,17 @@ public class generadorIntermedio {
 
         return aplicarReglaDeTres("tempo", valorOriginal, dividendoReglaTres, divisorReglaTres);
     }
+    
+    public static int codigoBuzzerTempo(String entradaTempo) {
+        // Divisor y dividendo en la regla de tres
+        double divisorReglaTres = 225.0;
+        double dividendoReglaTres = 110.0;
+
+        // Obtener el valor original
+        int valorOriginal = obtenerValorOriginal(entradaTempo);
+
+        return codigoTempoOptimizado(valorOriginal, divisorReglaTres,dividendoReglaTres);
+    }
 
     private static int obtenerValorOriginal(String entrada) {
         String[] partes = entrada.split("=");
@@ -48,8 +59,8 @@ public class generadorIntermedio {
         return cadenaSalida;
     }
 
-    private static double codigoTempoOptimizado(int valorOriginal, double divisor, double dividendo) {
-        return (valorOriginal * divisor) / dividendo;
+    private static int codigoTempoOptimizado(int valorOriginal, double divisor, double dividendo) {
+        return (int) ((valorOriginal * divisor) / dividendo);
     }
     //--------------------------------------------------------------------------
 

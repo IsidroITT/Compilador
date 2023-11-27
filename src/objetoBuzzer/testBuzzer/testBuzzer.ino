@@ -94,7 +94,7 @@
 int tempo = 225;
 
 // Cambia esto al pin que desees utilizar
-int buzzer = 9;
+int buzzer = 19;
 
 // Notas de la melodía seguidas por la duración.
 // un 4 significa una negra, 8 dieciseisava, 16 corchea, y así sucesivamente
@@ -108,20 +108,36 @@ const int melody[] PROGMEM = {
   // At Doom's Gate (E1M1)
   // Score available at https://musescore.com/pieridot/doom
 
-NOTE_G2, 4, NOTE_F4, 4, NOTE_A3, 4, NOTE_B3, 4
-NOTE_A, 2, NOTE_A, 2
-NOTE_A, 1
-NOTE_G2, 4, NOTE_F4, 4, NOTE_A3, 4, NOTE_B3, 4
-NOTE_A2, 2, NOTE_A4, 2
-NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4
-NOTE_G2, 2, NOTE_F4, 2
-NOTE_G2, 2, NOTE_F4, 2
-NOTE_F, 2, NOTE_B, 2
-NOTE_B, 1
-NOTE_G2, 2, NOTE_F4, 2
-NOTE_A2, 2, NOTE_B4, 2
-NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4
-NOTE_G2, 2, NOTE_F4, 2
+NOTE_G2, 4, NOTE_F4, 4, NOTE_A3, 4, NOTE_B3, 4,
+NOTE_A, 2, NOTE_A, 2,
+NOTE_A, 1,
+NOTE_G2, 4, NOTE_F4, 4, NOTE_A3, 4, NOTE_B3, 4,
+NOTE_A2, 2, NOTE_A4, 2,
+NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4,
+NOTE_G2, 2, NOTE_F4, 2,
+NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4,
+NOTE_G2, 2, NOTE_F4, 2,
+NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4,
+NOTE_G2, 2, NOTE_F4, 2,
+NOTE_G2, 2, NOTE_F4, 2,
+NOTE_F, 2, NOTE_B, 2,
+NOTE_B, 1,
+NOTE_G2, 2, NOTE_F4, 2,
+NOTE_A3, 2, NOTE_B4, 2,
+NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
+NOTE_G2, 2, NOTE_F4, 2,
+NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
+NOTE_G2, 2, NOTE_F4, 2,
+NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
+NOTE_G2, 2, NOTE_F4, 2,
+NOTE_F, 4, NOTE_A, 2, NOTE_C, 4,
+NOTE_B, 1,
+NOTE_F3, 1,
+NOTE_A3, 2, NOTE_B4, 2,
+NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
+NOTE_F3, 1,
+NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
+NOTE_F3, 1,
 };
 
 

@@ -8,10 +8,14 @@ TODO:
 
 - [x] Analisis Léxico
 - [x] Analisis Sintáctico (Listo a un 95%, falta agregar un par de errores pero no afectan al semantico)
-- [ ] Analisis Semántico
-- [ ] Nuevas ventajas
+- [x] Analisis Semántico
+- [x] Nuevas ventajas
 - [ ] Codigo intermedio
+- [ ] Codigo intermedio optimizado
 - [ ] Ganas de vivir
-- [ ] Automatas AFND
-- [ ] Gramatica libre de contexto
-- [ ] Salida fisica
+- [x] Automatas AFND
+- [x] Gramatica libre de contexto
+- [x] Salida fisica
+- [x] Codigo objeto buzzer
+- [x] Codigo objeto piano
+- [ ] Funciones (Genereacion y llamados)

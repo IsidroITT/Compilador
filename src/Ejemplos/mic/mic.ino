@@ -94,7 +94,7 @@
 int tempo = 225;
 
 // Cambia esto al pin que desees utilizar
-int buzzer = 9;
+int buzzer = 19;
 
 // Notas de la melodía seguidas por la duración.
 // un 4 significa una negra, 8 dieciseisava, 16 corchea, y así sucesivamente
