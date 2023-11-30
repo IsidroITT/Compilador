@@ -5,28 +5,33 @@ Adafruit_PWMServoDriver pca1 = Adafruit_PWMServoDriver(0x40);
 Adafruit_PWMServoDriver pca2 = Adafruit_PWMServoDriver(0x41);
 
 //Definir el puerto en el que están conectados los servos correspondientes a las notas
-#define G3 0
-#define A3 1
-#define B3 2
-#define C4 3
-#define D4 4
-#define E4 5
-#define F4 6
-#define G4 7
-#define A4 8
-#define B4 9
-#define C5 10
-#define D5 11
+#define C3 0
+#define D3 1
+#define E3 2
+#define F3 3
+#define G3 4
+#define A3 5
+#define B3 6
+#define C4 7
+#define D4 8
+#define E4 9
+#define F4 10
+#define G4 11
+#define A4 12
+#define B4 13
+#define C5 14
+#define D5 15
 
-#define E5 12
-#define F5 13
-#define G5 14
-#define A5 15
-#define C6 16
+#define E5 0
+#define F5 1
+#define G5 2
+#define A5 3
+#define B5 4
+#define C5 5
 
 void setup() {
   Serial.begin(9600);
-  pca1.begin();
+	pca1.begin();
   pca2.begin();
   pca1.setPWMFreq(60);
   pca2.setPWMFreq(60);
@@ -35,100 +40,70 @@ void setup() {
 void loop() {
   inicializar (); //inicializar todos los servos a 20, dar un delay de 2 segundos antes de empezar a tocar
   //Canción de la tormenta
-tocarNota(pca1,G4,1000);
-
-tocarNota(pca1,G3,1000);
-
-tocarNota(pca1,F4,1000);
-
-tocarNota(pca1,B3,1000);
-
-tocarNota(pca1,B3,2000);
-
-tocarNota(pca1,A3,500);
-
-tocarNota(pca1,B3,500);
-
-tocarNota(pca1,C4,500);
-
-tocarNota(pca1,D4,500);
-
-tocarNota(pca1,G4,1000);
-
-tocarNota(pca1,G3,1000);
-
-tocarNota(pca1,A4,1000);
-
-tocarNota(pca1,B4,1000);
-
-tocarNota(pca1,E4,500);
-
+  //Primer compás
+  tocarNota(pca1,D3,500);
+  tocarNota(pca1,F3,500);
+  tocarNota(pca1,D4,1000);
+  //Segundo compás
+  tocarNota(pca1,D3,500);
+  tocarNota(pca1,F3,500);
+  tocarNota(pca1,D4,1000);
+  //Tercer compás
+  tocarNota(pca1,E4,500);
+  tocarNota(pca1,F4,500);
+  tocarNota(pca1,E4,500);
+  tocarNota(pca1,F4,500);
+  //Cuarto compás
+  tocarNota(pca1,E4,500);
+  tocarNota(pca1,C4,500);
+  tocarNota(pca1,A3,500);
+    //Primer compás
+  tocarNota(pca1,D3,500);
+  tocarNota(pca1,F3,500);
+  tocarNota(pca1,D4,1000);
+  //Segundo compás
+  tocarNota(pca1,D3,500);
+  tocarNota(pca1,F3,500);
+  tocarNota(pca1,D4,1000);
+  //Tercer compás
+  tocarNota(pca1,E4,500);
+  tocarNota(pca1,F4,500);
+  tocarNota(pca1,E4,500);
+  tocarNota(pca1,F4,500);
+  //Cuarto compás
+  tocarNota(pca1,E4,500);
+  tocarNota(pca1,C4,500);
+  tocarNota(pca1,A3,500);
   delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,E4,500);
-
+  //Quinto compás
+  tocarNota(pca1,A3,1000); 
+  tocarNota(pca1,D3,1000);
+  tocarNota(pca1,F3,500);
+  tocarNota(pca1,G3,500);
+  //Sexto compás
+  tocarNota(pca1,A3,2000);
+  //Séptimo compás
+  tocarNota(pca1,A3,1000); 
+  tocarNota(pca1,D3,1000);
+  tocarNota(pca1,F3,500);
+  tocarNota(pca1,G3,500);
+  //Octavo compás
+  tocarNota(pca1,E3,2000);
+  //Quinto compás
+  tocarNota(pca1,A3,1000); 
+  tocarNota(pca1,D3,1000);
+  tocarNota(pca1,F3,500);
+  tocarNota(pca1,G3,500);
+  //Sexto compás
+  tocarNota(pca1,A3,2000);
   delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,E4,500);
-
-  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,A3,1000);
-
-tocarNota(pca1,C4,500);
-
-tocarNota(pca1,B3,2000);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,A3,1000);
-
-tocarNota(pca1,B4,1000);
-
-tocarNota(pca1,E4,500);
-
-  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,E4,500);
-
-  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
+  //Séptimo compás
+  tocarNota(pca1,A3,1000); 
+  tocarNota(pca1,D3,1000);
+  tocarNota(pca1,F3,500);
+  tocarNota(pca1,G3,500);
+  //Octavo compás
+  tocarNota(pca1,E3,2000);
 
   delay(10000); //Delay de 10 segundos antes de repetir la pieza
 }
@@ -170,7 +145,6 @@ int anguloaPulso(int angulo){
 //Método para tocar una nota, se le indica qué placa es, el puerto del servomotor y el delay
 void tocarNota(Adafruit_PWMServoDriver placa,int nota, int duracion){
 	placa.setPWM(nota,0,anguloaPulso(0));
-	int duracionCalculada = duracion * (60.0 / 208);
-     delay(duracionCalculada);
-     placa.setPWM(nota,0,anguloaPulso(20));
+	delay(duracion);
+	placa.setPWM(nota,0,anguloaPulso(20));
 }

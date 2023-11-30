@@ -32,68 +32,6 @@ public class codObjetoPiano {
         generarDiccionarioNotasClave();
     }
 
-    public static void main(String[] args) {
-        String texto = "// Declaraciones iniciales\n"
-                + "compas = 4/4;\n"
-                + "tempo = 208;\n"
-                + "\n"
-                + "// Variables para buzzer\n"
-                + "var $timbre = [G2.b, F4.b,];\n"
-                + "var $timbreFuncion = [G2.n, F4.n, A3.n, B3.n,];\n"
-                + "\n"
-                + "// Funciones dentro del lenguaje\n"
-                + "fn #miFuncioncita(){\n"
-                + "	$timbreFuncion;\n"
-                + "    	clave(F^2){\n"
-                + "           	[A.b, A.b,];\n"
-                + "           	[A.r,];\n"
-                + "     	};\n"
-                + "	$timbreFuncion;\n"
-                + "     	[A2.b, A4.b,];\n"
-                + "     	rep(3){\n"
-                + "	   	[A4.n, A4.n, A4.n, A4.n,]; \n"
-                + "		$timbre;\n"
-                + "	};\n"
-                + "};\n"
-                + "\n"
-                + "// Notas\n"
-                + "	\\inicio;\n"
-                + "		$timbre;\n"
-                + "	    	clave(G^2){\n"
-                + "            	[F.b, B.b,];\n"
-                + "            	[B.r,];\n"
-                + "        	};\n"
-                + "		#miFuncioncita();\n"
-                + "        	$timbre;\n"
-                + "        	[A3.b, B4.b,];\n"
-                + "        	rep(3){\n"
-                + "		   	[E4.n, E4.n, F4.n, G4.n,]; \n"
-                + "			$timbre;\n"
-                + "		};\n"
-                + "	\\fin;\n"
-                + "	\n"
-                + "\n"
-                + "// Variables para piano\n"
-                + "var $timbrePiano = [F3.P-r,];\n"
-                + "\n"
-                + "// Notas del piano\n"
-                + "piano{\n"
-                + "	clave(G^2) {\n"
-                + "        	[F.P-n, A.P-b, C.P-n,];\n"
-                + "      	[B.P-r,];\n"
-                + "   	};\n"
-                + "   	$timbrePiano;\n"
-                + "    	[A3.P-b, B4.P-b,];\n"
-                + "	rep(4) {\n"
-                + "		[E4.P-n, E4.P-n, F4.P-n, G4.P-n,];\n"
-                + "		$timbrePiano;\n"
-                + "	};\n"
-                + "};";
-
-        String resultado = procesarRepeticiones(texto);
-        System.out.println(resultado);
-    }
-
     /**
      * @param funcionesxd Son las funciones que se agregaran a la generacionde
      * cofigo
@@ -101,86 +39,114 @@ public class codObjetoPiano {
      *
      * Funcion que permite generar el codigo objeto para nuestro piano
      */
-    public static void generateCodigoPiano(String funcionesxd, String nombreArchivo, String funcionesLlamar) {
-        String ruta = "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/objetoPiano/" + nombreArchivo + "Piano.ino";
-        codigoPiano = "#include <wire.h>\n"
+    public static void generateCodigoPiano(String funcionesxd, String nombreArchivo, String funcionesLlamar, int tempoPiano) {
+        String ruta = "/home/kobayashi/Desktop/Semestre7/4-Automatas2/todoxd/Compilador-main/src/objetoPiano/" + nombreArchivo + "Piano.ino";
+        codigoPiano = "#include <Wire.h>\n"
                 + "#include <Adafruit_PWMServoDriver.h>\n"
                 + "\n"
                 + "Adafruit_PWMServoDriver pca1 = Adafruit_PWMServoDriver(0x40);\n"
                 + "Adafruit_PWMServoDriver pca2 = Adafruit_PWMServoDriver(0x41);\n"
-                + "Adafruit_PWMServoDriver pca2 = Adafruit_PWMServoDriver(0x42);\n"
                 + "\n"
-                + "#define C3 0\n"
-                + "#define C#3 1\n"
-                + "#define D3 2\n"
-                + "#define D#3 3\n"
-                + "#define E3 4\n"
-                + "#define F3 5\n"
-                + "#define F#3 6\n"
-                + "#define G3 7\n"
-                + "#define G#3 8\n"
-                + "#define A3  9\n"
-                + "#define A#3 10\n"
-                + "#define B3  11\n"
-                + "#define C4  12\n"
-                + "#define C#4 13\n"
-                + "#define D4  14\n"
-                + "#define D#4 15\n"
+                + "//Definir el puerto en el que están conectados los servos correspondientes a las notas\n"
+                + "#define G3 0\n"
+                + "#define A3 1\n"
+                + "#define B3 2\n"
+                + "#define C4 3\n"
+                + "#define D4 4\n"
+                + "#define E4 5\n"
+                + "#define F4 6\n"
+                + "#define G4 7\n"
+                + "#define A4 8\n"
+                + "#define B4 9\n"
+                + "#define C5 10\n"
+                + "#define D5 11\n"
                 + "\n"
-                + "#define E4  0\n"
-                + "#define F4  1\n"
-                + "#define F#4 2\n"
-                + "#define G4  3\n"
-                + "#define G#4 4\n"
-                + "#define A4  5\n"
-                + "#define A#4 6\n"
-                + "#define B4  7\n"
-                + "#define C5  8\n"
-                + "#define C#5 9\n"
-                + "#define D5  10\n"
-                + "#define D#5 11\n"
-                + "#define E5  12\n"
-                + "#define F5  13\n"
-                + "#define F#5 14\n"
-                + "#define G5  15\n"
+                + "#define E5 12\n"
+                + "#define F5 13\n"
+                + "#define G5 14\n"
+                + "#define A5 15\n"
+                + "#define C6 16\n"
+                //                + "//Notas pertenecientes al pca1\n"
+                //                + "#define C3 15\n"
+                //                + "#define E3 14\n"
+                //                + "#define G3 13\n"
+                //                + "#define B3 12\n"
+                //                + "#define D4 11\n"
+                //                + "#define F4 5\n"
+                //                + "#define A4 4\n"
+                //                + "#define C5 3\n"
+                //                + "#define E5 2\n"
+                //                + "#define G5 1\n"
+                //                + "#define B5 0\n"
+                //                + "//Notas pertenecientes al pca2\n"
+                //                + "#define D3 0\n"
+                //                + "#define F3 1\n"
+                //                + "#define A3 2\n"
+                //                + "#define C4 3\n"
+                //                + "#define E4 4\n"
+                //                + "#define G4 5\n"
+                //                + "#define B4 11\n"
+                //                + "#define D5 12\n"
+                //                + "#define F5 13\n"
+                //                + "#define A5 14\n"
+                //                + "#define C6 15"
                 + "\n"
-                + "#define G#5 0\n"
-                + "#define A5  1\n"
-                + "#define A#5 2\n"
-                + "#define B5  3\n"
-                + "#define C5  4\n"
-                + "\n"
-                + "\n"
-                + "void setup(){\n"
-                + "	Serial.begin(9600);\n"
-                + "	pca1.begin();\n"
-                + "	pca2.begin();\n"
-                + "	pca3.begin();\n"
-                + "	pca1.setPWMFreq(60);\n"
-                + "	pca2.setPWMFreq(60);\n"
-                + "	pca3.setPWMFreq(60);\n"
+                + "void setup() {\n"
+                + "  Serial.begin(9600);\n"
+                + "  pca1.begin();\n"
+                + "  pca2.begin();\n"
+                + "  pca1.setPWMFreq(60);\n"
+                + "  pca2.setPWMFreq(60);\n"
                 + "}\n"
                 + "\n"
-                + "void loop(){\n"
-                + "	//inicializar los servos\n"
-                + "	for(int i=0;i<=15;i++){\n"
-                + "		pca1.setPWM(i,0,90);\n"
-                + "		pca2.setPWM(i,0,90);\n"
-                + "		pca3.setPWM(i,0,90);\n"
-                + "	}\n"
-                + "	//notas\n"
+                + "void loop() {\n"
+                + "  inicializar (); //inicializar todos los servos a 20, dar un delay de 2 segundos antes de empezar a tocar\n"
+                + "  //Canción de la tormenta\n"
                 + funcionesxd
+                + "  delay(10000); //Delay de 10 segundos antes de repetir la pieza\n"
+                + "}\n"
                 + "\n"
+                + "void inicializar (){\n"
+                + "  pca1.setPWM(0,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(1,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(2,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(3,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(4,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(5,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(6,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(7,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(8,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(9,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(10,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(11,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(12,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(13,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(14,0,anguloaPulso(20));\n"
+                + "  pca1.setPWM(15,0,anguloaPulso(20));\n"
+                + "\n"
+                + "  pca2.setPWM(0,0,anguloaPulso(20));\n"
+                + "  pca2.setPWM(1,0,anguloaPulso(20));\n"
+                + "  pca2.setPWM(2,0,anguloaPulso(20));\n"
+                + "  pca2.setPWM(3,0,anguloaPulso(20));\n"
+                + "  pca2.setPWM(4,0,anguloaPulso(20));\n"
+                + "  pca2.setPWM(5,0,anguloaPulso(20));\n"
+                + "\n"
+                + "  delay(2000);\n"
+                + "}\n"
+                + "\n"
+                + "//Método que nos permite utilizar \"ángulos\" en lugar de pulsos\n"
+                + "int anguloaPulso(int angulo){\n"
+                + "  int pulso = map(angulo,0,180,100,580);\n"
+                + "  return pulso;\n"
                 + "}\n"
                 + "\n"
                 + "//Método para tocar una nota, se le indica qué placa es, el puerto del servomotor y el delay\n"
                 + "void tocarNota(Adafruit_PWMServoDriver placa,int nota, int duracion){\n"
-                + "	placa.setPWM(nota,0,140);\n"
-                + "	delay(duracion);\n"
-                + "	pca1.setPWM(nota,0,90);\n"
-                + "}\n"
-                + "\n"
-                + funcionesLlamar;
+                + "	placa.setPWM(nota,0,anguloaPulso(0));\n"
+                + "	int duracionCalculada = duracion * (60.0 / " + tempoPiano + ");\n"
+                + "     delay(duracionCalculada);\n"
+                + "     placa.setPWM(nota,0,anguloaPulso(20));\n"
+                + "}";
 
         try {
             File file = new File(ruta);
@@ -205,6 +171,8 @@ public class codObjetoPiano {
     public static String generarFuncionesPiano(String entrada) {
         String[] elementos = entrada.replaceAll("\\[|\\]", "").split(",\\s*");
         String funcionGenerada = "";
+        String ultimoPCAUtilizado = "";
+        String ultimaNotaUtilizada = "";
 
         for (String elemento : elementos) {
             // Normalizar cadena
@@ -229,7 +197,14 @@ public class codObjetoPiano {
             String valorPCA = diccionarioNotaPCA.get(nota);
             Integer valorDelay = diccionarioFiguraDelay.get(figura);
 
-            funcionGenerada += "tocarNota(" + valorPCA + "," + nota + "," + valorDelay + ");";
+            String funcionDeTocarNota = "tocarNota(" + valorPCA + "," + nota + "," + valorDelay + ");\n";
+            if (ultimoPCAUtilizado.equals(valorPCA) && ultimaNotaUtilizada.equals(nota)) {
+                funcionDeTocarNota = "  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma\n" + funcionDeTocarNota;
+            }
+            ultimoPCAUtilizado = valorPCA;
+            ultimaNotaUtilizada = nota;
+
+            funcionGenerada += funcionDeTocarNota + "\n";
         }
         return funcionGenerada;
     }
@@ -289,7 +264,7 @@ public class codObjetoPiano {
     }
 
     /**
-     * 
+     *
      */
     public static String procesarRepeticiones(String entrada) {
         Pattern pattern = Pattern.compile("rep\\((\\d+)\\)\\s*\\{(.*?)\\}", Pattern.DOTALL);
@@ -336,11 +311,13 @@ public class codObjetoPiano {
         diccionarioNotaPCA.put("B4", "pca1");
         diccionarioNotaPCA.put("C5", "pca1");
         diccionarioNotaPCA.put("D5", "pca1");
+
         diccionarioNotaPCA.put("E5", "pca1");
         diccionarioNotaPCA.put("F5", "pca1");
         diccionarioNotaPCA.put("G5", "pca1");
         diccionarioNotaPCA.put("A5", "pca1");
         diccionarioNotaPCA.put("B5", "pca1");
+        diccionarioNotaPCA.put("C6", "pca1");
     }
 
     /**

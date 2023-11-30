@@ -35,100 +35,126 @@ void setup() {
 void loop() {
   inicializar (); //inicializar todos los servos a 20, dar un delay de 2 segundos antes de empezar a tocar
   //Canción de la tormenta
-tocarNota(pca1,G4,1000);
+tocarNota(pca1,E4,1000);
 
-tocarNota(pca1,G3,1000);
+tocarNota(pca1,F4,500);
 
-tocarNota(pca1,F4,1000);
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,F4,500);
 
-tocarNota(pca1,B3,1000);
+tocarNota(pca1,G4,500);
 
-tocarNota(pca1,B3,2000);
+tocarNota(pca1,F4,500);
 
-tocarNota(pca1,A3,500);
+tocarNota(pca1,E4,500);
 
-tocarNota(pca1,B3,500);
+tocarNota(pca1,D4,500);
+
+tocarNota(pca1,C4,500);
+
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,C4,500);
+
+tocarNota(pca1,D4,500);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,D4,500);
+
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,D4,1000);
+
+tocarNota(pca1,E4,1000);
+
+tocarNota(pca1,F4,500);
+
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,F4,500);
+
+tocarNota(pca1,G4,500);
+
+tocarNota(pca1,F4,500);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,D4,500);
+
+tocarNota(pca1,C4,500);
+
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,C4,500);
+
+tocarNota(pca1,D4,500);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,D4,500);
+
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,D4,1000);
+
+tocarNota(pca1,E4,1000);
+
+tocarNota(pca1,F4,500);
+
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,F4,500);
+
+tocarNota(pca1,D4,500);
+
+tocarNota(pca1,C4,500);
+
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,C4,1000);
+
+tocarNota(pca1,D4,1000);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,C4,500);
+
+tocarNota(pca1,D4,500);
+
+tocarNota(pca1,C4,500);
+
+  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
+tocarNota(pca1,C4,1000);
+
+tocarNota(pca1,D4,1000);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,C4,500);
+
+tocarNota(pca1,D4,500);
+
+tocarNota(pca1,E4,250);
+
+tocarNota(pca1,F4,250);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,C4,500);
+
+tocarNota(pca1,D4,500);
+
+tocarNota(pca1,E4,250);
+
+tocarNota(pca1,F4,250);
+
+tocarNota(pca1,E4,500);
+
+tocarNota(pca1,C4,500);
 
 tocarNota(pca1,C4,500);
 
 tocarNota(pca1,D4,500);
 
 tocarNota(pca1,G4,1000);
-
-tocarNota(pca1,G3,1000);
-
-tocarNota(pca1,A4,1000);
-
-tocarNota(pca1,B4,1000);
-
-tocarNota(pca1,E4,500);
-
-  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,E4,500);
-
-  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,E4,500);
-
-  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,A3,1000);
-
-tocarNota(pca1,C4,500);
-
-tocarNota(pca1,B3,2000);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,A3,1000);
-
-tocarNota(pca1,B4,1000);
-
-tocarNota(pca1,E4,500);
-
-  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
-
-tocarNota(pca1,E4,500);
-
-  delay(50); //Este delay lo puse aquí porque se vuelven locos los servos y no regresa a la posición inicial si la siguiente nota a tocar es la misma
-tocarNota(pca1,E4,500);
-
-tocarNota(pca1,F4,500);
-
-tocarNota(pca1,G4,500);
-
-tocarNota(pca1,F3,2000);
 
   delay(10000); //Delay de 10 segundos antes de repetir la pieza
 }
@@ -170,7 +196,7 @@ int anguloaPulso(int angulo){
 //Método para tocar una nota, se le indica qué placa es, el puerto del servomotor y el delay
 void tocarNota(Adafruit_PWMServoDriver placa,int nota, int duracion){
 	placa.setPWM(nota,0,anguloaPulso(0));
-	int duracionCalculada = duracion * (60.0 / 208);
+	int duracionCalculada = duracion * (60.0 / 120);
      delay(duracionCalculada);
      placa.setPWM(nota,0,anguloaPulso(20));
 }

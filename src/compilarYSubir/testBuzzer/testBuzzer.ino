@@ -109,8 +109,8 @@ const int melody[] PROGMEM = {
   // Score available at https://musescore.com/pieridot/doom
 
 NOTE_G2, 4, NOTE_F4, 4, NOTE_A3, 4, NOTE_B3, 4,
-NOTE_A, 2, NOTE_A, 2,
-NOTE_A, 1,
+NOTE_A3, 2, NOTE_A3, 2,
+NOTE_A3, 1,
 NOTE_G2, 4, NOTE_F4, 4, NOTE_A3, 4, NOTE_B3, 4,
 NOTE_A2, 2, NOTE_A4, 2,
 NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4,
@@ -120,8 +120,8 @@ NOTE_G2, 2, NOTE_F4, 2,
 NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4, NOTE_A4, 4,
 NOTE_G2, 2, NOTE_F4, 2,
 NOTE_G2, 2, NOTE_F4, 2,
-NOTE_F, 2, NOTE_B, 2,
-NOTE_B, 1,
+NOTE_F4, 2, NOTE_B3, 2,
+NOTE_B3, 1,
 NOTE_G2, 2, NOTE_F4, 2,
 NOTE_A3, 2, NOTE_B4, 2,
 NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
@@ -130,8 +130,8 @@ NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
 NOTE_G2, 2, NOTE_F4, 2,
 NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
 NOTE_G2, 2, NOTE_F4, 2,
-NOTE_F, 4, NOTE_A, 2, NOTE_C, 4,
-NOTE_B, 1,
+NOTE_A3, 4, NOTE_A3, 2, NOTE_A3, 4,
+NOTE_B3, 1,
 NOTE_F3, 1,
 NOTE_A3, 2, NOTE_B4, 2,
 NOTE_E4, 4, NOTE_E4, 4, NOTE_F4, 4, NOTE_G4, 4,
@@ -180,3 +180,4 @@ void setup() {
 void loop() {
   // no es necesario repetir la melodía.
 }
+

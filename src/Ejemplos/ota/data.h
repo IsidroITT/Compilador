@@ -1,2 +1,2 @@
-const char* ssid    = "MEGACABLE-2.4G-21AB";
-const char* password = "LonelyLove69";
+const char* ssid     = "ESP-CONNECT";
+const char* password = "ESP-CONNECT";

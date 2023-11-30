@@ -1,56 +1,98 @@
-// Declaraciones iniciales
 compas = 4/4;
-tempo = 110;
+tempo = 120;
 
-// Variables para buzzer
-var $timbre = [G2.b, F4.b,];
-var $timbreFuncion = [G2.n, F4.n, A3.n, B3.n,];
+var $primerBU = [E4.b, F4.n, F4.n,];
+var $segundoBU = [G4.n, F4.n, E4.n, D4.n,];
+var $tercerBU = [C4.n, C4.n, D4.n, E4.n,];
 
-// Funciones dentro del lenguaje
-fn #miFuncioncita(){
-	$timbreFuncion;
-    	clave(F^2){
-           	[A.b, A.b,];
-           	[A.r,];
-     	};
-	$timbreFuncion;
-     	[A2.b, A4.b,];
-     	rep(3){
-	   	[A4.n, A4.n, A4.n, A4.n,]; 
-		$timbre;
+\inicio;
+	$primerBU;
+	$segundoBU;
+	$tercerBU;
+
+	// Clave para reproducir 4to y 5to compas
+	clave(G^2){
+		//Cuarto compas
+		[E.n, D.n, D.b,];
+		// El 1er y el 5to compas son el mismo
+		$primerBU;
 	};
-};
 
-// Notas
-	\inicio;
-		$timbre;
-	    	clave(G^2){
-            	[F.b, B.b,];
-            	[B.r,];
-        	};
-		#miFuncioncita();
-        	$timbre;
-        	[A3.b, B4.b,];
-        	rep(3){
-		   	[E4.n, E4.n, F4.n, G4.n,]; 
-			$timbre;
-		};
-	\fin;
-	
+	// Clave falsa del 4to y 5to
+	clave(A^2){
+		[E.n, D.n, D.b,];
+		$primerBU;
+	};
+	// Sexto comaps
+	$segundoBU;
+	// Septimo compas
+	$tercerBU;
 
-// Variables para piano
-var $timbrePiano = [F3.P-r,];
+	clave(G^2){
+		[E.n, D.n, D.b,];
+		// El 1er y el 5to compas son el mismo
+		$primerBU;
+	};
 
-// Notas del piano
+	// Repetir el 8vo y 9no compas
+	rep(2){
+		// 8vo compas
+		[D4.n, C4.n, C4.b,];
+		// 9no compas
+		[D4.b, E4.n, C4.n,];
+	};
+	rep(2){
+		// 10mo y 11vo compas
+		[D4.n, E4.c, F4.c, E4.n, C4.n,];
+	};
+	// 12vo compas
+	[C4.n, D4.n, G4.b,];
+\fin;
+
+var $primer = [E4.P-b, F4.P-n, F4.P-n,];
+var $segundo = [G4.P-n, F4.P-n, E4.P-n, D4.P-n,];
+var $tercer = [C4.P-n, C4.P-n, D4.P-n, E4.P-n,];
+
 piano{
-	clave(G^2) {
-        	[F.P-n, A.P-b, C.P-n,];
-      	[B.P-r,];
-   	};
-   	$timbrePiano;
-    	[A3.P-b, B4.P-b,];
-	rep(2) {
-		[E4.P-n, E4.P-n, F4.P-n, G4.P-n,];
-		$timbrePiano;
+	$primer;
+	$segundo;
+	$tercer;
+
+	// Clave para reproducir 4to y 5to compas
+	clave(G^2){
+		//Cuarto compas
+		[E.P-n, D.P-n, D.P-b,];
+		// El 1er y el 5to compas son el mismo
+		$primer;
 	};
+
+	// Clave falsa del 4to y 5to
+	clave(A^2){
+		[E.P-n, D.P-n, D.P-b,];
+		$primer;
+	};
+	// Sexto comaps
+	$segundo;
+	// Septimo compas
+	$tercer;
+
+	clave(G^2){
+		[E.P-n, D.P-n, D.P-b,];
+		// El 1er y el 5to compas son el mismo
+		$primer;
+	};
+
+	// Repetir el 8vo y 9no compas
+	rep(2){
+		// 8vo compas
+		[D4.P-n, C4.P-n, C4.P-b,];
+		// 9no compas
+		[D4.P-b, E4.P-n, C4.P-n,];
+	};
+	rep(2){
+		// 10mo y 11vo compas
+		[D4.P-n, E4.P-c, F4.P-c, E4.P-n, C4.P-n,];
+	};
+	// 12vo compas
+	[C4.P-n, D4.P-n, G4.P-b,];
 };

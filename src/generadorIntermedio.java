@@ -26,6 +26,87 @@ public class generadorIntermedio {
         generadorIntermedio.saltos = saltos;
     }
 
+    public static void main(String[] args) {
+        String input = "compas = 10/10;\n"
+                + "tempo = 208;\n"
+                + "var $timbre = [G2.b, F4.b,];\n"
+                + "var $timbreFuncion = [G2.n, F4.n, A3.n, B3.n,];\n"
+                + "\n"
+                + "// Funciones dentro del lenguaje\n"
+                + "fn #miFuncioncita(){\n"
+                + "	$timbreFuncion;\n"
+                + "	clave(A^2){\n"
+                + "		[F.b, B.b,];\n"
+                + "		[B.r,];\n"
+                + "	}\n"
+                + "	$timbreFuncion;\n"
+                + "	[A2.b, B4.b,];\n"
+                + "	rep(3){\n"
+                + "		[E4.n, E4.n, F4.n, G4.n,]; \n"
+                + "		$timbre;\n"
+                + "	};\n"
+                + "};\n"
+                + "\n"
+                + "// Notas\n"
+                + "\\inicio;\n"
+                + "	$timbre;\n"
+                + "	clave(G^2){\n"
+                + "		[F.b, B.b,];\n"
+                + "		[B.r,];\n"
+                + "	};\n"
+                + "	#miFuncioncita();\n"
+                + "	$timbre;\n"
+                + "	[A2.b, B4.b,];\n"
+                + "	rep(3){\n"
+                + "		[E4.n, E4.n, F4.n, G4.n,]; \n"
+                + "		$timbre;\n"
+                + "	};\n"
+                + "\\fin;\n"
+                + "	\n"
+                + "\n"
+                + "// Notas piano\n"
+                + "var $timbrePiano = [F3.P-r,];\n"
+                + "var $timbreFuncionPiano = [G4.P-b, G3.P-b,];\n"
+                + "\n"
+                + "// Funciones para el piano\n"
+                + "fn #miFuncioncitaPiano(){\n"
+                + "	$timbreFuncionPiano;\n"
+                + "	clave(G^2){\n"
+                + "		[F.P-b, B.P-b,];\n"
+                + "		[B.P-r,];\n"
+                + "		[A.P-n, B.P-n, C.P-n, D.P-n,];\n"
+                + "	};\n"
+                + "	$timbreFuncionPiano;\n"
+                + "	[A4.P-b, B4.P-b,];\n"
+                + "	rep(3){\n"
+                + "		[E4.P-n, E4.P-n, F4.P-n, G4.P-n,]; \n"
+                + "		$timbrePiano;\n"
+                + "	};\n"
+                + "};\n"
+                + "\n"
+                + "piano{\n"
+                + "	clave(G^2) {\n"
+                + "		[F.P-n, A.P-b, C.P-n,];\n"
+                + "		[B.P-r,];\n"
+                + "	};\n"
+                + "	#miFuncioncitaPiano();\n"
+                + "	$timbrePiano;\n"
+                + "	[A3.P-b, B4.P-b,];\n"
+                + "	rep(2) {\n"
+                + "		[E4.P-n, E4.P-n, F4.P-n, G4.P-n,];\n"
+                + "		$timbrePiano;\n"
+                + "	};\n"
+                + "};";
+
+        input = input.replace(";", "");
+
+        // Remover bloques de código que coincidan con el patrón
+        String result = optimizadorDeClave(input);
+
+        System.out.println("Texto original:\n" + input);
+        System.out.println("\nResultado:\n" + result);
+    }
+
     //--------------------------------------------------------------------------
     //CodigoTempo
     public static String codigoIntermedioTempo(String entradaTempo) {
@@ -50,7 +131,7 @@ public class generadorIntermedio {
         return codigoTempoOptimizado(valorOriginal, divisorReglaTres, dividendoReglaTres);
     }
 
-    private static int obtenerValorOriginal(String entrada) {
+    public static int obtenerValorOriginal(String entrada) {
         String[] partes = entrada.split("=");
         String valorStr = partes[1].trim();
         return Integer.parseInt(valorStr);
@@ -65,6 +146,7 @@ public class generadorIntermedio {
     }
 
     private static int codigoTempoOptimizado(int valorOriginal, double divisor, double dividendo) {
+
         return (int) ((valorOriginal * divisor) / dividendo);
     }
     //--------------------------------------------------------------------------
@@ -115,15 +197,11 @@ public class generadorIntermedio {
             String[] partes = nota.split("\\.");
             if (partes.length == 2) {
                 // Reemplazar notas de clave xd
-                System.out.println(partes[0]);
                 if (diccionarioNotasClave.containsKey(partes[0])) {
                     partes[0] = diccionarioNotasClave.get(partes[0]);
                 }
-                System.out.println(partes[0]);
                 String notaNombre = partes[0];
-                System.out.println("NOTA: " + notaNombre);
                 String figura = partes[1];
-                System.out.println("FIGURA: " + figura);
                 int valor = diccionarioFiguraValor.get(figura);
                 resultado.append("NOTE_" + notaNombre + ", " + valor + ", ");
             }
@@ -272,8 +350,56 @@ public class generadorIntermedio {
         }
         return repIntermedio;
     }
-    //--------------------------------------------------------------------------
 
+    // Reemplazar variables en el codigo
+    public static Map<String, String> extractFunctions(String input) {
+        Map<String, String> functions = new HashMap<>();
+
+        // Expresión regular para encontrar funciones y su contenido
+        Pattern pattern = Pattern.compile("fn #(\\w+)\\(\\)\\s*\\{([^{}]+)}", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(input);
+
+        // Buscar y mapear las funciones y su contenido
+        while (matcher.find()) {
+            String functionName = matcher.group(1);
+            String functionContent = matcher.group(2).trim();
+            functions.put(functionName, functionContent);
+        }
+
+        return functions;
+    }
+
+    public static String replaceFunctionCalls(String input, Map<String, String> functions) {
+        // Reemplazar llamadas a funciones por su contenido
+        for (Map.Entry<String, String> entry : functions.entrySet()) {
+            String functionName = entry.getKey();
+            String functionContent = entry.getValue();
+
+            String functionCallRegex = functionName + "\\(\\)\\s*\\{([^{}]+)}";
+            Pattern pattern = Pattern.compile(functionCallRegex, Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(input);
+
+            while (matcher.find()) {
+                String matchedFunction = matcher.group(0);
+                input = input.replace(matchedFunction, functionContent);
+            }
+        }
+
+        return input;
+    }
+
+    //--------------------------------------------------------------------------
+    // IF's optimizados
+    public static String optimizadorDeClave(String entrada) {
+        // Expresión regular para encontrar bloques de código que coincidan con el patrón
+        Pattern pattern = Pattern.compile("clave\\((?!G\\^2\\))[^)]+\\)\\s*\\{[^{}]+}", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(entrada);
+
+        // Eliminar los bloques de código que coincidan con el patrón
+        return matcher.replaceAll("");
+    }
+
+    //--------------------------------------------------------------------------
     private static void generarDiccionarioNotasClave() {
         diccionarioNotasClave.put("A", "A3");
         diccionarioNotasClave.put("B", "B3");

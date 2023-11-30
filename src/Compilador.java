@@ -2,6 +2,7 @@
 import Analisis.ErroresSintacticos;
 import Analisis.TablaSimbolos;
 import Analisis.CodigoIntermedio;
+import Analisis.IntermedioOptimizado;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import compilerTools.Directory;
 import javax.swing.UIManager;
@@ -12,6 +13,7 @@ import compilerTools.Grammar;
 import compilerTools.Production;
 import compilerTools.TextColor;
 import compilerTools.Token;
+//import static generadorIntermedio.optimizadorDeClave;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -60,6 +62,7 @@ public class Compilador extends javax.swing.JFrame {
     // Variables para el analisis sintactico
     private ArrayList<Production> identProd;
     private HashMap<String, String> identificadores;
+    private Map<String, String> reemplazoFunciones;
 
     // Codigo compilado
     private boolean codeHasBeenCompiled = true;
@@ -70,6 +73,7 @@ public class Compilador extends javax.swing.JFrame {
     // Variables codigo intermedio
     private generadorIntermedio codIntermedio;
     private String codigoIntermedioSinOptimizar;
+    private String codigoIntermedioOptimizado;
     private codObjetoPiano funcionesPiano;
     private codObjetoBuzzer buzzerCod;
 
@@ -78,11 +82,14 @@ public class Compilador extends javax.swing.JFrame {
     private String funcionesxd = "";
     private String nombreArchivo = "";
     private int TEMPO_BUZZER = 0;
+    private int TEMPO_PIANO = 0;
 
     // Variables mostrar resultado de los analisis
     private TablaSimbolos TablaDSimbolos;
     private ErroresSintacticos ErroresSintac;
     private CodigoIntermedio mostrarCodigoIntermedio;
+    private IntermedioOptimizado mostarIntermedioOptimizado;
+    private subirCodigoArduino subirCodArduino;
 
     /**
      * Creates new form Compilador
@@ -100,9 +107,9 @@ public class Compilador extends javax.swing.JFrame {
         // Acultar los analizadores
         btnAnalizadores.setVisible(false);
         btnGramaticas.setVisible(false);
-        btnArbolesSemanticos.setVisible(false);
+        btnIntermedioOptimizado.setVisible(false);
         btnIntermedio.setVisible(false);
-        btnAutomatas.setVisible(false);
+        btnSubirArduino.setVisible(false);
         btnTablaSimbolos.setVisible(false);
 
         // Mostrar tabla de simbolos
@@ -152,6 +159,9 @@ public class Compilador extends javax.swing.JFrame {
         mostrarCodigoIntermedio = new CodigoIntermedio();
         funcionesPiano = new codObjetoPiano();
         buzzerCod = new codObjetoBuzzer();
+        mostarIntermedioOptimizado = new IntermedioOptimizado();
+        subirCodArduino = new subirCodigoArduino();
+        reemplazoFunciones = new HashMap<>();
 
         //Autocompletado de codigo
         Functions.setAutocompleterJTextComponent(new String[]{/*UTILIZAR AL FINAL*/}, jtpCode, () -> {
@@ -178,9 +188,9 @@ public class Compilador extends javax.swing.JFrame {
         btnAnalizadores = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         btnIntermedio = new javax.swing.JButton();
-        btnArbolesSemanticos = new javax.swing.JButton();
+        btnIntermedioOptimizado = new javax.swing.JButton();
         btnGramaticas = new javax.swing.JButton();
-        btnAutomatas = new javax.swing.JButton();
+        btnSubirArduino = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblErrores = new javax.swing.JTable();
 
@@ -244,7 +254,7 @@ public class Compilador extends javax.swing.JFrame {
                 btnTablaSimbolosActionPerformed(evt);
             }
         });
-        jPanel1.add(btnTablaSimbolos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 80, 210, 80));
+        jPanel1.add(btnTablaSimbolos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 10, 210, 80));
 
         btnCompilar.setBackground(new java.awt.Color(204, 255, 204));
         btnCompilar.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
@@ -334,18 +344,17 @@ public class Compilador extends javax.swing.JFrame {
         });
         jPanel1.add(btnIntermedio, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 160, 210, 80));
 
-        btnArbolesSemanticos.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnArbolesSemanticos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/arbol.png"))); // NOI18N
-        btnArbolesSemanticos.setText("Arbol semantico");
-        btnArbolesSemanticos.setToolTipText("");
-        btnArbolesSemanticos.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnArbolesSemanticos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnArbolesSemanticos.addActionListener(new java.awt.event.ActionListener() {
+        btnIntermedioOptimizado.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
+        btnIntermedioOptimizado.setText("Intermedio optimizado");
+        btnIntermedioOptimizado.setToolTipText("");
+        btnIntermedioOptimizado.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        btnIntermedioOptimizado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnIntermedioOptimizado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnArbolesSemanticosActionPerformed(evt);
+                btnIntermedioOptimizadoActionPerformed(evt);
             }
         });
-        jPanel1.add(btnArbolesSemanticos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 320, 210, 90));
+        jPanel1.add(btnIntermedioOptimizado, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 90));
 
         btnGramaticas.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
         btnGramaticas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/GooglePlus_G_icon-icons.com_49945 (1).png"))); // NOI18N
@@ -358,20 +367,19 @@ public class Compilador extends javax.swing.JFrame {
                 btnGramaticasActionPerformed(evt);
             }
         });
-        jPanel1.add(btnGramaticas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 10, 210, 70));
+        jPanel1.add(btnGramaticas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 90, 210, 70));
 
-        btnAutomatas.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
-        btnAutomatas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/iconos/300px-simple_cycle_graphsvg (1).png"))); // NOI18N
-        btnAutomatas.setText("AFND");
-        btnAutomatas.setToolTipText("");
-        btnAutomatas.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
-        btnAutomatas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnAutomatas.addActionListener(new java.awt.event.ActionListener() {
+        btnSubirArduino.setFont(new java.awt.Font("Open Sans Semibold", 1, 15)); // NOI18N
+        btnSubirArduino.setText("Subir código");
+        btnSubirArduino.setToolTipText("");
+        btnSubirArduino.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(52, 73, 94), 2, true));
+        btnSubirArduino.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnSubirArduino.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAutomatasActionPerformed(evt);
+                btnSubirArduinoActionPerformed(evt);
             }
         });
-        jPanel1.add(btnAutomatas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 240, 210, 80));
+        jPanel1.add(btnSubirArduino, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 330, 210, 80));
 
         tblErrores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -409,17 +417,17 @@ public class Compilador extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAutomatasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAutomatasActionPerformed
-        System.out.println("Soy el botoncito de los automatitas 8D");
-    }//GEN-LAST:event_btnAutomatasActionPerformed
+    private void btnSubirArduinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubirArduinoActionPerformed
+        subirCodArduino.setVisible(true);
+    }//GEN-LAST:event_btnSubirArduinoActionPerformed
 
     private void btnGramaticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGramaticasActionPerformed
         ErroresSintac.setVisible(true);
     }//GEN-LAST:event_btnGramaticasActionPerformed
 
-    private void btnArbolesSemanticosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArbolesSemanticosActionPerformed
-        System.out.println("Soy el botoncito de los arbolitos semanticos :P");
-    }//GEN-LAST:event_btnArbolesSemanticosActionPerformed
+    private void btnIntermedioOptimizadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIntermedioOptimizadoActionPerformed
+        mostarIntermedioOptimizado.setVisible(true);
+    }//GEN-LAST:event_btnIntermedioOptimizadoActionPerformed
 
     private void btnIntermedioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIntermedioActionPerformed
         mostrarCodigoIntermedio.setVisible(true);
@@ -428,8 +436,8 @@ public class Compilador extends javax.swing.JFrame {
     private void btnAnalizadoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalizadoresActionPerformed
         btnGramaticas.setVisible(true);
         btnIntermedio.setVisible(true);
-        //btnArbolesSintactico.setVisible(true);
-        //btnAutomatas.setVisible(true);
+        btnIntermedioOptimizado.setVisible(true);
+        btnSubirArduino.setVisible(true);
         btnTablaSimbolos.setVisible(true);
     }//GEN-LAST:event_btnAnalizadoresActionPerformed
 
@@ -453,15 +461,17 @@ public class Compilador extends javax.swing.JFrame {
         } else {
             // Inicializar el codigo intermedio
             codigoIntermedioSinOptimizar = "";
+            codigoIntermedioOptimizado = "";
 
             // Compilar el proyecto
             compilar();
             intermedio();
             nombreArchivo = this.getTitle().substring(0, this.getTitle().length() - 4);
             buzzerCod.generateCodigoBuzzer(notasxd, nombreArchivo, TEMPO_BUZZER);
-            funcionesPiano.generateCodigoPiano(funcionesxd, nombreArchivo, "");
+            funcionesPiano.generateCodigoPiano(funcionesxd, nombreArchivo, "", TEMPO_PIANO);
 
             mostrarCodigoIntermedio.getTxtIntermedio().setText(codigoIntermedioSinOptimizar);
+            mostarIntermedioOptimizado.getTxtIntermedioOptimizado().setText(codigoIntermedioOptimizado);
         }
 
         // Mostrar los "analisis" realizados
@@ -493,8 +503,12 @@ public class Compilador extends javax.swing.JFrame {
     public void intermedio() {
         // Primera evaluacion -Encontrar variables y tempo-
         String codLimpio = jtpCode.getText().replace(";", "");
-        String[] codIntermdioAmedias = codLimpio.split("\n");
+        String codigoLimpioOptimizar = jtpCode.getText().replace(";", "");;
 
+        String[] codIntermdioAmedias = codLimpio.split("\n");
+        String[] codIntermedioOP = codigoLimpioOptimizar.split("\n");
+
+        // Codigo intermedio
         for (String linea : codIntermdioAmedias) {
             // Agregar variables al mapa
             if (linea.contains("var")) {
@@ -508,12 +522,36 @@ public class Compilador extends javax.swing.JFrame {
             }
         }
 
+        //Codigo intermedio optimzado
+        for (String linea : codIntermedioOP) {
+            // Agregar variables al mapa
+            if (linea.contains("var")) {
+                codIntermedio.agregarVariablesAlMapa(linea, identificadores);
+            }
+
+            // Generar codigo intermedio del tempos
+            if (linea.startsWith("tempo")) {
+                codigoIntermedioOptimizado += "(t2, =, , " + codIntermedio.codigoBuzzerTempo(linea) + ")\n";
+                TEMPO_PIANO = codIntermedio.obtenerValorOriginal(linea);
+            }
+        }
+
+        // ELIMINAR CLAVES FALSAS------------------------------------------------
+        codigoLimpioOptimizar = codIntermedio.optimizadorDeClave(codigoLimpioOptimizar);
+        codIntermedioOP = codigoLimpioOptimizar.split("\n");
+        //----------------------------------------------------------------------
+
         // Limpiar variables
         codLimpio = codIntermedio.eliminarLineasVar(codIntermdioAmedias);
+        //  OPTIMIZADO
+        codigoLimpioOptimizar = codIntermedio.eliminarLineasVar(codIntermedioOP);
 
         // Agregar if's intemedios
         codLimpio = codIntermedio.remplazarIF(codLimpio);
         codIntermdioAmedias = codLimpio.split("\n");
+        //  OPTIMIZADO
+        codigoLimpioOptimizar = codIntermedio.remplazarIF(codigoLimpioOptimizar);
+        codIntermedioOP = codigoLimpioOptimizar.split("\n");
 
         // Reemplazar variables        
         int i = 0;
@@ -525,6 +563,19 @@ public class Compilador extends javax.swing.JFrame {
                     linea = linea.replace("$", "");
                 }
                 codIntermdioAmedias[i - 1] = linea;
+            }
+        }
+
+        // Reemplazar variables OPTIMIZADO
+        i = 0;
+        for (String linea : codIntermedioOP) {
+            i++;
+            if (codIntermedio.cadenaPerteneceAlMapa(linea, identificadores)) {
+                linea = codIntermedio.reemplazarVariables(linea, identificadores);
+                if (linea.contains("$")) {
+                    linea = linea.replace("$", "");
+                }
+                codIntermedioOP[i - 1] = linea;
             }
         }
 
@@ -583,9 +634,79 @@ public class Compilador extends javax.swing.JFrame {
             }
         }
 
+        // Analisis completo OPTIMIZADO
+        i = 0;
+        for (String linea : codIntermedioOP) {
+            i++;
+            // Agregar etiquetas a funciones
+            if (linea.contains("fn #")) {
+                String salto = codIntermedio.renombrarFuncion(linea);
+                if (salto.contains(" ")) {
+                    salto = salto.replace(" ", "");
+                }
+                if (salto.contains("\t")) {
+                    salto = salto.replace("\t", "");
+                }
+                codigoIntermedioOptimizado += "\n" + salto + "\n";
+                continue;
+            }
+
+            // Agregra saltos a condicionales
+            if (linea.contains("TRUE") || linea.contains("L")) {
+                if (linea.contains("\t")) {
+                    linea = linea.replace("\t", "");
+                }
+                codigoIntermedioOptimizado += "\n" + linea + "\n";
+            }
+
+            // Agregrar saltos a repeticiones
+            if (linea.contains("rep")) {
+                codigoIntermedioOptimizado += codIntermedio.repsIf(linea) + "\n";
+            }
+
+            // Reemplazar compases buzzer
+            if (linea.contains("[") && linea.contains("]")) {
+                codigoIntermedioOptimizado += codIntermedio.codigoIntermedioNotas(linea) + "\n";
+            }
+
+            // Generar funciones del piano
+            if (linea.contains(".P-")) {
+                //funcionesxd += funcionesPiano.generarFuncionesPiano(linea);
+            }
+
+            // Crear saltos a funciones
+            if (linea.contains("#")) {
+                String llamado = codIntermedio.llamarFuncion(linea);
+                llamado = llamado.substring(0, llamado.length() - 2);
+                if (llamado.contains(" ")) {
+                    llamado = llamado.replace(" ", "");
+                }
+                if (llamado.contains("\t")) {
+                    llamado = llamado.replace("\t", "");
+                }
+                llamado = llamado.replace("#", "jmp ");
+                codigoIntermedioOptimizado += llamado + "\n";
+            }
+        }
+
         // Limpiar repeticiones para generar notas completas de ciclos
         codLimpio = funcionesPiano.procesarRepeticiones(codLimpio);
+        codLimpio.replace("\t", "");
+
+        // Limpiar repeticiones para generar notas completas de ciclos OPTIMIZADO
+        codigoLimpioOptimizar = funcionesPiano.procesarRepeticiones(codigoLimpioOptimizar);
+        codigoLimpioOptimizar.replace("\t", "");
+
+        // Reemplazar funciones en el codigo
+//        System.out.println("CODIGO LIMPIO ULTIMA REVICION: \n" + codLimpio);
+//
+//        reemplazoFunciones = codIntermedio.extractFunctions(codLimpio);
+//        System.out.println("CODIGO LIMPIO DESPUES COSA 1 VARIABLES:\n" + codLimpio);
+//
+//        codLimpio = codIntermedio.replaceFunctionCalls(codLimpio, reemplazoFunciones);
+//        System.out.println("CODIGO LIMPIO DESPUES COSA 2 VARIABLES:\n" + codLimpio);
         codIntermdioAmedias = codLimpio.split("\n");
+        codIntermedioOP = codigoLimpioOptimizar.split("\n");
 
         // Reemplazar variables otra vez xd
         i = 0;
@@ -600,17 +721,29 @@ public class Compilador extends javax.swing.JFrame {
             }
         }
 
-        for (String linea : codIntermdioAmedias) {
+        // Reemplazar variables otra vez xd
+        i = 0;
+        for (String linea : codIntermedioOP) {
+            i++;
+            if (codIntermedio.cadenaPerteneceAlMapa(linea, identificadores)) {
+                linea = codIntermedio.reemplazarVariables(linea, identificadores);
+                if (linea.contains("$")) {
+                    linea = linea.replace("$", "");
+                }
+                codIntermedioOP[i - 1] = linea;
+            }
+        }
+
+        // Generar las notas para el piano y el speaker
+        for (String linea : codIntermedioOP) {
 
             // Reemplazar compases buzzer
             if (linea.contains("[") && linea.contains("]")) {
-                //codigoIntermedioSinOptimizar += codIntermedio.codigoIntermedioNotas(linea) + "\n";
+                if (linea.contains(".P-")) {
+                    funcionesxd += funcionesPiano.generarFuncionesPiano(linea);
+                    continue;
+                }
                 notasxd += codIntermedio.codigoIntermedioNotas(linea) + ",\n";
-            }
-
-            // Generar funciones del piano
-            if (linea.contains(".P-")) {
-                funcionesxd += funcionesPiano.generarFuncionesPiano(linea);
             }
         }
     }
@@ -1527,7 +1660,7 @@ public class Compilador extends javax.swing.JFrame {
 
         // Agregar relaciones al diccionario (número de error -> ruta de la imagen)
         //diccionarioErroresImagenes.put(1, "ruta/a/imagen1.jpg");
-        String base = "/home/kobayashi/Desktop/Semestre 7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/";
+        String base = "/home/kobayashi/Desktop/Semestre7/4-Automatas2/todoxd/Compilador-main/src/imagenes/ImgGramaticas/";
         diccionarioErroresImagenes.put(2, base + "ClaveIfExpresion.jpeg");
         diccionarioErroresImagenes.put(3, base + "ClaveIfExpresion.jpeg");
         diccionarioErroresImagenes.put(4, base + "ClaveIfExpresion.jpeg");
@@ -1707,14 +1840,14 @@ public class Compilador extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAbrir;
     private javax.swing.JButton btnAnalizadores;
-    private javax.swing.JButton btnArbolesSemanticos;
-    private javax.swing.JButton btnAutomatas;
     private javax.swing.JButton btnCompilar;
     private javax.swing.JButton btnGramaticas;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnGuardarC1;
     private javax.swing.JButton btnIntermedio;
+    private javax.swing.JButton btnIntermedioOptimizado;
     private javax.swing.JButton btnNuevo;
+    private javax.swing.JButton btnSubirArduino;
     private javax.swing.JButton btnTablaSimbolos;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
