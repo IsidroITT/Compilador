@@ -1,0 +1,45 @@
+compas = 3/4;
+tempo = 90;
+
+var $primer = [D4.n, A5.n, A5.n,];
+var $segundo = [C6.c, E5.c, C5.b,];
+var $tercer = [D4.c, F4.c, C5.b,];
+
+\inicio;
+	rep(4){
+		$primer;
+		$segundo;
+	};
+	rep(2){
+		[D4.c, F4.c, C5.b,];
+	};
+	[E5.n, F5.c, E5.n, F5.c,];
+	[E5.c, C5.c, B4.b,];
+	rep(2){
+		[B4.n, D4.n, F4.c, G4.c,];
+		[B4.b, B4.n,];
+	};
+	$tercer;
+	$tercer;
+\fin;
+
+var $primerPI = [D4.P-n, A5.P-n, A5.P-n,];
+var $segundoPI = [C6.P-c, E5.P-c, C5.P-b,];
+var $tercerPI = [D4.P-c, F4.P-c, C5.P-b,];
+piano{
+		rep(4){
+		$primerPI;
+		$segundoPI;
+	};
+	rep(2){
+		[D4.P-c, F4.P-c, C5.P-b,];
+	};
+	[E5.P-n, F5.P-c, E5.P-n, F5.P-c,];
+	[E5.P-c, C5.P-c, B4.P-b,];
+	rep(2){
+		[B4.P-n, D4.P-n, F4.P-c, G4.P-c,];
+		[B4.P-b, B4.P-n,];
+	};
+	$tercerPI;
+	$tercerPI;
+}

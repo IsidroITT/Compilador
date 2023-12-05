@@ -1,98 +1,15 @@
 compas = 4/4;
-tempo = 120;
+tempo = 114;
 
-var $primerBU = [E4.b, F4.n, F4.n,];
-var $segundoBU = [G4.n, F4.n, E4.n, D4.n,];
-var $tercerBU = [C4.n, C4.n, D4.n, E4.n,];
+var $FGGC = [F5.n, G5.c, G5.c, G5.n, C5.n,];
+var $GAACBA = [G5.n, G5.c, A5.c, A5.n, C6.s, B5.s, A5.c,];
+var $CCCDFF = [C5.b, C1.s, C5.s, C5.s, D5.s, F5.c, F5.c,];
 
 \inicio;
-	$primerBU;
-	$segundoBU;
-	$tercerBU;
-
-	// Clave para reproducir 4to y 5to compas
-	clave(G^2){
-		//Cuarto compas
-		[E.n, D.n, D.b,];
-		// El 1er y el 5to compas son el mismo
-		$primerBU;
-	};
-
-	// Clave falsa del 4to y 5to
-	clave(A^2){
-		[E.n, D.n, D.b,];
-		$primerBU;
-	};
-	// Sexto comaps
-	$segundoBU;
-	// Septimo compas
-	$tercerBU;
-
-	clave(G^2){
-		[E.n, D.n, D.b,];
-		// El 1er y el 5to compas son el mismo
-		$primerBU;
-	};
-
-	// Repetir el 8vo y 9no compas
 	rep(2){
-		// 8vo compas
-		[D4.n, C4.n, C4.b,];
-		// 9no compas
-		[D4.b, E4.n, C4.n,];
-	};
-	rep(2){
-		// 10mo y 11vo compas
-		[D4.n, E4.c, F4.c, E4.n, C4.n,];
-	};
-	// 12vo compas
-	[C4.n, D4.n, G4.b,];
+		$FGGC;
+		$GAACBA;
+		$FGGC;
+		$CCCDFF;
+	}
 \fin;
-
-var $primer = [E4.P-b, F4.P-n, F4.P-n,];
-var $segundo = [G4.P-n, F4.P-n, E4.P-n, D4.P-n,];
-var $tercer = [C4.P-n, C4.P-n, D4.P-n, E4.P-n,];
-
-piano{
-	$primer;
-	$segundo;
-	$tercer;
-
-	// Clave para reproducir 4to y 5to compas
-	clave(G^2){
-		//Cuarto compas
-		[E.P-n, D.P-n, D.P-b,];
-		// El 1er y el 5to compas son el mismo
-		$primer;
-	};
-
-	// Clave falsa del 4to y 5to
-	clave(A^2){
-		[E.P-n, D.P-n, D.P-b,];
-		$primer;
-	};
-	// Sexto comaps
-	$segundo;
-	// Septimo compas
-	$tercer;
-
-	clave(G^2){
-		[E.P-n, D.P-n, D.P-b,];
-		// El 1er y el 5to compas son el mismo
-		$primer;
-	};
-
-	// Repetir el 8vo y 9no compas
-	rep(2){
-		// 8vo compas
-		[D4.P-n, C4.P-n, C4.P-b,];
-		// 9no compas
-		[D4.P-b, E4.P-n, C4.P-n,];
-	};
-	rep(2){
-		// 10mo y 11vo compas
-		[D4.P-n, E4.P-c, F4.P-c, E4.P-n, C4.P-n,];
-	};
-	// 12vo compas
-	[C4.P-n, D4.P-n, G4.P-b,];
-};

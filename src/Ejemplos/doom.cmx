@@ -1,0 +1,24 @@
+compas = 4/4;
+tempo = 200;
+var $chido = [E2.c, E2.c, E3.c, E2.c, E2.c, D3.c, E2.c, E2.c,];
+var $linea2 = [C3.c, E2.c, E2.c, A2.c, E2.c, E2.c, B2.c, C3.c,];
+\inicio;
+//Primeros 4 compases
+	$chido;
+	$linea2;
+	$chido;
+	[C3.c, E2.c, E2.c, A2.b, A2.c,];
+
+// Segundos 4 compases
+\fin;
+
+// Lo mismo dearriba pero para el piano
+var $chidoPiano = [E3.P-c, E3.P-c, E4.P-c, E3.P-c, E3.P-c, D4.P-c, E3.P-c, E3.P-c,];
+var $linea2Piano = [C4.P-c, E3.P-c, E3.P-c, A3.P-c, E3.P-c, E3.P-c, B3.P-c, C4.P-c,];
+
+piano{
+	$chidoPiano;
+	$linea2Piano;
+	$chidoPiano;
+	[C4.P-c, E3.P-c, E3.P-c, A3.P-b, A3.P-c,];
+}
